@@ -6,25 +6,25 @@ import { RouterLink } from 'vue-router'
   <header>
     <div class="container">
       <div class="logo">
-        <RouterLink><img src="../icons/UniHub.png" alt="Logo UniHub" /></RouterLink>
+        <RouterLink to="/"><img src="../icons/UniHub.png" alt="Logo UniHub" /></RouterLink>
       </div>
 
       <nav>
         <ul>
-          <li><RouterLink>Home</RouterLink></li>
-          <li><RouterLink>Favoritos</RouterLink></li>
-          <li><RouterLink>Sobre Nós</RouterLink></li>
+          <li><RouterLink to="/">Home</RouterLink></li>
+          <li><RouterLink to="#">Favoritos</RouterLink></li>
+          <li><RouterLink to="#">Sobre Nós</RouterLink></li>
           <li>
-            <span class="nav-border"><RouterLink>Explore pelo Mapa!</RouterLink></span>
+            <span class="nav-border"><RouterLink to="#">Explore pelo Mapa!</RouterLink></span>
           </li>
         </ul>
       </nav>
 
       <div class="login">
         <ul>
-          <li><RouterLink>Entrar</RouterLink></li>
+          <li><RouterLink to="#">Entrar</RouterLink></li>
           <li>
-            <span class="login-border"><RouterLink>Criar Conta</RouterLink></span>
+            <span class="login-border"><RouterLink to="#">Criar Conta</RouterLink></span>
           </li>
         </ul>
       </div>
