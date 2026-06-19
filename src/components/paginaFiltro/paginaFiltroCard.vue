@@ -16,10 +16,9 @@ console.log(props.id)
 </script>
 
 <template>
-  teste1
   <div class="container">
     {{ props.id }}
-      <h2>{{ nome }}</h2>
+    <h2>{{ nome }}</h2>
       <p>{{  }}</p>
       <h3>{{  }}</h3>
       <!--
