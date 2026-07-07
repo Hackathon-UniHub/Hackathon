@@ -1,12 +1,48 @@
 <script setup>
+import { ref, computed } from 'vue'
 import paginaFiltroCard from './paginaFiltroCard.vue'
-import universidades from '@/data/universidades.js'
-console.log(universidades)
+import { getEstados, filtrar } from '@/utils/filtroUtils.js'
+
+const estadoAtivo = ref('')
+
+const pesquisa = ref('')
+
+const estados = getEstados()
+
+const universidades = computed(() => filtrar(estadoAtivo.value, pesquisa.value))
+
+function selecionarEstado(uf) {
+  if (estadoAtivo.value === uf) {
+    estadoAtivo.value = ''
+    pesquisa.value = ''
+  } else {
+    estadoAtivo.value = uf
+    pesquisa.value = ''
+  }
+}
 </script>
 
 <template>
-  <h1>Tudo que você precisa em um só lugar</h1>
-  <div class="lista-produtos">
+
+  <div>
+    <button
+      v-for="uf in estados"
+      :key="uf"
+      @click="selecionarEstado(uf)"
+    >
+      {{ uf }}
+    </button>
+  </div>
+
+  <div v-if="estadoAtivo">
+    <input
+      v-model="pesquisa"
+      type="text"
+      placeholder="Pesquise por universidades..."
+    />
+  </div>
+
+  <div v-if="estadoAtivo">
     <paginaFiltroCard
       v-for="universidade in universidades"
       :key="universidade.id"
@@ -22,5 +58,3 @@ console.log(universidades)
     />
   </div>
 </template>
-
-<style scoped></style>
