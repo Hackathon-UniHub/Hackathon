@@ -21,8 +21,35 @@
     <section class="uniMaisEscolhidas">
       <h2>Universidades mais escolhidas!</h2>
       <div class="universidades">
-        
+        <ul>
+          <li><button><img src="../components/icons/UFRJ.png" alt="UFRJ"></button></li>
+          <li><button><img src="../components/icons/UNICAMP.png" alt="UNICAMP"></button></li>
+          <li><button><img src="../components/icons/UFRGS.png" alt="UFRGS"></button></li>
+          <li><button><img src="../components/icons/USP.png" alt="USP"></button></li>
+          <li><button><img src="../components/icons/PUC_SP.png" alt="PUC-SP"></button></li>
+        </ul>
       </div>
+    </section>
+
+    <section class="estatisticas">
+      <ul>
+        <li class="unicadastrada">
+          <p>+206 Universidades cadastradas</p>
+          <img src="../components/icons/capelo.png" alt="Capelo">
+        </li>
+        <li class="certificado">
+          <p>+150 Alunos orientados</p>
+          <img src="../components/icons/verificacao.png" alt="Certificados">
+        </li>
+        <li class="estado">
+          <p>26 Estados</p>
+          <img src="../components/icons/mapa-brasil.png" alt="mapa do Brasil">
+        </li>
+        <li class="avaliacao">
+          <p>8.5/10 Avaliações</p>
+          <img src="../components/icons/estrela.png" alt="Avaliações">
+        </li>
+      </ul>
     </section>
   </main>
 </template>
@@ -254,4 +281,80 @@ main {
   display: block;
 }
 
+
+
+
+section.uniMaisEscolhidas {
+  padding: 4vw 8vw;
+}
+
+.uniMaisEscolhidas h2 {
+  font-size: 2.5rem;
+  text-align: center;
+  margin-bottom: 2vw;
+  font-weight: bold;
+  color: #6b0f1a;
+}
+
+.uniMaisEscolhidas button {
+  background-color: transparent;
+  border: none;
+  cursor: pointer;
+}
+
+.uniMaisEscolhidas img {
+
+  transition: transform 0.2s ease;
+}
+
+.uniMaisEscolhidas img:hover{
+  transform: translateX(5px);
+}
+
+.uniMaisEscolhidas ul {
+  display: flex;
+  justify-content: center;
+  gap: 2vw;
+  flex-wrap: wrap;
+}
+
+
+
+section.estatisticas {
+  background-color: #FFEECF;
+  padding: 4vw 8vw;
+}
+
+.estatisticas ul {
+  display: flex;
+  justify-content: center; /* Centraliza o bloco inteiro de itens */
+  flex-wrap: wrap;
+  gap: 10vw; /* Dá um respiro legal entre os itens */
+  align-items: flex-start; /* Alinha todos pelo topo do texto */
+}
+
+.estatisticas li {
+  display: flex;
+  flex-direction: column; /* Coloca o texto em cima e a imagem embaixo */
+  align-items: center; /* Centraliza tudo horizontalmente no item */
+  text-align: center; /* Garante que o texto fique centralizado nas quebras de linha */
+  max-width: 200px; /* Limita a largura para o texto quebrar igual ao protótipo */
+}
+
+.estatisticas p {
+  font-size: 1.2rem;
+  font-weight: bold;
+  color: #6b0f1a;
+  line-height: 1.3;
+  margin-bottom: 1.5rem; /* Espaço entre o texto e a imagem */
+  min-height: 3.2rem; /* <-- ADICIONADO: Garante que o texto sempre tenha o espaço de 2 linhas */
+}
+
+.estatisticas li img {
+  object-fit: contain;
+}
+
+.estatisticas .certificado img {
+  transform: translateY(-20px); /* Move o broche para cima sem alterar o tamanho */
+}
 </style>
