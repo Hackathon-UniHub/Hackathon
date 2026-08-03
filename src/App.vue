@@ -1,15 +1,28 @@
 <script setup>
-import AppFooter from './components/layout/AppFooter.vue'
-import AppHeader from './components/layout/AppHeader.vue'
-import { RouterView } from 'vue-router' // Importe o RouterView aqui
+import { useAuthStore } from '@/stores/auth'
+
+const authStore = useAuthStore()
 </script>
 
 <template>
-  <AppHeader />
-  <main>
-    <RouterView />
-  </main>
-  <AppFooter />
+  <div id="app">
+    <router-view v-if="!authStore.loading" />
+    <div v-else class="loading">Carregando...</div>
+  </div>
 </template>
 
-<style scoped></style>
+<style>
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: system-ui, sans-serif;
+}
+
+.loading {
+  text-align: center;
+  margin-top: 100px;
+}
+</style>
