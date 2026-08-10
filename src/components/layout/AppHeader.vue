@@ -175,14 +175,21 @@ header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 1px 2vw;
+  padding: 0.1rem 2vw;
+}
+
+.logo img {
+  height: 72px;
+  width: auto;
 }
 
 nav ul li > a,
 .login ul li > a {
   display: inline-block;
   color: #000000;
-  transition: transform 0.2s ease, opacity 0.2s ease;
+  transition:
+    transform 0.2s ease,
+    opacity 0.2s ease;
 }
 
 nav ul li > a:hover,
@@ -222,7 +229,7 @@ nav ul li {
 .nav-border,
 .login-border {
   background-color: #e4c97d;
-  padding: 5px 1vw;
+  padding: 2px 1vw;
   border-radius: 10px;
   display: inline-block;
   transition: all 0.2s ease-in-out;
@@ -247,5 +254,4 @@ a:hover {
   transition: font-weight 0.1s;
   cursor: pointer;
 }
-
 </style>
