@@ -77,7 +77,7 @@ function selecionarEstado(uf) {
       <div class="filtroEstado">
         <span class="subtitulo">FILTRAR POR ESTADO</span>
         <div class="botoesEstados">
-          <button
+          <button class="botao"
             v-for="uf in estados"
             :key="uf"
             :class="{ ativo: estadoAtivo === uf }"
@@ -110,6 +110,19 @@ function selecionarEstado(uf) {
 </template>
 
 <style scoped>
+
+
+
+
+
+
+
+
+
+
+
+
+
 .pesquisa {
   background-color: #651c1f;
   color: #ffffff;
@@ -194,7 +207,7 @@ function selecionarEstado(uf) {
 .paginaFiltro {
   min-height: 100vh;
   width: 100%;
-  background-color: #dfd89f;
+  background-color: #fffcf7;
   padding: 3rem 1.5rem;
 }
 
