@@ -1,25 +1,51 @@
+<script setup>
+import { HugeiconsIcon } from '@hugeicons/vue'
+import { InstagramIcon, Facebook01Icon, NewTwitterIcon } from '@hugeicons/core-free-icons'
+</script>
+
 <template>
-  <footer class="site-footer">
-    <div class="container footer-content">
-      <div class="brand-block">
-        <div class="brand-row">
-          <img src="../../assets/logo.svg" alt="UniHub" class="brand-logo" />
+  <footer class="rodape">
+    <div class="container rodape-conteudo">
+      <div class="bloco-marca">
+        <div class="linha-marca">
+          <img src="../../assets/logo.svg" alt="UniHub" class="logo-marca" />
         </div>
 
-        <p class="brand-copy">
+        <p class="texto-marca">
           Encontre a universidade ideal para o seu futuro. Compare instituições, explore no mapa e
           tome decisões com confiança.
         </p>
 
-        <div class="socials" aria-label="Redes sociais">
-          <a href="#" aria-label="Instagram">◎</a>
-          <a href="#" aria-label="Facebook">f</a>
-          <a href="#" aria-label="X">x</a>
+        <div class="redes-sociais" aria-label="Redes sociais">
+          <a href="#" aria-label="Instagram">
+            <HugeiconsIcon
+              :icon="InstagramIcon"
+              :size="20"
+              color="currentColor"
+              :stroke-width="1.8"
+            />
+          </a>
+          <a href="#" aria-label="Facebook">
+            <HugeiconsIcon
+              :icon="Facebook01Icon"
+              :size="20"
+              color="currentColor"
+              :stroke-width="1.8"
+            />
+          </a>
+          <a href="#" aria-label="X">
+            <HugeiconsIcon
+              :icon="NewTwitterIcon"
+              :size="20"
+              color="currentColor"
+              :stroke-width="1.8"
+            />
+          </a>
         </div>
       </div>
 
-      <div class="footer-links">
-        <div class="link-group">
+      <div class="links-rodape">
+        <div class="grupo-links">
           <h4>Produto</h4>
           <ul>
             <li><a href="#">Mapa interativo</a></li>
@@ -28,7 +54,7 @@
           </ul>
         </div>
 
-        <div class="link-group">
+        <div class="grupo-links">
           <h4>Conta</h4>
           <ul>
             <li><a href="#">Entrar</a></li>
@@ -36,7 +62,7 @@
           </ul>
         </div>
 
-        <div class="link-group">
+        <div class="grupo-links">
           <h4>Contato</h4>
           <ul>
             <li><a href="mailto:contato@unihub.com.br">contato@unihub.com.br</a></li>
@@ -47,9 +73,9 @@
       </div>
     </div>
 
-    <div class="container footer-bottom">
+    <div class="container rodape-inferior">
       <span>© 2026 UniHub. Todos os direitos reservados.</span>
-      <div class="bottom-links">
+      <div class="links-inferiores">
         <a href="#">Privacidade</a>
         <a href="#">Termos</a>
       </div>
@@ -58,13 +84,13 @@
 </template>
 
 <style scoped>
-.site-footer {
+.rodape {
   background: var(--ink-950);
   color: var(--white);
   padding-top: 64px;
 }
 
-.footer-content {
+.rodape-conteudo {
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
@@ -72,37 +98,37 @@
   padding-bottom: 36px;
 }
 
-.brand-block {
+.bloco-marca {
   max-width: 360px;
   flex: 1;
 }
 
-.brand-row {
+.linha-marca {
   display: inline-flex;
   align-items: center;
   margin-bottom: 18px;
 }
 
-.brand-logo {
+.logo-marca {
   display: block;
   width: 124px;
   height: auto;
   filter: brightness(0) invert(1);
 }
 
-.brand-copy {
+.texto-marca {
   color: rgba(255, 255, 255, 0.82);
   font-size: 0.96rem;
   line-height: 1.7;
   margin-bottom: 22px;
 }
 
-.socials {
+.redes-sociais {
   display: flex;
   gap: 10px;
 }
 
-.socials a {
+.redes-sociais a {
   width: 38px;
   height: 38px;
   border-radius: 50%;
@@ -120,19 +146,19 @@
     background 0.2s ease;
 }
 
-.socials a:hover {
+.redes-sociais a:hover {
   transform: translateY(-1px);
   background: rgba(255, 255, 255, 0.1);
 }
 
-.footer-links {
+.links-rodape {
   display: grid;
   grid-template-columns: repeat(3, minmax(170px, 1fr));
   gap: 36px;
   flex: 1.2;
 }
 
-.link-group h4 {
+.grupo-links h4 {
   margin-bottom: 16px;
   color: rgba(255, 255, 255, 0.86);
   font-size: 0.8rem;
@@ -141,23 +167,23 @@
   text-transform: uppercase;
 }
 
-.link-group ul {
+.grupo-links ul {
   list-style: none;
   display: grid;
   gap: 10px;
 }
 
-.link-group li a {
+.grupo-links li a {
   color: rgba(255, 255, 255, 0.7);
   font-size: 0.96rem;
   transition: color 0.2s ease;
 }
 
-.link-group li a:hover {
+.grupo-links li a:hover {
   color: var(--white);
 }
 
-.footer-bottom {
+.rodape-inferior {
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -167,42 +193,42 @@
   font-size: 0.9rem;
 }
 
-.bottom-links {
+.links-inferiores {
   display: inline-flex;
   align-items: center;
   gap: 18px;
 }
 
-.bottom-links a {
+.links-inferiores a {
   color: rgba(255, 255, 255, 0.7);
 }
 
-.bottom-links a:hover {
+.links-inferiores a:hover {
   color: var(--white);
 }
 
 @media (max-width: 900px) {
-  .footer-content {
+  .rodape-conteudo {
     flex-direction: column;
     gap: 28px;
   }
 
-  .footer-links {
+  .links-rodape {
     width: 100%;
   }
 }
 
 @media (max-width: 640px) {
-  .site-footer {
+  .rodape {
     padding-top: 44px;
   }
 
-  .footer-links {
+  .links-rodape {
     grid-template-columns: 1fr;
     gap: 22px;
   }
 
-  .footer-bottom {
+  .rodape-inferior {
     flex-direction: column;
     gap: 12px;
     align-items: flex-start;

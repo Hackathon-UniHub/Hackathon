@@ -13,6 +13,8 @@
     "format": "prettier --write --experimental-cli src/"
   },
   "dependencies": {
+    "@hugeicons/core-free-icons": "^4.2.3",
+    "@hugeicons/vue": "^1.0.7",
     "vue": "^3.5.32",
     "vue-router": "^5.0.4"
   },

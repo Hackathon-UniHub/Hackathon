@@ -1,10 +1,8 @@
 <template>
-  <main class="page-shell">
-    <section class="hero-section">
-      <div class="container hero-layout">
-        <div class="hero-copy">
-          <div class="mini-badge">Atualizado agora</div>
-
+  <main class="pagina">
+    <section class="secao-principal">
+      <div class="container layout-principal">
+        <div class="texto-principal">
           <h1>
             Encontre a sua
             <span>universidade ideal</span>
@@ -13,43 +11,43 @@
 
           <p>Compare instituições, explore no mapa e tome decisões com confiança.</p>
 
-          <div class="hero-actions">
-            <a href="#" class="btn btn-primary">Começar agora</a>
-            <a href="#" class="btn btn-secondary">Ver mapa interativo</a>
+          <div class="acoes-principal">
+            <a href="#" class="botao botao-primario">Começar agora</a>
+            <a href="#" class="botao botao-secundario">Ver mapa interativo</a>
           </div>
 
-          <div class="stats-grid">
-            <article class="stat-card">
+          <div class="grade-estatisticas">
+            <article class="cartao-estatistica">
               <strong>200+</strong>
               <span>Universidades</span>
             </article>
-            <article class="stat-card">
+            <article class="cartao-estatistica">
               <strong>5 mil</strong>
               <span>Estudantes</span>
             </article>
-            <article class="stat-card">
+            <article class="cartao-estatistica">
               <strong>48k</strong>
               <span>Comentários</span>
             </article>
-            <article class="stat-card">
+            <article class="cartao-estatistica">
               <strong>4.9</strong>
               <span>Ranking</span>
             </article>
           </div>
         </div>
 
-        <div class="hero-visual">
-          <div class="photo-card">
-            <div class="photo-header">
-              <span class="tiny-tag">#1</span>
-              <span class="tiny-tag muted">Working</span>
+        <div class="visual-principal">
+          <div class="cartao-foto">
+            <div class="cabecalho-foto">
+              <span class="etiqueta-pequena">#1</span>
+              <span class="etiqueta-pequena etiqueta-pequena-muted">Working</span>
             </div>
 
-            <div class="portrait">
-              <div class="portrait-placeholder"></div>
+            <div class="retrato">
+              <div class="placeholder-retrato"></div>
             </div>
 
-            <div class="photo-caption">
+            <div class="legenda-foto">
               <strong>Hannah</strong>
               <p>“Selecionei a melhor opção para mudar minha vida acadêmica.”</p>
             </div>
@@ -58,138 +56,60 @@
       </div>
     </section>
 
-    <section class="universities-section">
+    <section class="secao-universidades">
       <div class="container">
-        <div class="section-header">
-          <span class="eyebrow">Universidades</span>
+        <div class="cabecalho-secao">
+          <span class="destaque">Universidades</span>
           <h2>Universidades mais buscadas</h2>
           <a href="#">Ver todas</a>
         </div>
 
-        <div class="university-grid">
-          <article class="university-card">
-            <div class="card-top">
-              <span class="badge badge-primary">USP</span>
-              <span class="rating">4.9</span>
-            </div>
-            <h3>Universidade de São Paulo</h3>
-            <p>São Paulo, SP</p>
-            <div class="card-meta">
-              <span>Medicina</span>
-              <span>Ensino</span>
-            </div>
-          </article>
-
-          <article class="university-card">
-            <div class="card-top">
-              <span class="badge badge-blue">UNICAMP</span>
-              <span class="rating">4.8</span>
-            </div>
-            <h3>Universidade Estadual de Campinas</h3>
-            <p>Campinas, SP</p>
-            <div class="card-meta">
-              <span>Tecnologia</span>
-              <span>Pesquisa</span>
-            </div>
-          </article>
-
-          <article class="university-card">
-            <div class="card-top">
-              <span class="badge badge-green">UERJ</span>
-              <span class="rating">4.7</span>
-            </div>
-            <h3>Universidade do Estado do Rio de Janeiro</h3>
-            <p>Rio de Janeiro, RJ</p>
-            <div class="card-meta">
-              <span>Direito</span>
-              <span>Ciências</span>
-            </div>
-          </article>
-
-          <article class="university-card">
-            <div class="card-top">
-              <span class="badge badge-primary">UFRJ</span>
-              <span class="rating">4.7</span>
-            </div>
-            <h3>Universidade Federal do Rio de Janeiro</h3>
-            <p>Rio de Janeiro, RJ</p>
-            <div class="card-meta">
-              <span>Engenharia</span>
-              <span>Inovação</span>
-            </div>
-          </article>
-
-          <article class="university-card">
-            <div class="card-top">
-              <span class="badge badge-blue">UFMG</span>
-              <span class="rating">4.6</span>
-            </div>
-            <h3>Universidade Federal de Minas Gerais</h3>
-            <p>Belo Horizonte, MG</p>
-            <div class="card-meta">
-              <span>Áreas</span>
-              <span>Pesquisa</span>
-            </div>
-          </article>
-
-          <article class="university-card">
-            <div class="card-top">
-              <span class="badge badge-green">UFBA</span>
-              <span class="rating">4.6</span>
-            </div>
-            <h3>Universidade Federal da Bahia</h3>
-            <p>Salvador, BA</p>
-            <div class="card-meta">
-              <span>Saúde</span>
-              <span>Humanas</span>
-            </div>
-          </article>
-        </div>
+        <div class="grade-universidades"></div>
       </div>
     </section>
 
-    <section class="how-it-works">
-      <div class="container how-inner">
-        <span class="eyebrow light">Como funciona</span>
-        <h2>Como o UniHub funciona?</h2>
+    <section class="como-funciona">
+      <div class="container conteudo-como-funciona">
+        <span class="destaque destaque-claro">Como funciona</span>
+        <h2>Como o <span class="texto-destaque">UniHub</span> funciona?</h2>
         <p>Três passos simples para começar sua jornada acadêmica.</p>
 
-        <div class="steps-grid">
-          <article class="step-card">
-            <div class="step-number">01</div>
+        <div class="grade-passos">
+          <article class="cartao-passo">
+            <div class="numero-passo">01</div>
             <h3>Busque e filtre</h3>
             <p>Encontre universidades por curso, localização e avaliação.</p>
           </article>
 
-          <article class="step-card">
-            <div class="step-number">02</div>
+          <article class="cartao-passo">
+            <div class="numero-passo">02</div>
             <h3>Explore no mapa</h3>
             <p>Veja opções em cada região e compare melhor sua escolha.</p>
           </article>
 
-          <article class="step-card">
-            <div class="step-number">03</div>
+          <article class="cartao-passo">
+            <div class="numero-passo">03</div>
             <h3>Compare e decida</h3>
             <p>Analise ideias, critérios e tome sua decisão com segurança.</p>
           </article>
         </div>
 
-        <div class="cta-box">
-          <a href="#" class="btn btn-primary">Criar conta grátis</a>
+        <div class="caixa-acao">
+          <a href="#" class="botao botao-primario">Criar conta grátis</a>
         </div>
       </div>
     </section>
 
-    <section class="final-cta">
-      <div class="container final-cta-inner">
-        <div class="cta-copy">
+    <section class="chamada-final">
+      <div class="container conteudo-chamada-final">
+        <div class="texto-chamada">
           <h2>Pronto para encontrar a universidade ideal?</h2>
           <p>Junte-se a milhares de estudantes que já usam o UniHub para planejar o futuro.</p>
         </div>
 
-        <div class="cta-actions">
-          <a href="#" class="btn btn-secondary">Explorar universidades</a>
-          <a href="#" class="btn btn-primary">Abrir mapa</a>
+        <div class="acoes-chamada">
+          <a href="#" class="botao botao-secundario">Explorar universidades</a>
+          <a href="#" class="botao botao-primario">Abrir mapa</a>
         </div>
       </div>
     </section>
@@ -197,26 +117,26 @@
 </template>
 
 <style scoped>
-.page-shell {
+.pagina {
   background: var(--cream-50);
 }
 
-.hero-section {
+.secao-principal {
   padding: 52px 0 28px;
 }
 
-.hero-layout {
+.layout-principal {
   display: grid;
   grid-template-columns: 1.15fr 0.85fr;
   gap: 36px;
   align-items: center;
 }
 
-.hero-copy {
+.texto-principal {
   padding: 16px 0;
 }
 
-.mini-badge {
+.etiqueta-mini {
   display: inline-flex;
   align-items: center;
   gap: 8px;
@@ -230,7 +150,7 @@
   text-transform: uppercase;
 }
 
-.hero-copy h1 {
+.texto-principal h1 {
   margin-top: 20px;
   font-size: clamp(2.4rem, 4vw, 4rem);
   line-height: 1.02;
@@ -239,28 +159,29 @@
   max-width: 540px;
 }
 
-.hero-copy h1 span {
+.texto-principal h1 span {
   display: block;
   color: var(--brand-700);
   font-style: italic;
-  font-weight: 700;
+  font-weight: 400;
+  font-family: 'Georgia', 'Times New Roman', serif;
 }
 
-.hero-copy p {
+.texto-principal p {
   margin-top: 18px;
   max-width: 560px;
   color: var(--ink-700);
   font-size: 1.04rem;
 }
 
-.hero-actions {
+.acoes-principal {
   display: flex;
   flex-wrap: wrap;
   gap: 14px;
   margin-top: 28px;
 }
 
-.btn {
+.botao {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -274,23 +195,25 @@
   text-decoration: none;
 }
 
-.btn:hover {
+.botao:hover {
   transform: translateY(-1px);
 }
 
-.btn-primary {
+.botao-primario {
   background: linear-gradient(135deg, var(--brand-700), var(--brand-600));
   color: var(--white);
-  box-shadow: 0 12px 24px rgba(122, 15, 26, 0.14);
+  box-shadow: 0 12px 24px rgba(122, 15, 26, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.2);
 }
 
-.btn-secondary {
-  background: rgba(255, 255, 255, 0.4);
-  color: var(--ink-900);
-  border: 1px solid var(--color-border);
+.botao-secundario {
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--white);
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.15);
 }
 
-.stats-grid {
+.grade-estatisticas {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 18px;
@@ -298,7 +221,7 @@
   max-width: 620px;
 }
 
-.stat-card {
+.cartao-estatistica {
   background: rgba(255, 255, 255, 0.66);
   border: 1px solid rgba(28, 28, 34, 0.08);
   border-radius: 18px;
@@ -307,26 +230,26 @@
   box-shadow: 0 8px 20px rgba(28, 28, 34, 0.03);
 }
 
-.stat-card strong {
+.cartao-estatistica strong {
   display: block;
   color: var(--ink-900);
   font-size: 1.45rem;
   line-height: 1.2;
 }
 
-.stat-card span {
+.cartao-estatistica span {
   display: block;
   margin-top: 6px;
   color: var(--ink-600);
   font-size: 0.76rem;
 }
 
-.hero-visual {
+.visual-principal {
   display: flex;
   justify-content: center;
 }
 
-.photo-card {
+.cartao-foto {
   width: min(100%, 480px);
   background: linear-gradient(135deg, #f5efe9, #ede4dd);
   border: 1px solid rgba(28, 28, 34, 0.06);
@@ -335,14 +258,14 @@
   box-shadow: 0 18px 36px rgba(28, 28, 34, 0.08);
 }
 
-.photo-header {
+.cabecalho-foto {
   display: flex;
   justify-content: space-between;
   align-items: center;
   margin-bottom: 14px;
 }
 
-.tiny-tag {
+.etiqueta-pequena {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -354,19 +277,19 @@
   font-weight: 700;
 }
 
-.tiny-tag.muted {
+.etiqueta-pequena-muted {
   background: rgba(28, 28, 34, 0.06);
   color: var(--ink-700);
 }
 
-.portrait {
+.retrato {
   border-radius: 20px;
   overflow: hidden;
   background: linear-gradient(135deg, #e6d9d1, #d7dadd);
   min-height: 280px;
 }
 
-.portrait-placeholder {
+.placeholder-retrato {
   width: 100%;
   height: 100%;
   min-height: 280px;
@@ -376,7 +299,7 @@
   position: relative;
 }
 
-.portrait-placeholder::before {
+.placeholder-retrato::before {
   content: '';
   position: absolute;
   width: 140px;
@@ -389,7 +312,7 @@
   box-shadow: 0 18px 0 -10px rgba(255, 255, 255, 0.25);
 }
 
-.portrait-placeholder::after {
+.placeholder-retrato::after {
   content: '';
   position: absolute;
   left: 50%;
@@ -401,29 +324,29 @@
   background: linear-gradient(180deg, #1d1a22, #2f2a32);
 }
 
-.photo-caption {
+.legenda-foto {
   margin-top: 12px;
   display: flex;
   flex-direction: column;
   gap: 4px;
 }
 
-.photo-caption strong {
+.legenda-foto strong {
   color: var(--ink-900);
   font-size: 1rem;
 }
 
-.photo-caption p {
+.legenda-foto p {
   color: var(--ink-700);
   font-size: 0.82rem;
   line-height: 1.5;
 }
 
-.universities-section {
+.secao-universidades {
   padding: 36px 0 46px;
 }
 
-.section-header {
+.cabecalho-secao {
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -431,19 +354,19 @@
   margin-bottom: 24px;
 }
 
-.section-header h2 {
+.cabecalho-secao h2 {
   color: var(--ink-900);
   font-size: clamp(1.8rem, 2vw, 2.4rem);
   letter-spacing: -0.04em;
 }
 
-.section-header a {
+.cabecalho-secao a {
   color: var(--brand-700);
   font-weight: 700;
   text-decoration: none;
 }
 
-.eyebrow {
+.destaque {
   display: inline-flex;
   align-items: center;
   padding: 6px 10px;
@@ -456,13 +379,18 @@
   text-transform: uppercase;
 }
 
-.university-grid {
+.destaque-claro {
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--white);
+}
+
+.grade-universidades {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 20px;
 }
 
-.university-card {
+.cartao-universidade {
   background: rgba(255, 255, 255, 0.7);
   border: 1px solid rgba(28, 28, 34, 0.08);
   border-radius: 20px;
@@ -470,7 +398,7 @@
   box-shadow: 0 10px 30px rgba(28, 28, 34, 0.04);
 }
 
-.card-top {
+.topo-cartao {
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -478,7 +406,7 @@
   margin-bottom: 16px;
 }
 
-.badge {
+.marca {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -489,47 +417,47 @@
   letter-spacing: 0.04em;
 }
 
-.badge-primary {
+.marca-primaria {
   background: rgba(122, 15, 26, 0.1);
   color: var(--brand-700);
 }
 
-.badge-blue {
+.marca-azul {
   background: rgba(59, 130, 246, 0.12);
   color: #1d4ed8;
 }
 
-.badge-green {
+.marca-verde {
   background: rgba(34, 197, 94, 0.12);
   color: #15803d;
 }
 
-.rating {
+.avaliacao {
   color: var(--brand-700);
   font-weight: 800;
   font-size: 0.8rem;
 }
 
-.university-card h3 {
+.cartao-universidade h3 {
   color: var(--ink-900);
   font-size: 1.06rem;
   line-height: 1.4;
   margin-bottom: 8px;
 }
 
-.university-card p {
+.cartao-universidade p {
   color: var(--ink-600);
   font-size: 0.82rem;
   margin-bottom: 14px;
 }
 
-.card-meta {
+.meta-cartao {
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
 }
 
-.card-meta span {
+.meta-cartao span {
   display: inline-flex;
   align-items: center;
   padding: 5px 8px;
@@ -539,48 +467,50 @@
   font-size: 0.7rem;
 }
 
-.how-it-works {
-  background: var(--ink-950);
+.como-funciona {
+  background: linear-gradient(180deg, var(--ink-950) 0%, #1a1a22 100%);
   color: var(--white);
   padding: 54px 0 36px;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
 }
 
-.how-inner {
+.conteudo-como-funciona {
   text-align: center;
 }
 
-.eyebrow.light {
-  background: rgba(255, 255, 255, 0.08);
-  color: var(--white);
-}
-
-.how-it-works h2 {
+.como-funciona h2 {
   margin-top: 12px;
   font-size: clamp(2rem, 3vw, 2.8rem);
   letter-spacing: -0.04em;
 }
 
-.how-it-works p {
+.texto-destaque {
+  color: var(--brand-400);
+  font-weight: 700;
+}
+
+.como-funciona p {
   margin-top: 12px;
   color: rgba(255, 255, 255, 0.7);
 }
 
-.steps-grid {
+.grade-passos {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 22px;
   margin-top: 36px;
 }
 
-.step-card {
+.cartao-passo {
   border: 1px solid rgba(255, 255, 255, 0.08);
-  background: rgba(255, 255, 255, 0.03);
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.04), rgba(122, 15, 26, 0.05));
   border-radius: 20px;
   padding: 22px 18px;
   text-align: left;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
 }
 
-.step-number {
+.numero-passo {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -593,104 +523,108 @@
   margin-bottom: 16px;
 }
 
-.step-card h3 {
+.cartao-passo h3 {
   margin-bottom: 12px;
   color: var(--white);
   font-size: 1.1rem;
 }
 
-.step-card p {
+.cartao-passo p {
   margin: 0;
   color: rgba(255, 255, 255, 0.76);
   line-height: 1.6;
 }
 
-.cta-box {
+.caixa-acao {
   margin-top: 28px;
   display: flex;
   justify-content: center;
 }
 
-.final-cta {
-  padding: 42px 0 68px;
+.chamada-final {
+  padding: 60px 0 82px;
 }
 
-.final-cta-inner {
+.conteudo-chamada-final {
   display: flex;
   flex-direction: column;
-  gap: 20px;
-  padding: 38px 34px;
-  border-radius: 28px;
+  gap: 24px;
+  justify-content: center;
+  min-height: 260px;
+  padding: 46px 34px;
+  border-radius: 30px;
   background: linear-gradient(135deg, var(--brand-700), var(--brand-500));
   color: var(--white);
-  box-shadow: 0 18px 34px rgba(122, 15, 26, 0.12);
+  box-shadow:
+    0 20px 40px rgba(122, 15, 26, 0.14),
+    inset 0 1px 0 rgba(255, 255, 255, 0.18);
 }
 
-.cta-copy h2 {
+.texto-chamada h2 {
   font-size: clamp(2rem, 3vw, 3rem);
   line-height: 1.1;
   letter-spacing: -0.05em;
 }
 
-.cta-copy p {
+.texto-chamada p {
   margin-top: 12px;
   max-width: 620px;
   color: rgba(255, 255, 255, 0.85);
 }
 
-.cta-actions {
+.acoes-chamada {
   display: flex;
   flex-wrap: wrap;
   gap: 14px;
 }
 
-.cta-actions .btn-secondary {
+.acoes-chamada .botao-secundario {
   background: rgba(255, 255, 255, 0.12);
   border-color: rgba(255, 255, 255, 0.3);
   color: var(--white);
 }
 
 @media (max-width: 980px) {
-  .hero-layout,
-  .university-grid,
-  .steps-grid {
+  .layout-principal,
+  .grade-universidades,
+  .grade-passos {
     grid-template-columns: 1fr;
   }
 
-  .hero-layout {
+  .layout-principal {
     display: grid;
   }
 
-  .stats-grid {
+  .grade-estatisticas {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
 
 @media (max-width: 640px) {
-  .hero-section {
+  .secao-principal {
     padding-top: 30px;
   }
 
-  .hero-actions,
-  .cta-actions {
+  .acoes-principal,
+  .acoes-chamada {
     flex-direction: column;
     align-items: stretch;
   }
 
-  .btn {
+  .botao {
     width: 100%;
   }
 
-  .section-header {
+  .cabecalho-secao {
     align-items: flex-start;
     flex-direction: column;
   }
 
-  .stats-grid {
+  .grade-estatisticas {
     grid-template-columns: 1fr 1fr;
   }
 
-  .final-cta-inner {
+  .conteudo-chamada-final {
     padding: 24px 20px;
   }
 }
