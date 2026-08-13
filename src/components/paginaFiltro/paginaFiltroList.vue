@@ -62,67 +62,72 @@ function selecionarEstado(uf) {
 
 
     <div class="pesquisa">
-      <div class="cabecalhoPesquisa">
-        <span class="subtitulo">EXPLORAR</span>
-        <h2>Encontre sua <span>universidade ideal</span></h2>
-      </div>
-
-      <div class="input">
-        <input
-          v-model="pesquisa"
-          type="text"
-          placeholder="Pesquise por universidades..."
-        />
-      </div>
-      <div class="filtroEstado">
-        <span class="subtitulo">FILTRAR POR ESTADO</span>
-        <div class="botoesEstados">
-          <button class="botao"
-            v-for="uf in estados"
-            :key="uf"
-            :class="{ ativo: estadoAtivo === uf }"
-            @click="selecionarEstado(uf)"
-          >
-            {{ uf }}
-          </button>
+      <div class="barraPesquisa">
+        <div class="cabecalhoPesquisa">
+          <span class="subtitulo">EXPLORAR</span>
+          <h2>Encontre sua <span>universidade ideal</span></h2>
+        </div>
+        <div class="input">
+          <input
+            v-model="pesquisa"
+            type="text"
+            placeholder="Pesquise por universidades..."
+          />
         </div>
       </div>
     </div>
 
 
 
-    <div v-if="estadoAtivo">
-      <paginaFiltroCard
-        v-for="universidade in universidades"
-        :key="universidade.id"
-        :id="universidade.id"
-        :nome="universidade.nome"
-        :sigla="universidade.sigla"
-        :municipio="universidade.municipio"
-        :uf="universidade.uf"
-        :categoria="universidade.categoria_administrativa"
-        :situacao="universidade.situacao"
-        :site="universidade.site"
-        :rating="universidade.igc"
-      />
+    <div class="divisao">
+      <div class="lateralEstados">
+        <div class="pesquisa">
+          <div class="filtroEstado">
+            <span class="subtitulo">FILTRAR POR ESTADO</span>
+            <div class="botoesEstados">
+              <button class="botao"
+                v-for="uf in estados"
+                :key="uf"
+                :class="{ ativo: estadoAtivo === uf }"
+                @click="selecionarEstado(uf)"
+              >
+                {{ uf }}
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="cardsUniversidades">
+        <div v-if="estadoAtivo">
+          <paginaFiltroCard
+            v-for="universidade in universidades"
+            :key="universidade.id"
+            :id="universidade.id"
+            :nome="universidade.nome"
+            :sigla="universidade.sigla"
+            :municipio="universidade.municipio"
+            :uf="universidade.uf"
+            :categoria="universidade.categoria_administrativa"
+            :situacao="universidade.situacao"
+            :site="universidade.site"
+            :rating="universidade.igc"
+          />
+        </div>
+      </div>
     </div>
+
   </div>
 </template>
 
 <style scoped>
 
-
-
-
-
-
-
-
-
-
-
-
-
+.divisao {
+  display: flex;
+  gap: 2rem;
+  width: 95%;
+  max-width: 1180px;
+  margin: 0 auto;
+}
 .pesquisa {
   background-color: #651c1f;
   color: #ffffff;
