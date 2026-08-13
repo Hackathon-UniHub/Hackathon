@@ -11,6 +11,7 @@ defineProps(['id', 'nome', 'sigla', 'municipio', 'uf', 'categoria', 'situacao', 
     <p>{{ municipio }}</p>
     <button class="botao" @click="Favoritar">Favoritar</button>
   </div>
+  
 </template>
 
 <style scoped>
