@@ -4,6 +4,7 @@ import paginaFiltroCard from './paginaFiltroCard.vue'
 import { getEstados, filtrar } from '@/utils/filtroUtils.js'
 
 const estadoAtivo = ref('')
+// const rating = ref('')
 const pesquisa = ref('')
 
 const estados = getEstados()
@@ -22,15 +23,10 @@ function selecionarEstado(uf) {
 </script>
 
 <template>
-
-
-
   <div class="paginaFiltro">
     <div>
       <h1>Tudo que você precisa em <span class="colorUm">um só lugar</span></h1>
     </div>
-
-
 
     <div class="containerQuatro">
       <div class="containerEsquerdo">
@@ -59,8 +55,6 @@ function selecionarEstado(uf) {
       </div>
     </div>
 
-
-
     <div class="pesquisa">
       <div class="barraPesquisa">
         <div class="cabecalhoPesquisa">
@@ -68,16 +62,10 @@ function selecionarEstado(uf) {
           <h2>Encontre sua <span>universidade ideal</span></h2>
         </div>
         <div class="input">
-          <input
-            v-model="pesquisa"
-            type="text"
-            placeholder="Pesquise por universidades..."
-          />
+          <input v-model="pesquisa" type="text" placeholder="Pesquise por universidades..." />
         </div>
       </div>
     </div>
-
-
 
     <div class="divisao">
       <div class="lateralEstados">
@@ -85,7 +73,8 @@ function selecionarEstado(uf) {
           <div class="filtroEstado">
             <span class="subtitulo">FILTRAR POR ESTADO</span>
             <div class="botoesEstados">
-              <button class="botao"
+              <button
+                class="botao"
                 v-for="uf in estados"
                 :key="uf"
                 :class="{ ativo: estadoAtivo === uf }"
@@ -93,6 +82,16 @@ function selecionarEstado(uf) {
               >
                 {{ uf }}
               </button>
+              <!--
+              <button
+                class="botao"
+                v-for="rating in estados"
+                :key="rating"
+                :class="{ ativo: estadoAtivo === rating }"
+                @click="selecionarEstado(uf)"
+              >
+            </button>
+            {{ rating }} -->
             </div>
           </div>
         </div>
@@ -115,12 +114,83 @@ function selecionarEstado(uf) {
         </div>
       </div>
     </div>
-
   </div>
 </template>
 
 <style scoped>
+.divisao {
+  display: flex;
+  gap: 2rem;
+  width: 95%;
+  max-width: 1200px;
+  margin: 0 auto;
+  align-items: flex-start;
+}
 
+.lateralEstados {
+  width: 280px;
+  flex-shrink: 0;
+  background-color: #ffffff;
+  border-radius: 16px;
+  padding: 1.5rem;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.lateralEstados .subtitulo {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #8c8c8c;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  margin-bottom: 0.8rem;
+  display: block;
+}
+
+.filtroGrupo {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.botoesGrid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.botaoFiltro {
+  background-color: #f5f5f5;
+  border: 1px solid transparent;
+  color: #555555;
+  padding: 0.4rem 0.75rem;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.botaoFiltro:hover {
+  background-color: #e8e8e8;
+}
+
+.botaoFiltro.ativo {
+  background-color: #7a1c1d;
+  color: #ffffff;
+  font-weight: 600;
+}
+.cardsUniversidades {
+  flex: 1;
+}
+.cardsUniversidades > div {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 1.25rem;
+}
 .divisao {
   display: flex;
   gap: 2rem;
@@ -141,7 +211,6 @@ function selecionarEstado(uf) {
   flex-direction: column;
   gap: 1.5rem;
 }
-
 .cabecalhoPesquisa h2 {
   font-size: 2.2rem;
   font-weight: bold;
@@ -263,7 +332,9 @@ h1 {
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  box-shadow: 0 16px 32px rgba(0, 0, 0, 0.25), 0 6px 12px rgba(50, 1, 2, 0.15);
+  box-shadow:
+    0 16px 32px rgba(0, 0, 0, 0.25),
+    0 6px 12px rgba(50, 1, 2, 0.15);
 }
 
 .containerDois h2 {
@@ -283,33 +354,35 @@ h1 {
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  background-color: #651C1F;
+  background-color: #651c1f;
   color: #320102;
   padding: 2.8rem 2rem;
   border-radius: 16px;
   text-align: center;
   align-items: center;
-  box-shadow: 0 16px 32px rgba(0, 0, 0, 0.3), 0 6px 12px rgba(50, 1, 2, 0.2);
+  box-shadow:
+    0 16px 32px rgba(0, 0, 0, 0.3),
+    0 6px 12px rgba(50, 1, 2, 0.2);
 }
 
 .containerTres h2 {
   font-size: 1.6rem;
   font-weight: bold;
   margin: 0 0 1rem 0;
-  color: #FAF5D1;
+  color: #faf5d1;
 }
 
 .containerTres p {
   font-size: 1.05rem;
   font-weight: bold;
-  color: #DFD89F;
+  color: #dfd89f;
   margin: 0;
 }
 
 .containerTres strong {
   font-size: 1.8rem;
   font-weight: bold;
-  color: #FAF5D1;
+  color: #faf5d1;
 }
 
 .divUm {
@@ -322,7 +395,9 @@ h1 {
   display: flex;
   flex-direction: column;
   justify-content: center;
-  box-shadow: 0 16px 32px rgba(0, 0, 0, 0.28), 0 6px 12px rgba(50, 1, 2, 0.2);
+  box-shadow:
+    0 16px 32px rgba(0, 0, 0, 0.28),
+    0 6px 12px rgba(50, 1, 2, 0.2);
 }
 
 .divUm h2 {
@@ -347,7 +422,9 @@ h1 {
   display: flex;
   flex-direction: column;
   justify-content: center;
-  box-shadow: 0 16px 32px rgba(0, 0, 0, 0.25), 0 6px 12px rgba(50, 1, 2, 0.15);
+  box-shadow:
+    0 16px 32px rgba(0, 0, 0, 0.25),
+    0 6px 12px rgba(50, 1, 2, 0.15);
 }
 
 .divDois h2 {
