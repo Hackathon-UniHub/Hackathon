@@ -17,7 +17,10 @@ async function handleGoogleLogin() {
 
 <template>
   <div class="login-container">
-    <h1>Entrar</h1>
+    <h1>Bem vinde de volta!</h1>
+    <input id="info" type="email" placeholder="Endereço de email"/>
+    <input id="info" type="password" placeholder="Senha"/>
+    <button type=""
     <button class="google-btn" @click="handleGoogleLogin">
       Entrar com Google
     </button>
