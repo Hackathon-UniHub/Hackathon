@@ -1,15 +1,22 @@
 <script setup>
 import { ref, computed } from 'vue'
 import paginaFiltroCard from './paginaFiltroCard.vue'
-import { getEstados, filtrar } from '@/utils/filtroUtils.js'
+import { getEstados, getRatings, filtrar } from '@/utils/filtroUtils.js'
 
 const estadoAtivo = ref('')
-// const rating = ref('')
+const ratingAtivo = ref('Todas')
 const pesquisa = ref('')
 
 const estados = getEstados()
+const ratings = getRatings()
 
-const universidades = computed(() => filtrar(estadoAtivo.value, pesquisa.value))
+const universidades = computed(() =>
+  filtrar(
+    estadoAtivo.value,
+    pesquisa.value,
+    ratingAtivo.value === 'Todas' ? '' : ratingAtivo.value,
+  ),
+)
 
 function selecionarEstado(uf) {
   if (estadoAtivo.value === uf) {
@@ -17,6 +24,16 @@ function selecionarEstado(uf) {
     pesquisa.value = ''
   } else {
     estadoAtivo.value = uf
+    pesquisa.value = ''
+  }
+}
+
+function selecionarRating(r) {
+  if (ratingAtivo.value === r) {
+    ratingAtivo.value = 'Todas'
+    pesquisa.value = ''
+  } else {
+    ratingAtivo.value = r
     pesquisa.value = ''
   }
 }
@@ -82,22 +99,34 @@ function selecionarEstado(uf) {
               >
                 {{ uf }}
               </button>
-              <!--
+            </div>
+          </div>
+
+          <div class="filtroEstado" style="margin-top: 1rem">
+            <span class="subtitulo">FILTRAR POR AVALIAÇÃO</span>
+            <div class="botoesEstados">
               <button
                 class="botao"
-                v-for="rating in estados"
-                :key="rating"
-                :class="{ ativo: estadoAtivo === rating }"
-                @click="selecionarEstado(uf)"
+                :class="{ ativo: ratingAtivo === 'Todas' }"
+                @click="selecionarRating('Todas')"
               >
-            </button>
-            {{ rating }} -->
+                Todas
+              </button>
+              <button
+                class="botao"
+                v-for="r in ratings"
+                :key="r"
+                :class="{ ativo: ratingAtivo === r }"
+                @click="selecionarRating(r)"
+              >
+                {{ r }}
+              </button>
             </div>
           </div>
         </div>
       </div>
       <div class="cardsUniversidades">
-        <div v-if="estadoAtivo">
+        <div>
           <paginaFiltroCard
             v-for="universidade in universidades"
             :key="universidade.id"
@@ -118,184 +147,25 @@ function selecionarEstado(uf) {
 </template>
 
 <style scoped>
-.divisao {
-  display: flex;
-  gap: 2rem;
-  width: 95%;
-  max-width: 1200px;
-  margin: 0 auto;
-  align-items: flex-start;
-}
-
-.lateralEstados {
-  width: 280px;
-  flex-shrink: 0;
-  background-color: #ffffff;
-  border-radius: 16px;
-  padding: 1.5rem;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
-  display: flex;
-  flex-direction: column;
-  gap: 1.5rem;
-}
-
-.lateralEstados .subtitulo {
-  font-size: 0.75rem;
-  font-weight: 700;
-  color: #8c8c8c;
-  letter-spacing: 0.5px;
-  text-transform: uppercase;
-  margin-bottom: 0.8rem;
-  display: block;
-}
-
-.filtroGrupo {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-  margin-bottom: 1rem;
-}
-
-.botoesGrid {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
-}
-
-.botaoFiltro {
-  background-color: #f5f5f5;
-  border: 1px solid transparent;
-  color: #555555;
-  padding: 0.4rem 0.75rem;
-  border-radius: 8px;
-  font-size: 0.85rem;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.botaoFiltro:hover {
-  background-color: #e8e8e8;
-}
-
-.botaoFiltro.ativo {
-  background-color: #7a1c1d;
-  color: #ffffff;
-  font-weight: 600;
-}
-.cardsUniversidades {
-  flex: 1;
-}
-.cardsUniversidades > div {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: 1.25rem;
-}
-.divisao {
-  display: flex;
-  gap: 2rem;
-  width: 95%;
-  max-width: 1180px;
-  margin: 0 auto;
-}
-.pesquisa {
-  background-color: #651c1f;
-  color: #ffffff;
-  padding: 2.5rem 2rem;
-  border-radius: 16px;
-  width: 95%;
-  max-width: 1180px;
-  margin: 0 auto 2rem auto;
-  box-shadow: 0 16px 32px rgba(0, 0, 0, 0.25);
-  display: flex;
-  flex-direction: column;
-  gap: 1.5rem;
-}
-.cabecalhoPesquisa h2 {
-  font-size: 2.2rem;
-  font-weight: bold;
-  color: #ffffff;
-  margin: 0.2rem 0 0 0;
-}
-
-.cabecalhoPesquisa h2 span {
-  color: #dfd89f;
-}
-
-.subtitulo {
-  font-size: 0.75rem;
-  font-weight: 700;
-  letter-spacing: 1.5px;
-  color: #dfd89f;
-  text-transform: uppercase;
-  display: block;
-}
-
-.input input {
-  width: 100%;
-  padding: 1rem 1.5rem;
-  background-color: rgba(0, 0, 0, 0.15);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  border-radius: 12px;
-  color: #ffffff;
-  font-size: 1.1rem;
-  outline: none;
-  transition: border-color 0.3s;
-}
-.input input::placeholder {
-  color: rgba(255, 255, 255, 0.5);
-}
-.input input:focus {
-  border-color: #dfd89f;
-}
-.filtroEstado {
-  display: flex;
-  flex-direction: column;
-  gap: 0.8rem;
-}
-.botoesEstados {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-}
-.botoesEstados button {
-  background: transparent;
-  border: 1px solid rgba(255, 255, 255, 0.4);
-  color: #ffffff;
-  padding: 0.4rem 1rem;
-  border-radius: 20px;
-  font-size: 0.95rem;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-.botoesEstados button:hover {
-  background-color: rgba(255, 255, 255, 0.15);
-  border-color: #dfd89f;
-}
-.botoesEstados button.ativo {
-  background-color: #dfd89f;
-  color: #651c1f;
-  border-color: #dfd89f;
-  font-weight: bold;
-}
 .paginaFiltro {
   min-height: 100vh;
   width: 100%;
   background-color: #fffcf7;
   padding: 3rem 1.5rem;
+  color: #1c1c22;
 }
 
 h1 {
   font-size: clamp(2.2rem, 3.8vw, 3.2rem);
-  font-weight: bold;
+  font-weight: 800;
   text-align: center;
   margin-bottom: 2.5rem;
-  color: #920205;
+  color: #7a0f1a;
 }
 
 .colorUm {
-  font-weight: bold;
-  color: #640203;
+  font-weight: 800;
+  color: #58141c;
 }
 
 .containerQuatro {
@@ -324,7 +194,7 @@ h1 {
 
 .containerDois {
   background-color: #ffffff;
-  color: #320102;
+  color: #1c1c22;
   padding: 2.8rem 2rem;
   border-radius: 16px;
   text-align: center;
@@ -332,20 +202,20 @@ h1 {
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  box-shadow:
-    0 16px 32px rgba(0, 0, 0, 0.25),
-    0 6px 12px rgba(50, 1, 2, 0.15);
+  box-shadow: 0 4px 20px rgba(18, 18, 22, 0.05);
+  border: 1px solid #eeeef0;
 }
 
 .containerDois h2 {
-  font-size: 1.6rem;
-  font-weight: bold;
-  margin: 0 0 1rem 0;
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin: 0 0 0.8rem 0;
+  color: #1c1c22;
 }
 
 .containerDois p {
-  font-size: 1.05rem;
-  font-weight: bold;
+  font-size: 1rem;
+  color: #5d5d6b;
   margin: 0;
 }
 
@@ -354,40 +224,37 @@ h1 {
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  background-color: #651c1f;
-  color: #320102;
+  background-color: #7a0f1a;
+  color: #ffffff;
   padding: 2.8rem 2rem;
   border-radius: 16px;
   text-align: center;
   align-items: center;
-  box-shadow:
-    0 16px 32px rgba(0, 0, 0, 0.3),
-    0 6px 12px rgba(50, 1, 2, 0.2);
+  box-shadow: 0 8px 24px rgba(122, 15, 26, 0.15);
 }
 
 .containerTres h2 {
-  font-size: 1.6rem;
-  font-weight: bold;
+  font-size: 1.5rem;
+  font-weight: 700;
   margin: 0 0 1rem 0;
-  color: #faf5d1;
+  color: #ffffff;
 }
 
 .containerTres p {
-  font-size: 1.05rem;
-  font-weight: bold;
-  color: #dfd89f;
+  font-size: 1rem;
+  color: #e3a3a8;
   margin: 0;
 }
 
 .containerTres strong {
   font-size: 1.8rem;
-  font-weight: bold;
-  color: #faf5d1;
+  font-weight: 700;
+  color: #fffcf7;
 }
 
 .divUm {
-  background-color: #920205;
-  color: #ebe3ad;
+  background-color: #58141c;
+  color: #ffffff;
   padding: 2.2rem 1.2rem;
   text-align: center;
   border-radius: 16px;
@@ -395,26 +262,24 @@ h1 {
   display: flex;
   flex-direction: column;
   justify-content: center;
-  box-shadow:
-    0 16px 32px rgba(0, 0, 0, 0.28),
-    0 6px 12px rgba(50, 1, 2, 0.2);
 }
 
 .divUm h2 {
-  font-size: 1.35rem;
-  font-weight: bold;
-  margin: 0 0 0.8rem 0;
+  font-size: 1.3rem;
+  font-weight: 700;
+  margin: 0 0 0.6rem 0;
+  color: #ffffff;
 }
 
 .divUm p {
   font-size: 0.95rem;
-  font-weight: bold;
+  color: #f0cdd0;
   margin: 0;
 }
 
 .divDois {
   background-color: #ffffff;
-  color: #320102;
+  color: #1c1c22;
   padding: 2.2rem 1.2rem;
   text-align: center;
   border-radius: 16px;
@@ -422,20 +287,159 @@ h1 {
   display: flex;
   flex-direction: column;
   justify-content: center;
-  box-shadow:
-    0 16px 32px rgba(0, 0, 0, 0.25),
-    0 6px 12px rgba(50, 1, 2, 0.15);
+  box-shadow: 0 4px 20px rgba(18, 18, 22, 0.05);
+  border: 1px solid #eeeef0;
 }
 
 .divDois h2 {
-  font-size: 1.35rem;
-  font-weight: bold;
-  margin: 0 0 0.8rem 0;
+  font-size: 1.3rem;
+  font-weight: 700;
+  margin: 0 0 0.6rem 0;
+  color: #1c1c22;
 }
 
 .divDois p {
   font-size: 0.95rem;
-  font-weight: bold;
+  color: #5d5d6b;
   margin: 0;
+}
+
+.pesquisa {
+  background-color: #7a0f1a;
+  color: #ffffff;
+  padding: 2.5rem 2rem;
+  border-radius: 16px;
+  width: 95%;
+  max-width: 1180px;
+  margin: 0 auto 2rem auto;
+  box-shadow: 0 12px 32px rgba(122, 15, 26, 0.2);
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.cabecalhoPesquisa h2 {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #ffffff;
+  margin: 0.2rem 0 0 0;
+}
+
+.cabecalhoPesquisa h2 span {
+  color: #e3a3a8;
+}
+
+.subtitulo {
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  color: #e3a3a8;
+  text-transform: uppercase;
+  display: block;
+}
+
+.input input {
+  width: 100%;
+  padding: 1rem 1.5rem;
+  background-color: rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 12px;
+  color: #ffffff;
+  font-size: 1rem;
+  outline: none;
+  transition: all 0.2s ease;
+}
+
+.input input::placeholder {
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.input input:focus {
+  border-color: #ffffff;
+  background-color: rgba(255, 255, 255, 0.18);
+}
+
+.divisao {
+  display: flex;
+  gap: 2rem;
+  width: 95%;
+  max-width: 1180px;
+  margin: 0 auto;
+  align-items: flex-start;
+}
+
+.lateralEstados {
+  width: 280px;
+  flex-shrink: 0;
+  background-color: #ffffff;
+  border-radius: 16px;
+  padding: 1.5rem;
+  box-shadow: 0 4px 20px rgba(18, 18, 22, 0.05);
+  border: 1px solid #eeeef0;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.lateralEstados .pesquisa {
+  background-color: transparent;
+  padding: 0;
+  box-shadow: none;
+  margin: 0;
+  width: 100%;
+}
+
+.lateralEstados .subtitulo {
+  color: #91919f;
+  font-size: 0.75rem;
+  font-weight: 700;
+  margin-bottom: 0.8rem;
+}
+
+.filtroEstado {
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+}
+
+.botoesEstados {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.botoesEstados .botao {
+  background-color: #f7f7f8;
+  border: 1px solid #eeeef0;
+  color: #5d5d6b;
+  padding: 0.4rem 0.85rem;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.botoesEstados .botao:hover {
+  background-color: #f9e8e9;
+  color: #7a0f1a;
+  border-color: #f0cdd0;
+}
+
+.botoesEstados .botao.ativo {
+  background-color: #7a0f1a;
+  color: #ffffff;
+  border-color: #7a0f1a;
+  font-weight: 600;
+}
+
+.cardsUniversidades {
+  flex: 1;
+}
+
+.cardsUniversidades > div {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 1.25rem;
 }
 </style>
