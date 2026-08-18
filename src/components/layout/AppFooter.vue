@@ -201,7 +201,9 @@ footer {
   height: auto;
   display: block;
   filter: invert(1);
-  transition: transform 0.2s ease, opacity 0.2s ease;
+  transition:
+    transform 0.2s ease,
+    opacity 0.2s ease;
 }
 
 .redes-sociais img:hover {
@@ -224,4 +226,4 @@ footer {
 .contato p {
   font-size: 1.1rem;
 }
-  </style>
+</style>

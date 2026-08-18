@@ -181,7 +181,9 @@ nav ul li > a,
 .login ul li > a {
   display: inline-block;
   color: #000000;
-  transition: transform 0.2s ease, opacity 0.2s ease;
+  transition:
+    transform 0.2s ease,
+    opacity 0.2s ease;
 }
 
 nav ul li > a:hover,
@@ -246,5 +248,4 @@ a:hover {
   transition: font-weight 0.1s;
   cursor: pointer;
 }
-
 </style>
