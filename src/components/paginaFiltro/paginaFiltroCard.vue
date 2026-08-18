@@ -5,20 +5,28 @@ defineProps(['id', 'nome', 'sigla', 'municipio', 'uf', 'categoria', 'situacao', 
 <template>
   <div class="card">
     <h2 class="nome">{{ nome }}</h2>
-    <!--<a v-if="site" :href="site" target="_blank">Ver site</a>-->
     <p>Nota: {{ rating }}</p>
     <p>{{ municipio }} - {{ uf }}</p>
-    <button class="botao" @click="Favoritar">Favoritar</button>
+    <div class="botoes">
+      <button class="botao" @click="Favoritar">Favoritar</button>
+      <RouterLink class="botao" to="/universidade">Pagina da universidade</RouterLink>
+    </div>
   </div>
 </template>
 
 <style scoped>
+.botoes {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
 .card {
   background-color: #ffffff;
   border-radius: 16px;
   padding: 1.5rem;
   box-shadow: 0 4px 16px rgba(18, 18, 22, 0.05);
-  border: 1px solid #eeeef0; /* ink-100 */
+  border: 1px solid #eeeef0;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
@@ -58,8 +66,14 @@ defineProps(['id', 'nome', 'sigla', 'municipio', 'uf', 'categoria', 'situacao', 
   border-radius: 8px;
   font-weight: 600;
   font-size: 0.85rem;
+  font-family: inherit;
   cursor: pointer;
-  align-self: flex-start;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  text-decoration: none;
+  line-height: 1;
   transition: background-color 0.2s ease, transform 0.1s ease;
 }
 

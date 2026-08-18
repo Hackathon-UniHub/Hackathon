@@ -149,8 +149,7 @@ function selecionarRating(r) {
 <style scoped>
 .paginaFiltro {
   min-height: 100vh;
-  width: 100%;
-  background-color: #fffcf7;
+  background: #fffcf7;
   padding: 3rem 1.5rem;
   color: #1c1c22;
 }
@@ -164,168 +163,131 @@ h1 {
 }
 
 .colorUm {
-  font-weight: 800;
   color: #58141c;
+}
+
+.containerQuatro,
+.pesquisa,
+.divisao {
+  width: 95%;
+  max-width: 1180px;
+  margin: 0 auto;
 }
 
 .containerQuatro {
   display: flex;
-  justify-content: center;
-  align-items: stretch;
   gap: 20px;
-  width: 95%;
-  max-width: 1180px;
-  margin: 0 auto 3rem auto;
+  margin-bottom: 3rem;
+}
+
+.containerEsquerdo,
+.containerUm {
+  display: flex;
+  gap: 20px;
 }
 
 .containerEsquerdo {
   flex: 2.2;
-  display: flex;
   flex-direction: column;
-  gap: 20px;
 }
 
 .containerUm {
-  display: flex;
   justify-content: space-between;
-  align-items: stretch;
-  gap: 20px;
 }
 
-.containerDois {
-  background-color: #ffffff;
-  color: #1c1c22;
-  padding: 2.8rem 2rem;
+.containerDois,
+.containerTres,
+.divUm,
+.divDois {
+  padding: 2.2rem 1.2rem;
   border-radius: 16px;
   text-align: center;
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  box-shadow: 0 4px 20px rgba(18, 18, 22, 0.05);
+  flex: 1;
+}
+
+.containerDois,
+.divDois {
+  background: #fff;
+  box-shadow: 0 4px 20px #1212160d;
   border: 1px solid #eeeef0;
 }
 
-.containerDois h2 {
-  font-size: 1.5rem;
-  font-weight: 700;
-  margin: 0 0 0.8rem 0;
+.containerDois {
+  padding: 2.8rem 2rem;
+}
+
+.containerDois h2,
+.divDois h2 {
   color: #1c1c22;
 }
 
-.containerDois p {
-  font-size: 1rem;
+.containerDois p,
+.divDois p {
   color: #5d5d6b;
   margin: 0;
 }
 
-.containerTres {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  background-color: #7a0f1a;
-  color: #ffffff;
-  padding: 2.8rem 2rem;
-  border-radius: 16px;
-  text-align: center;
-  align-items: center;
-  box-shadow: 0 8px 24px rgba(122, 15, 26, 0.15);
+.divUm {
+  background: #58141c;
+  color: #fff;
 }
 
-.containerTres h2 {
-  font-size: 1.5rem;
-  font-weight: 700;
-  margin: 0 0 1rem 0;
-  color: #ffffff;
+.divUm p {
+  color: #f0cdd0;
+  margin: 0;
+}
+
+.containerTres {
+  background: #7a0f1a;
+  color: #fff;
+  padding: 2.8rem 2rem;
+  justify-content: space-between;
+  box-shadow: 0 8px 24px #7a0f1a26;
 }
 
 .containerTres p {
-  font-size: 1rem;
   color: #e3a3a8;
   margin: 0;
 }
 
 .containerTres strong {
   font-size: 1.8rem;
-  font-weight: 700;
   color: #fffcf7;
 }
 
-.divUm {
-  background-color: #58141c;
-  color: #ffffff;
-  padding: 2.2rem 1.2rem;
-  text-align: center;
-  border-radius: 16px;
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-}
-
-.divUm h2 {
+h2 {
   font-size: 1.3rem;
   font-weight: 700;
-  margin: 0 0 0.6rem 0;
-  color: #ffffff;
+  margin: 0 0 0.6rem;
+  color: inherit;
 }
 
-.divUm p {
-  font-size: 0.95rem;
-  color: #f0cdd0;
-  margin: 0;
-}
-
-.divDois {
-  background-color: #ffffff;
-  color: #1c1c22;
-  padding: 2.2rem 1.2rem;
-  text-align: center;
-  border-radius: 16px;
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  box-shadow: 0 4px 20px rgba(18, 18, 22, 0.05);
-  border: 1px solid #eeeef0;
-}
-
-.divDois h2 {
-  font-size: 1.3rem;
-  font-weight: 700;
-  margin: 0 0 0.6rem 0;
-  color: #1c1c22;
-}
-
-.divDois p {
-  font-size: 0.95rem;
-  color: #5d5d6b;
-  margin: 0;
+.containerDois h2,
+.containerTres h2 {
+  font-size: 1.5rem;
+  margin-bottom: 0.8rem;
 }
 
 .pesquisa {
-  background-color: #7a0f1a;
-  color: #ffffff;
+  background: #7a0f1a;
+  color: #fff;
   padding: 2.5rem 2rem;
   border-radius: 16px;
-  width: 95%;
-  max-width: 1180px;
-  margin: 0 auto 2rem auto;
-  box-shadow: 0 12px 32px rgba(122, 15, 26, 0.2);
-  display: flex;
-  flex-direction: column;
-  gap: 1.5rem;
+  margin-bottom: 2rem;
+  box-shadow: 0 12px 32px #7a0f1a33;
 }
 
 .cabecalhoPesquisa h2 {
   font-size: 2rem;
-  font-weight: 700;
-  color: #ffffff;
-  margin: 0.2rem 0 0 0;
+  color: #fff;
+  margin-top: 0.2rem;
 }
 
-.cabecalhoPesquisa h2 span {
+.cabecalhoPesquisa span {
   color: #e3a3a8;
 }
 
@@ -334,55 +296,48 @@ h1 {
   font-weight: 700;
   letter-spacing: 1.5px;
   color: #e3a3a8;
-  text-transform: uppercase;
   display: block;
 }
 
 .input input {
   width: 100%;
   padding: 1rem 1.5rem;
-  background-color: rgba(255, 255, 255, 0.12);
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  background: #ffffff1f;
+  border: 1px solid #ffffff33;
   border-radius: 12px;
-  color: #ffffff;
+  color: #fff;
   font-size: 1rem;
-  outline: none;
-  transition: all 0.2s ease;
+  outline: 0;
+  transition: 0.2s;
 }
 
 .input input::placeholder {
-  color: rgba(255, 255, 255, 0.6);
+  color: #ffffff99;
 }
 
 .input input:focus {
-  border-color: #ffffff;
-  background-color: rgba(255, 255, 255, 0.18);
+  border-color: #fff;
+  background: #ffffff2e;
 }
 
 .divisao {
   display: flex;
   gap: 2rem;
-  width: 95%;
-  max-width: 1180px;
-  margin: 0 auto;
   align-items: flex-start;
 }
 
 .lateralEstados {
   width: 280px;
   flex-shrink: 0;
-  background-color: #ffffff;
+  background: #fff;
   border-radius: 16px;
   padding: 1.5rem;
-  box-shadow: 0 4px 20px rgba(18, 18, 22, 0.05);
+  box-shadow: 0 4px 20px #1212160d;
   border: 1px solid #eeeef0;
-  display: flex;
-  flex-direction: column;
-  gap: 1.5rem;
 }
 
 .lateralEstados .pesquisa {
-  background-color: transparent;
+  background: 0 0;
   padding: 0;
   box-shadow: none;
   margin: 0;
@@ -391,8 +346,6 @@ h1 {
 
 .lateralEstados .subtitulo {
   color: #91919f;
-  font-size: 0.75rem;
-  font-weight: 700;
   margin-bottom: 0.8rem;
 }
 
@@ -409,7 +362,7 @@ h1 {
 }
 
 .botoesEstados .botao {
-  background-color: #f7f7f8;
+  background: #f7f7f8;
   border: 1px solid #eeeef0;
   color: #5d5d6b;
   padding: 0.4rem 0.85rem;
@@ -417,18 +370,18 @@ h1 {
   font-size: 0.85rem;
   font-weight: 500;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: 0.2s;
 }
 
 .botoesEstados .botao:hover {
-  background-color: #f9e8e9;
+  background: #f9e8e9;
   color: #7a0f1a;
   border-color: #f0cdd0;
 }
 
 .botoesEstados .botao.ativo {
-  background-color: #7a0f1a;
-  color: #ffffff;
+  background: #7a0f1a;
+  color: #fff;
   border-color: #7a0f1a;
   font-weight: 600;
 }
