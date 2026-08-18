@@ -32,8 +32,8 @@ async function handleSubmit() {
   <div class="complete-profile">
     <h1>Complete seu cadastro</h1>
     <form @submit.prevent="handleSubmit">
-      <input v-model="fullName" placeholder="Nome completo" required />
-      <input v-model="username" placeholder="Nome de usuário" required />
+      <input class="dados" v-model="fullName" placeholder="Nome completo" required />
+      <input class="dados" v-model="username" placeholder="Nome de usuário" required />
       <button type="submit" :disabled="loading">
         {{ loading ? 'Salvando...' : 'Salvar' }}
       </button>
@@ -59,7 +59,6 @@ input {
   border-radius: 6px;
   border: 1px solid #ccc;
 }
-
 button {
   padding: 10px;
   border-radius: 6px;
@@ -67,6 +66,21 @@ button {
   background: #4f46e5;
   color: white;
   cursor: pointer;
+}
+input.dados{
+  background: rgba(255, 255, 255, 0.15); /* Fundo translúcido */
+  backdrop-filter: blur(12px) saturate(150%);
+  -webkit-backdrop-filter: blur(12px) saturate(150%);
+
+  /* Aplicação da distorção do SVG para simular o líquido */
+  filter: url(#glass-distortion);
+
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 16px;
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.2);
+
+  padding: 24px;
+  color: #fff;
 }
 
 .error {
