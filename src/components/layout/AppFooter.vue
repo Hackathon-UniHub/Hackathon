@@ -5,19 +5,19 @@ import { InstagramIcon, Facebook01Icon, NewTwitterIcon } from '@hugeicons/core-f
 
 <template>
   <footer class="rodape">
-    <div class="container rodape-conteudo">
-      <div class="bloco-marca">
-        <div class="linha-marca">
-          <img src="../../assets/logo.svg" alt="UniHub" class="logo-marca" />
+    <div class="container rodapeConteudo">
+      <div class="blocoMarca">
+        <div class="linhaMarca">
+          <img src="../../assets/logo.svg" alt="UniHub" class="logoMarca" />
         </div>
 
-        <p class="texto-marca">
+        <p class="textoMarca">
           Encontre a universidade ideal para o seu futuro. Compare instituições, explore no mapa e
           tome decisões com confiança.
         </p>
 
-        <div class="redes-sociais" aria-label="Redes sociais">
-          <a href="#" aria-label="Instagram">
+        <div class="redesSociais" aria-label="Redes sociais">
+          <a href="https://instagram.com" target="_blank" rel="noreferrer" aria-label="Instagram">
             <HugeiconsIcon
               :icon="InstagramIcon"
               :size="20"
@@ -25,7 +25,7 @@ import { InstagramIcon, Facebook01Icon, NewTwitterIcon } from '@hugeicons/core-f
               :stroke-width="1.8"
             />
           </a>
-          <a href="#" aria-label="Facebook">
+          <a href="https://facebook.com" target="_blank" rel="noreferrer" aria-label="Facebook">
             <HugeiconsIcon
               :icon="Facebook01Icon"
               :size="20"
@@ -33,7 +33,7 @@ import { InstagramIcon, Facebook01Icon, NewTwitterIcon } from '@hugeicons/core-f
               :stroke-width="1.8"
             />
           </a>
-          <a href="#" aria-label="X">
+          <a href="https://x.com" target="_blank" rel="noreferrer" aria-label="X">
             <HugeiconsIcon
               :icon="NewTwitterIcon"
               :size="20"
@@ -44,25 +44,25 @@ import { InstagramIcon, Facebook01Icon, NewTwitterIcon } from '@hugeicons/core-f
         </div>
       </div>
 
-      <div class="links-rodape">
-        <div class="grupo-links">
+      <div class="linksRodape">
+        <div class="grupoLinks">
           <h4>Produto</h4>
           <ul>
-            <li><a href="#">Mapa interativo</a></li>
-            <li><a href="#">Explorar</a></li>
-            <li><a href="#">Como funciona</a></li>
+            <li><RouterLink to="/mapa">Mapa interativo</RouterLink></li>
+            <li><RouterLink to="/explorar">Explorar</RouterLink></li>
+            <li><RouterLink to="/como-funciona">Como funciona</RouterLink></li>
           </ul>
         </div>
 
-        <div class="grupo-links">
+        <div class="grupoLinks">
           <h4>Conta</h4>
           <ul>
-            <li><a href="#">Entrar</a></li>
-            <li><a href="#">Criar conta</a></li>
+            <li><RouterLink to="/entrar">Entrar</RouterLink></li>
+            <li><RouterLink to="/criar-conta">Criar conta</RouterLink></li>
           </ul>
         </div>
 
-        <div class="grupo-links">
+        <div class="grupoLinks">
           <h4>Contato</h4>
           <ul>
             <li><a href="mailto:contato@unihub.com.br">contato@unihub.com.br</a></li>
@@ -73,11 +73,11 @@ import { InstagramIcon, Facebook01Icon, NewTwitterIcon } from '@hugeicons/core-f
       </div>
     </div>
 
-    <div class="container rodape-inferior">
+    <div class="container rodapeInferior">
       <span>© 2026 UniHub. Todos os direitos reservados.</span>
-      <div class="links-inferiores">
-        <a href="#">Privacidade</a>
-        <a href="#">Termos</a>
+      <div class="linksInferiores">
+        <RouterLink to="/">Privacidade</RouterLink>
+        <RouterLink to="/">Termos</RouterLink>
       </div>
     </div>
   </footer>
@@ -90,7 +90,7 @@ import { InstagramIcon, Facebook01Icon, NewTwitterIcon } from '@hugeicons/core-f
   padding-top: 64px;
 }
 
-.rodape-conteudo {
+.rodapeConteudo {
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
@@ -98,37 +98,37 @@ import { InstagramIcon, Facebook01Icon, NewTwitterIcon } from '@hugeicons/core-f
   padding-bottom: 36px;
 }
 
-.bloco-marca {
+.blocoMarca {
   max-width: 360px;
   flex: 1;
 }
 
-.linha-marca {
+.linhaMarca {
   display: inline-flex;
   align-items: center;
   margin-bottom: 18px;
 }
 
-.logo-marca {
+.logoMarca {
   display: block;
   width: 124px;
   height: auto;
   filter: brightness(0) invert(1);
 }
 
-.texto-marca {
+.textoMarca {
   color: rgba(255, 255, 255, 0.82);
   font-size: 0.96rem;
   line-height: 1.7;
   margin-bottom: 22px;
 }
 
-.redes-sociais {
+.redesSociais {
   display: flex;
   gap: 10px;
 }
 
-.redes-sociais a {
+.redesSociais a {
   width: 38px;
   height: 38px;
   border-radius: 50%;
@@ -146,19 +146,19 @@ import { InstagramIcon, Facebook01Icon, NewTwitterIcon } from '@hugeicons/core-f
     background 0.2s ease;
 }
 
-.redes-sociais a:hover {
+.redesSociais a:hover {
   transform: translateY(-1px);
   background: rgba(255, 255, 255, 0.1);
 }
 
-.links-rodape {
+.linksRodape {
   display: grid;
   grid-template-columns: repeat(3, minmax(170px, 1fr));
   gap: 36px;
   flex: 1.2;
 }
 
-.grupo-links h4 {
+.grupoLinks h4 {
   margin-bottom: 16px;
   color: rgba(255, 255, 255, 0.86);
   font-size: 0.8rem;
@@ -167,23 +167,23 @@ import { InstagramIcon, Facebook01Icon, NewTwitterIcon } from '@hugeicons/core-f
   text-transform: uppercase;
 }
 
-.grupo-links ul {
+.grupoLinks ul {
   list-style: none;
   display: grid;
   gap: 10px;
 }
 
-.grupo-links li a {
+.grupoLinks li a {
   color: rgba(255, 255, 255, 0.7);
   font-size: 0.96rem;
   transition: color 0.2s ease;
 }
 
-.grupo-links li a:hover {
+.grupoLinks li a:hover {
   color: var(--white);
 }
 
-.rodape-inferior {
+.rodapeInferior {
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -193,27 +193,27 @@ import { InstagramIcon, Facebook01Icon, NewTwitterIcon } from '@hugeicons/core-f
   font-size: 0.9rem;
 }
 
-.links-inferiores {
+.linksInferiores {
   display: inline-flex;
   align-items: center;
   gap: 18px;
 }
 
-.links-inferiores a {
+.linksInferiores a {
   color: rgba(255, 255, 255, 0.7);
 }
 
-.links-inferiores a:hover {
+.linksInferiores a:hover {
   color: var(--white);
 }
 
 @media (max-width: 900px) {
-  .rodape-conteudo {
+  .rodapeConteudo {
     flex-direction: column;
     gap: 28px;
   }
 
-  .links-rodape {
+  .linksRodape {
     width: 100%;
   }
 }
@@ -223,12 +223,12 @@ import { InstagramIcon, Facebook01Icon, NewTwitterIcon } from '@hugeicons/core-f
     padding-top: 44px;
   }
 
-  .links-rodape {
+  .linksRodape {
     grid-template-columns: 1fr;
     gap: 22px;
   }
 
-  .rodape-inferior {
+  .rodapeInferior {
     flex-direction: column;
     gap: 12px;
     align-items: flex-start;

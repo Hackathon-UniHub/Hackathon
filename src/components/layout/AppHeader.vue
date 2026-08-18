@@ -1,4 +1,3 @@
-<!-- filepath: /home/tempz/Documentos/Hackathon/src/components/layout/AppHeader.vue -->
 <script setup>
 import { HugeiconsIcon } from '@hugeicons/vue'
 import { Search01Icon } from '@hugeicons/core-free-icons'
@@ -9,30 +8,36 @@ const route = useRoute()
 
 <template>
   <header class="cabecalho">
-    <div class="cabecalho-conteudo">
-      <a class="link-logo" href="/" aria-label="UniHub">
-        <img src="../../assets/logo.svg" alt="UniHub" class="imagem-logo" />
-      </a>
+    <div class="cabecalhoConteudo">
+      <RouterLink class="linkLogo" to="/" aria-label="UniHub">
+        <img src="../../assets/logo.svg" alt="UniHub" class="imagemLogo" />
+      </RouterLink>
 
-      <nav class="menu-navegacao" aria-label="Navegação principal">
-        <RouterLink
-          class="link-navegacao"
-          :class="{ ativo: route.name === 'home' }"
-          :to="{ name: 'home' }"
-        >
-          Home
-        </RouterLink>
-        <a href="/mapa" class="link-navegacao">Mapa</a>
-        <a href="/explorar" class="link-navegacao">Explorar</a>
-        <a href="/como-funciona" class="link-navegacao">Como funciona</a>
+      <nav aria-label="Navegação principal">
+        <ul class="menuNavegacao">
+          <li>
+            <RouterLink
+              class="linkNavegacao"
+              :class="{ ativo: route.name === 'home' }"
+              :to="{ name: 'home' }"
+            >
+              Home
+            </RouterLink>
+          </li>
+          <li><RouterLink to="/mapa" class="linkNavegacao">Mapa</RouterLink></li>
+          <li><RouterLink to="/explorar" class="linkNavegacao">Explorar</RouterLink></li>
+          <li>
+            <RouterLink to="/como-funciona" class="linkNavegacao">Como funciona</RouterLink>
+          </li>
+        </ul>
       </nav>
 
-      <div class="area-acoes">
-        <a class="botao-pesquisa" href="/explorar" aria-label="Explorar">
+      <div class="areaAcoes">
+        <RouterLink class="botaoPesquisa" to="/explorar" aria-label="Explorar">
           <HugeiconsIcon :icon="Search01Icon" :size="22" color="currentColor" :stroke-width="1.8" />
-        </a>
-        <a class="botao-entrar" href="/entrar">Entrar</a>
-        <a class="botao-criar-conta" href="/criar-conta">Criar conta</a>
+        </RouterLink>
+        <RouterLink class="botaoEntrar" to="/entrar">Entrar</RouterLink>
+        <RouterLink class="botaoCriarConta" to="/criar-conta">Criar conta</RouterLink>
       </div>
     </div>
   </header>
@@ -45,7 +50,7 @@ const route = useRoute()
   border-bottom: 1px solid var(--color-border);
 }
 
-.cabecalho-conteudo {
+.cabecalhoConteudo {
   width: min(1200px, calc(100% - 32px));
   margin: 0 auto;
   min-height: 76px;
@@ -55,7 +60,7 @@ const route = useRoute()
   gap: 28px;
 }
 
-.link-logo {
+.linkLogo {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -63,21 +68,28 @@ const route = useRoute()
   text-decoration: none;
 }
 
-.imagem-logo {
+.imagemLogo {
   display: block;
   width: clamp(110px, 10vw, 160px);
   height: auto;
 }
 
-.menu-navegacao {
+.menuNavegacao {
   display: flex;
   align-items: center;
   justify-content: center;
   gap: clamp(14px, 2vw, 28px);
   flex: 1;
+  list-style: none;
+  margin: 0;
+  padding: 0;
 }
 
-.link-navegacao {
+.menuNavegacao li {
+  list-style: none;
+}
+
+.linkNavegacao {
   position: relative;
   display: inline-flex;
   align-items: center;
@@ -92,15 +104,15 @@ const route = useRoute()
     opacity 0.2s ease;
 }
 
-.link-navegacao:hover {
+.linkNavegacao:hover {
   color: var(--brand-700);
 }
 
-.link-navegacao.ativo {
+.linkNavegacao.ativo {
   color: var(--brand-700);
 }
 
-.link-navegacao.ativo::after {
+.linkNavegacao.ativo::after {
   content: '';
   position: absolute;
   left: 0;
@@ -111,13 +123,13 @@ const route = useRoute()
   border-radius: 999px;
 }
 
-.area-acoes {
+.areaAcoes {
   display: flex;
   align-items: center;
   gap: 12px;
 }
 
-.botao-pesquisa {
+.botaoPesquisa {
   width: 42px;
   height: 42px;
   display: inline-flex;
@@ -132,12 +144,12 @@ const route = useRoute()
     background 0.2s ease;
 }
 
-.botao-pesquisa:hover {
+.botaoPesquisa:hover {
   transform: translateY(-1px);
   background: rgba(122, 15, 26, 0.08);
 }
 
-.botao-pesquisa svg {
+.botaoPesquisa svg {
   width: 18px;
   height: 18px;
   stroke: currentColor;
@@ -147,8 +159,8 @@ const route = useRoute()
   stroke-linejoin: round;
 }
 
-.botao-entrar,
-.botao-criar-conta {
+.botaoEntrar,
+.botaoCriarConta {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -164,38 +176,38 @@ const route = useRoute()
     box-shadow 0.2s ease;
 }
 
-.botao-entrar {
+.botaoEntrar {
   background: transparent;
   color: var(--ink-800);
   border: 1px solid transparent;
 }
 
-.botao-entrar:hover,
-.botao-criar-conta:hover {
+.botaoEntrar:hover,
+.botaoCriarConta:hover {
   transform: translateY(-1px);
 }
 
-.botao-criar-conta {
+.botaoCriarConta {
   background: linear-gradient(135deg, var(--brand-700) 0%, var(--brand-600) 100%);
   color: var(--white);
   box-shadow: 0 8px 18px rgba(122, 15, 26, 0.14);
 }
 
 @media (max-width: 768px) {
-  .cabecalho-conteudo {
+  .cabecalhoConteudo {
     flex-wrap: wrap;
     justify-content: center;
     padding: 14px 0;
     gap: 12px;
   }
 
-  .menu-navegacao {
+  .menuNavegacao {
     width: 100%;
     flex-wrap: wrap;
     gap: 10px 18px;
   }
 
-  .area-acoes {
+  .areaAcoes {
     width: 100%;
     justify-content: center;
   }

@@ -1,8 +1,8 @@
 <template>
   <main class="pagina">
-    <section class="secao-principal">
-      <div class="container layout-principal">
-        <div class="texto-principal">
+    <section class="secaoPrincipal">
+      <div class="container layoutPrincipal">
+        <div class="textoPrincipal">
           <h1>
             Encontre a sua
             <span>universidade ideal</span>
@@ -11,44 +11,48 @@
 
           <p>Compare instituições, explore no mapa e tome decisões com confiança.</p>
 
-          <div class="acoes-principal">
-            <a href="#" class="botao botao-primario">Começar agora</a>
-            <a href="#" class="botao botao-secundario">Ver mapa interativo</a>
+          <div class="acoesPrincipal">
+            <RouterLink to="/explorar" class="botao botaoPrimario">Começar agora</RouterLink>
+            <RouterLink to="/mapa" class="botao botaoSecundario">Ver mapa interativo</RouterLink>
           </div>
 
-          <div class="grade-estatisticas">
-            <article class="cartao-estatistica">
+          <div class="gradeEstatisticas">
+            <article class="cartaoEstatistica">
               <strong>200+</strong>
               <span>Universidades</span>
             </article>
-            <article class="cartao-estatistica">
+            <article class="cartaoEstatistica">
               <strong>5 mil</strong>
               <span>Estudantes</span>
             </article>
-            <article class="cartao-estatistica">
+            <article class="cartaoEstatistica">
               <strong>48k</strong>
               <span>Comentários</span>
             </article>
-            <article class="cartao-estatistica">
+            <article class="cartaoEstatistica">
               <strong>4.9</strong>
               <span>Ranking</span>
             </article>
           </div>
         </div>
 
-        <div class="visual-principal">
-          <div class="cartao-foto">
-            <div class="cabecalho-foto">
-              <span class="etiqueta-pequena">#1</span>
-              <span class="etiqueta-pequena etiqueta-pequena-muted">Working</span>
+        <div class="visualPrincipal">
+          <div class="cartaoFoto">
+            <div class="cabecalhoFoto">
+              <span class="etiquetaPequena">#1</span>
+              <span class="etiquetaPequena etiquetaPequenaMuted">Working</span>
             </div>
 
             <div class="retrato">
-              <div class="placeholder-retrato"></div>
+              <img
+                src="../components/image/foto-estudante.jpeg"
+                alt="Estudante com mochila"
+                class="imagemEstudante"
+              />
             </div>
 
-            <div class="legenda-foto">
-              <strong>Hannah</strong>
+            <div class="legendaFoto">
+              <strong>Miguel</strong>
               <p>“Selecionei a melhor opção para mudar minha vida acadêmica.”</p>
             </div>
           </div>
@@ -56,60 +60,62 @@
       </div>
     </section>
 
-    <section class="secao-universidades">
+    <section class="secaoUniversidades">
       <div class="container">
-        <div class="cabecalho-secao">
+        <div class="cabecalhoSecao">
           <span class="destaque">Universidades</span>
           <h2>Universidades mais buscadas</h2>
-          <a href="#">Ver todas</a>
+          <RouterLink to="/explorar">Ver todas</RouterLink>
         </div>
 
-        <div class="grade-universidades"></div>
+        <div class="gradeUniversidades"></div>
       </div>
     </section>
 
-    <section class="como-funciona">
-      <div class="container conteudo-como-funciona">
-        <span class="destaque destaque-claro">Como funciona</span>
-        <h2>Como o <span class="texto-destaque">UniHub</span> funciona?</h2>
+    <section class="comoFunciona">
+      <div class="container conteudoComoFunciona">
+        <span class="destaque destaqueClaro">Como funciona</span>
+        <h2>Como o <span class="textoDestaque">UniHub</span> funciona?</h2>
         <p>Três passos simples para começar sua jornada acadêmica.</p>
 
-        <div class="grade-passos">
-          <article class="cartao-passo">
-            <div class="numero-passo">01</div>
+        <div class="gradePassos">
+          <article class="cartaoPasso">
+            <div class="numeroPasso">01</div>
             <h3>Busque e filtre</h3>
             <p>Encontre universidades por curso, localização e avaliação.</p>
           </article>
 
-          <article class="cartao-passo">
-            <div class="numero-passo">02</div>
+          <article class="cartaoPasso">
+            <div class="numeroPasso">02</div>
             <h3>Explore no mapa</h3>
             <p>Veja opções em cada região e compare melhor sua escolha.</p>
           </article>
 
-          <article class="cartao-passo">
-            <div class="numero-passo">03</div>
+          <article class="cartaoPasso">
+            <div class="numeroPasso">03</div>
             <h3>Compare e decida</h3>
             <p>Analise ideias, critérios e tome sua decisão com segurança.</p>
           </article>
         </div>
 
-        <div class="caixa-acao">
-          <a href="#" class="botao botao-primario">Criar conta grátis</a>
+        <div class="caixaAcao">
+          <RouterLink to="/criar-conta" class="botao botaoPrimario">Criar conta grátis</RouterLink>
         </div>
       </div>
     </section>
 
-    <section class="chamada-final">
-      <div class="container conteudo-chamada-final">
-        <div class="texto-chamada">
+    <section class="chamadaFinal">
+      <div class="container conteudoChamadaFinal">
+        <div class="textoChamada">
           <h2>Pronto para encontrar a universidade ideal?</h2>
           <p>Junte-se a milhares de estudantes que já usam o UniHub para planejar o futuro.</p>
         </div>
 
-        <div class="acoes-chamada">
-          <a href="#" class="botao botao-secundario">Explorar universidades</a>
-          <a href="#" class="botao botao-primario">Abrir mapa</a>
+        <div class="acoesChamada">
+          <RouterLink to="/explorar" class="botao botaoSecundario"
+            >Explorar universidades</RouterLink
+          >
+          <RouterLink to="/mapa" class="botao botaoPrimario">Abrir mapa</RouterLink>
         </div>
       </div>
     </section>
@@ -121,22 +127,22 @@
   background: var(--cream-50);
 }
 
-.secao-principal {
+.secaoPrincipal {
   padding: 52px 0 28px;
 }
 
-.layout-principal {
+.layoutPrincipal {
   display: grid;
   grid-template-columns: 1.15fr 0.85fr;
   gap: 36px;
   align-items: center;
 }
 
-.texto-principal {
+.textoPrincipal {
   padding: 16px 0;
 }
 
-.etiqueta-mini {
+.etiquetaMini {
   display: inline-flex;
   align-items: center;
   gap: 8px;
@@ -150,7 +156,7 @@
   text-transform: uppercase;
 }
 
-.texto-principal h1 {
+.textoPrincipal h1 {
   margin-top: 20px;
   font-size: clamp(2.4rem, 4vw, 4rem);
   line-height: 1.02;
@@ -159,7 +165,7 @@
   max-width: 540px;
 }
 
-.texto-principal h1 span {
+.textoPrincipal h1 span {
   display: block;
   color: var(--brand-700);
   font-style: italic;
@@ -167,14 +173,14 @@
   font-family: 'Georgia', 'Times New Roman', serif;
 }
 
-.texto-principal p {
+.textoPrincipal p {
   margin-top: 18px;
   max-width: 560px;
   color: var(--ink-700);
   font-size: 1.04rem;
 }
 
-.acoes-principal {
+.acoesPrincipal {
   display: flex;
   flex-wrap: wrap;
   gap: 14px;
@@ -199,21 +205,21 @@
   transform: translateY(-1px);
 }
 
-.botao-primario {
+.botaoPrimario {
   background: linear-gradient(135deg, var(--brand-700), var(--brand-600));
   color: var(--white);
   box-shadow: 0 12px 24px rgba(122, 15, 26, 0.2);
   border: 1px solid rgba(255, 255, 255, 0.2);
 }
 
-.botao-secundario {
+.botaoSecundario {
   background: rgba(255, 255, 255, 0.08);
   color: var(--white);
   border: 1px solid rgba(255, 255, 255, 0.22);
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.15);
 }
 
-.grade-estatisticas {
+.gradeEstatisticas {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 18px;
@@ -221,7 +227,7 @@
   max-width: 620px;
 }
 
-.cartao-estatistica {
+.cartaoEstatistica {
   background: rgba(255, 255, 255, 0.66);
   border: 1px solid rgba(28, 28, 34, 0.08);
   border-radius: 18px;
@@ -230,26 +236,26 @@
   box-shadow: 0 8px 20px rgba(28, 28, 34, 0.03);
 }
 
-.cartao-estatistica strong {
+.cartaoEstatistica strong {
   display: block;
   color: var(--ink-900);
   font-size: 1.45rem;
   line-height: 1.2;
 }
 
-.cartao-estatistica span {
+.cartaoEstatistica span {
   display: block;
   margin-top: 6px;
   color: var(--ink-600);
   font-size: 0.76rem;
 }
 
-.visual-principal {
+.visualPrincipal {
   display: flex;
   justify-content: center;
 }
 
-.cartao-foto {
+.cartaoFoto {
   width: min(100%, 480px);
   background: linear-gradient(135deg, #f5efe9, #ede4dd);
   border: 1px solid rgba(28, 28, 34, 0.06);
@@ -258,14 +264,14 @@
   box-shadow: 0 18px 36px rgba(28, 28, 34, 0.08);
 }
 
-.cabecalho-foto {
+.cabecalhoFoto {
   display: flex;
   justify-content: space-between;
   align-items: center;
   margin-bottom: 14px;
 }
 
-.etiqueta-pequena {
+.etiquetaPequena {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -277,76 +283,56 @@
   font-weight: 700;
 }
 
-.etiqueta-pequena-muted {
+.etiquetaPequenaMuted {
   background: rgba(28, 28, 34, 0.06);
   color: var(--ink-700);
 }
 
 .retrato {
+  position: relative;
   border-radius: 20px;
   overflow: hidden;
-  background: linear-gradient(135deg, #e6d9d1, #d7dadd);
-  min-height: 280px;
+  background: linear-gradient(135deg, #f3efe9, #e5e8ea);
+  min-height: 480px;
+  height: 80%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
-.placeholder-retrato {
+.imagemEstudante {
+  display: block;
   width: 100%;
   height: 100%;
-  min-height: 280px;
-  background:
-    radial-gradient(circle at 50% 28%, rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0) 20%),
-    linear-gradient(180deg, #d5c6ba 0%, #c7c1bc 100%);
-  position: relative;
+  min-height: 480px;
+  object-fit: cover;
+  object-position: center top;
+  transform: scale(1.02);
 }
 
-.placeholder-retrato::before {
-  content: '';
-  position: absolute;
-  width: 140px;
-  height: 140px;
-  border-radius: 50%;
-  background: linear-gradient(180deg, #f5d9c7 0%, #e7c7af 100%);
-  left: 50%;
-  top: 20%;
-  transform: translateX(-50%);
-  box-shadow: 0 18px 0 -10px rgba(255, 255, 255, 0.25);
-}
-
-.placeholder-retrato::after {
-  content: '';
-  position: absolute;
-  left: 50%;
-  bottom: 0;
-  transform: translateX(-50%);
-  width: 220px;
-  height: 150px;
-  border-radius: 50% 50% 0 0;
-  background: linear-gradient(180deg, #1d1a22, #2f2a32);
-}
-
-.legenda-foto {
+.legendaFoto {
   margin-top: 12px;
   display: flex;
   flex-direction: column;
   gap: 4px;
 }
 
-.legenda-foto strong {
+.legendaFoto strong {
   color: var(--ink-900);
   font-size: 1rem;
 }
 
-.legenda-foto p {
+.legendaFoto p {
   color: var(--ink-700);
   font-size: 0.82rem;
   line-height: 1.5;
 }
 
-.secao-universidades {
+.secaoUniversidades {
   padding: 36px 0 46px;
 }
 
-.cabecalho-secao {
+.cabecalhoSecao {
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -354,13 +340,13 @@
   margin-bottom: 24px;
 }
 
-.cabecalho-secao h2 {
+.cabecalhoSecao h2 {
   color: var(--ink-900);
   font-size: clamp(1.8rem, 2vw, 2.4rem);
   letter-spacing: -0.04em;
 }
 
-.cabecalho-secao a {
+.cabecalhoSecao a {
   color: var(--brand-700);
   font-weight: 700;
   text-decoration: none;
@@ -379,18 +365,18 @@
   text-transform: uppercase;
 }
 
-.destaque-claro {
+.destaqueClaro {
   background: rgba(255, 255, 255, 0.08);
   color: var(--white);
 }
 
-.grade-universidades {
+.gradeUniversidades {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 20px;
 }
 
-.cartao-universidade {
+.cartaoUniversidade {
   background: rgba(255, 255, 255, 0.7);
   border: 1px solid rgba(28, 28, 34, 0.08);
   border-radius: 20px;
@@ -398,7 +384,7 @@
   box-shadow: 0 10px 30px rgba(28, 28, 34, 0.04);
 }
 
-.topo-cartao {
+.topoCartao {
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -417,17 +403,17 @@
   letter-spacing: 0.04em;
 }
 
-.marca-primaria {
+.marcaPrimaria {
   background: rgba(122, 15, 26, 0.1);
   color: var(--brand-700);
 }
 
-.marca-azul {
+.marcaAzul {
   background: rgba(59, 130, 246, 0.12);
   color: #1d4ed8;
 }
 
-.marca-verde {
+.marcaVerde {
   background: rgba(34, 197, 94, 0.12);
   color: #15803d;
 }
@@ -438,26 +424,26 @@
   font-size: 0.8rem;
 }
 
-.cartao-universidade h3 {
+.cartaoUniversidade h3 {
   color: var(--ink-900);
   font-size: 1.06rem;
   line-height: 1.4;
   margin-bottom: 8px;
 }
 
-.cartao-universidade p {
+.cartaoUniversidade p {
   color: var(--ink-600);
   font-size: 0.82rem;
   margin-bottom: 14px;
 }
 
-.meta-cartao {
+.metaCartao {
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
 }
 
-.meta-cartao span {
+.metaCartao span {
   display: inline-flex;
   align-items: center;
   padding: 5px 8px;
@@ -467,41 +453,41 @@
   font-size: 0.7rem;
 }
 
-.como-funciona {
+.comoFunciona {
   background: linear-gradient(180deg, var(--ink-950) 0%, #1a1a22 100%);
   color: var(--white);
   padding: 54px 0 36px;
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
 }
 
-.conteudo-como-funciona {
+.conteudoComoFunciona {
   text-align: center;
 }
 
-.como-funciona h2 {
+.comoFunciona h2 {
   margin-top: 12px;
   font-size: clamp(2rem, 3vw, 2.8rem);
   letter-spacing: -0.04em;
 }
 
-.texto-destaque {
+.textoDestaque {
   color: var(--brand-400);
   font-weight: 700;
 }
 
-.como-funciona p {
+.comoFunciona p {
   margin-top: 12px;
   color: rgba(255, 255, 255, 0.7);
 }
 
-.grade-passos {
+.gradePassos {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 22px;
   margin-top: 36px;
 }
 
-.cartao-passo {
+.cartaoPasso {
   border: 1px solid rgba(255, 255, 255, 0.08);
   background: linear-gradient(180deg, rgba(255, 255, 255, 0.04), rgba(122, 15, 26, 0.05));
   border-radius: 20px;
@@ -510,7 +496,7 @@
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
 }
 
-.numero-passo {
+.numeroPasso {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -523,29 +509,29 @@
   margin-bottom: 16px;
 }
 
-.cartao-passo h3 {
+.cartaoPasso h3 {
   margin-bottom: 12px;
   color: var(--white);
   font-size: 1.1rem;
 }
 
-.cartao-passo p {
+.cartaoPasso p {
   margin: 0;
   color: rgba(255, 255, 255, 0.76);
   line-height: 1.6;
 }
 
-.caixa-acao {
+.caixaAcao {
   margin-top: 28px;
   display: flex;
   justify-content: center;
 }
 
-.chamada-final {
+.chamadaFinal {
   padding: 60px 0 82px;
 }
 
-.conteudo-chamada-final {
+.conteudoChamadaFinal {
   display: flex;
   flex-direction: column;
   gap: 24px;
@@ -560,53 +546,53 @@
     inset 0 1px 0 rgba(255, 255, 255, 0.18);
 }
 
-.texto-chamada h2 {
+.textoChamada h2 {
   font-size: clamp(2rem, 3vw, 3rem);
   line-height: 1.1;
   letter-spacing: -0.05em;
 }
 
-.texto-chamada p {
+.textoChamada p {
   margin-top: 12px;
   max-width: 620px;
   color: rgba(255, 255, 255, 0.85);
 }
 
-.acoes-chamada {
+.acoesChamada {
   display: flex;
   flex-wrap: wrap;
   gap: 14px;
 }
 
-.acoes-chamada .botao-secundario {
+.acoesChamada .botaoSecundario {
   background: rgba(255, 255, 255, 0.12);
   border-color: rgba(255, 255, 255, 0.3);
   color: var(--white);
 }
 
 @media (max-width: 980px) {
-  .layout-principal,
-  .grade-universidades,
-  .grade-passos {
+  .layoutPrincipal,
+  .gradeUniversidades,
+  .gradePassos {
     grid-template-columns: 1fr;
   }
 
-  .layout-principal {
+  .layoutPrincipal {
     display: grid;
   }
 
-  .grade-estatisticas {
+  .gradeEstatisticas {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
 
 @media (max-width: 640px) {
-  .secao-principal {
+  .secaoPrincipal {
     padding-top: 30px;
   }
 
-  .acoes-principal,
-  .acoes-chamada {
+  .acoesPrincipal,
+  .acoesChamada {
     flex-direction: column;
     align-items: stretch;
   }
@@ -615,16 +601,16 @@
     width: 100%;
   }
 
-  .cabecalho-secao {
+  .cabecalhoSecao {
     align-items: flex-start;
     flex-direction: column;
   }
 
-  .grade-estatisticas {
+  .gradeEstatisticas {
     grid-template-columns: 1fr 1fr;
   }
 
-  .conteudo-chamada-final {
+  .conteudoChamadaFinal {
     padding: 24px 20px;
   }
 }
