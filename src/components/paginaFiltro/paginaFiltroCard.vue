@@ -18,13 +18,16 @@ defineProps(['id', 'nome', 'sigla', 'municipio', 'uf', 'categoria', 'situacao', 
   border-radius: 16px;
   padding: 1.5rem;
   box-shadow: 0 4px 16px rgba(18, 18, 22, 0.05);
-  border: 1px solid #eeeef0; /* ink-100 */
+  border: 1px solid #eeeef0;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
   gap: 1rem;
   margin: 0;
-  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease,
+    border-color 0.2s ease;
 }
 
 .card:hover {
@@ -51,7 +54,7 @@ defineProps(['id', 'nome', 'sigla', 'municipio', 'uf', 'categoria', 'situacao', 
 }
 
 .card .botao {
-  background-color: #7A0F1A;
+  background-color: #7a0f1a;
   color: #ffffff;
   border: none;
   padding: 0.55rem 1.1rem;
@@ -60,11 +63,13 @@ defineProps(['id', 'nome', 'sigla', 'municipio', 'uf', 'categoria', 'situacao', 
   font-size: 0.85rem;
   cursor: pointer;
   align-self: flex-start;
-  transition: background-color 0.2s ease, transform 0.1s ease;
+  transition:
+    background-color 0.2s ease,
+    transform 0.1s ease;
 }
 
 .card .botao:hover {
-  background-color: #9e1f2e; 
+  background-color: #9e1f2e;
 }
 
 .card .botao:active {
