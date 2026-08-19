@@ -9,7 +9,9 @@ defineProps(['id', 'nome', 'sigla', 'municipio', 'uf', 'categoria', 'situacao', 
     <p>{{ municipio }} - {{ uf }}</p>
     <div class="botoes">
       <button class="botao" @click="Favoritar">Favoritar</button>
-      <RouterLink class="botao" to="/universidade">Pagina da universidade</RouterLink>
+      <RouterLink class="botao" :to="{ name: 'universidade', params: { id } }">
+        Pagina da universidade
+      </RouterLink>
     </div>
   </div>
 </template>
@@ -32,7 +34,10 @@ defineProps(['id', 'nome', 'sigla', 'municipio', 'uf', 'categoria', 'situacao', 
   justify-content: space-between;
   gap: 1rem;
   margin: 0;
-  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease,
+    border-color 0.2s ease;
 }
 
 .card:hover {
@@ -59,7 +64,7 @@ defineProps(['id', 'nome', 'sigla', 'municipio', 'uf', 'categoria', 'situacao', 
 }
 
 .card .botao {
-  background-color: #7A0F1A;
+  background-color: #7a0f1a;
   color: #ffffff;
   border: none;
   padding: 0.55rem 1.1rem;
@@ -74,11 +79,13 @@ defineProps(['id', 'nome', 'sigla', 'municipio', 'uf', 'categoria', 'situacao', 
   box-sizing: border-box;
   text-decoration: none;
   line-height: 1;
-  transition: background-color 0.2s ease, transform 0.1s ease;
+  transition:
+    background-color 0.2s ease,
+    transform 0.1s ease;
 }
 
 .card .botao:hover {
-  background-color: #9e1f2e; 
+  background-color: #9e1f2e;
 }
 
 .card .botao:active {
