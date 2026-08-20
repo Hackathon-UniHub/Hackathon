@@ -5,13 +5,19 @@ const routes = [
   {
     path: '/',
     name: 'home',
+    alias: ['/explorar', '/como-funciona'],
     component: () => import('@/views/HomeView.vue'),
-    meta: { requiresAuth: true },
   },
   {
     path: '/login',
     name: 'login',
+    alias: ['/entrar', '/criar-conta'],
     component: () => import('@/views/auth/LoginView.vue'),
+  },
+  {
+    path: '/mapa',
+    name: 'mapa',
+    component: () => import('@/views/MapaView.vue'),
   },
   {
     path: '/complete-profile',
@@ -26,7 +32,7 @@ const router = createRouter({
   routes,
 })
 
-router.beforeEach((to) => {
+/*router.beforeEach((to) => {
   const authStore = useAuthStore()
 
   if (to.meta.requiresAuth && !authStore.isLoggedIn) {
@@ -44,6 +50,6 @@ router.beforeEach((to) => {
   ) {
     return { name: 'home' }
   }
-})
+})*/
 
 export default router

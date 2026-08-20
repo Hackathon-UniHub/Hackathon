@@ -18,9 +18,7 @@ async function handleGoogleLogin() {
 <template>
   <div class="login-container">
     <h1>Entrar</h1>
-    <button class="google-btn" @click="handleGoogleLogin">
-      Entrar com Google
-    </button>
+    <button class="google-btn" @click="handleGoogleLogin">Entrar com Google</button>
     <p v-if="errorMsg" class="error">{{ errorMsg }}</p>
   </div>
 </template>
