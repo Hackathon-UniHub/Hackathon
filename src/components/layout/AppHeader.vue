@@ -28,23 +28,6 @@ const route = useRoute()
           <li><RouterLink to="/explorar" class="linkNavegacao">Explorar</RouterLink></li>
           <li>
             <RouterLink to="/como-funciona" class="linkNavegacao">Como funciona</RouterLink>
-import { RouterLink } from 'vue-router'
-</script>
-
-<template>
-  <header>
-    <div class="container">
-      <div class="logo">
-        <RouterLink><img src="../icons/UniHub.png" alt="Logo UniHub" /></RouterLink>
-      </div>
-
-      <nav>
-        <ul>
-          <li><RouterLink>Home</RouterLink></li>
-          <li><RouterLink>Favoritos</RouterLink></li>
-          <li><RouterLink>Sobre Nós</RouterLink></li>
-          <li>
-            <span class="nav-border"><RouterLink>Explore pelo Mapa!</RouterLink></span>
           </li>
         </ul>
       </nav>
@@ -55,13 +38,6 @@ import { RouterLink } from 'vue-router'
         </RouterLink>
         <RouterLink class="botaoEntrar" to="/entrar">Entrar</RouterLink>
         <RouterLink class="botaoCriarConta" to="/criar-conta">Criar conta</RouterLink>
-      <div class="login">
-        <ul>
-          <li><RouterLink>Entrar</RouterLink></li>
-          <li>
-            <span class="login-border"><RouterLink>Criar Conta</RouterLink></span>
-          </li>
-        </ul>
       </div>
     </div>
   </header>
@@ -235,6 +211,8 @@ import { RouterLink } from 'vue-router'
     width: 100%;
     justify-content: center;
   }
+}
+
 /* === RESET === */
 /* http://meyerweb.com/eric/tools/css/reset/
    v2.0 | 20110126

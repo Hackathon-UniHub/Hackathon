@@ -78,30 +78,6 @@ import { InstagramIcon, Facebook01Icon, NewTwitterIcon } from '@hugeicons/core-f
       <div class="linksInferiores">
         <RouterLink to="/">Privacidade</RouterLink>
         <RouterLink to="/">Termos</RouterLink>
-<script setup></script>
-
-<template>
-  <footer>
-    <div class="container">
-      <nav class="redes-sociais">
-        <ul>
-          <li>
-            <RouterLink><img src="../icons/instagram.svg" alt="Instagram" /></RouterLink>
-          </li>
-          <li>
-            <RouterLink><img src="../icons/x.svg" alt="X" /></RouterLink>
-          </li>
-          <li>
-            <RouterLink><img src="../icons/tiktok.svg" alt="TikTok" /></RouterLink>
-          </li>
-        </ul>
-      </nav>
-      <div class="contato">
-        <h2>Nos contate para mais informaões!</h2>
-        <p>+55 47 99708-5431</p>
-      </div>
-      <div class="copyright">
-        <p>&copy; 2026 UniHub - Todos os direitos reservados.</p>
       </div>
     </div>
   </footer>
@@ -257,6 +233,8 @@ import { InstagramIcon, Facebook01Icon, NewTwitterIcon } from '@hugeicons/core-f
     gap: 12px;
     align-items: flex-start;
   }
+}
+
 /* === RESET === */
 /* http://meyerweb.com/eric/tools/css/reset/
    v2.0 | 20110126

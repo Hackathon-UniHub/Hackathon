@@ -561,37 +561,9 @@
 .acoesChamada {
   display: flex;
   flex-wrap: wrap;
-  gap: 14px;
-}
-
-.acoesChamada .botaoSecundario {
-  background: rgba(255, 255, 255, 0.12);
-  border-color: rgba(255, 255, 255, 0.3);
-  color: var(--white);
-}
-
-@media (max-width: 980px) {
-  .layoutPrincipal,
-  .gradeUniversidades,
-  .gradePassos {
-    grid-template-columns: 1fr;
-  }
-
-  .layoutPrincipal {
-    display: grid;
-  }
-
-  .gradeEstatisticas {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
 }
 
 @media (max-width: 640px) {
-  .secaoPrincipal {
-    padding-top: 30px;
-  }
-
-  .acoesPrincipal,
   .acoesChamada {
     flex-direction: column;
     align-items: stretch;
@@ -613,33 +585,5 @@
   .conteudoChamadaFinal {
     padding: 24px 20px;
   }
-<script setup>
-import { useAuthStore } from '@/stores/auth'
-
-const authStore = useAuthStore()
-</script>
-
-<template>
-  <div class="home">
-    <h1>Bem-vindo, {{ authStore.profile?.full_name || authStore.user?.email }}!</h1>
-    <button @click="authStore.logout()">Sair</button>
-  </div>
-</template>
-
-<style scoped>
-.home {
-  max-width: 500px;
-  margin: 80px auto;
-  text-align: center;
-}
-
-button {
-  margin-top: 16px;
-  padding: 10px 20px;
-  border-radius: 6px;
-  border: none;
-  background: #ef4444;
-  color: white;
-  cursor: pointer;
 }
 </style>

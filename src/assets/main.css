@@ -14,7 +14,10 @@
   padding: 12px 18px;
   border-radius: var(--radius);
   font-weight: 700;
-  transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease,
+    background 0.2s ease;
   box-shadow: 0 10px 24px rgba(34, 197, 94, 0.25);
 }
 
@@ -153,7 +156,7 @@
 }
 
 .hero-card li::before {
-  content: "✓";
+  content: '✓';
   color: var(--color-primary);
   font-weight: 700;
 }
@@ -248,91 +251,9 @@
   .stats {
     grid-template-columns: 1fr;
   }
+}
+
 a {
   color: black;
   text-decoration: none;
-}
-
-html,
-body,
-div,
-span,
-applet,
-object,
-iframe,
-h1,
-h2,
-h3,
-h4,
-h5,
-h6,
-p,
-blockquote,
-pre,
-a,
-abbr,
-acronym,
-address,
-big,
-cite,
-code,
-del,
-dfn,
-em,
-img,
-ins,
-kbd,
-q,
-s,
-samp,
-small,
-strike,
-strong,
-sub,
-sup,
-tt,
-var,
-b,
-u,
-i,
-center,
-dl,
-dt,
-dd,
-ol,
-ul,
-li,
-fieldset,
-form,
-label,
-legend,
-table,
-caption,
-tbody,
-tfoot,
-thead,
-tr,
-th,
-td,
-article,
-aside,
-canvas,
-details,
-embed,
-figure,
-figcaption,
-footer,
-header,
-hgroup,
-menu,
-nav,
-output,
-ruby,
-section,
-summary,
-time,
-mark,
-audio,
-video {
-  font-family: 'Inclusive Sans', sans-serif;
 }
