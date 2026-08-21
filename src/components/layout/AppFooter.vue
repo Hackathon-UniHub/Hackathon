@@ -433,4 +433,35 @@ footer {
 .contato p {
   font-size: 1.1rem;
 }
+
+.rodape > .container {
+  width: 100%;
+  max-width: none;
+  margin-inline: auto;
+}
+
+.rodapeConteudo {
+  align-items: center;
+  justify-content: center;
+}
+
+.blocoMarca {
+  text-align: center;
+}
+
+.redesSociais {
+  justify-content: center;
+}
+
+.linksRodape {
+  justify-items: center;
+  text-align: center;
+}
+
+.rodapeInferior {
+  justify-content: center;
+  gap: 18px;
+  align-items: center;
+  text-align: center;
+}
 </style>

@@ -1,9 +1,7 @@
 <script setup>
 import { HugeiconsIcon } from '@hugeicons/vue'
 import { Search01Icon } from '@hugeicons/core-free-icons'
-import { RouterLink, useRoute } from 'vue-router'
-
-const route = useRoute()
+import { RouterLink } from 'vue-router'
 </script>
 
 <template>
@@ -16,18 +14,24 @@ const route = useRoute()
       <nav aria-label="Navegação principal">
         <ul class="menuNavegacao">
           <li>
-            <RouterLink
-              class="linkNavegacao"
-              :class="{ ativo: route.name === 'home' }"
-              :to="{ name: 'home' }"
-            >
+            <RouterLink class="linkNavegacao" :to="{ name: 'home' }" exact-active-class="ativo">
               Home
             </RouterLink>
           </li>
-          <li><RouterLink to="/mapa" class="linkNavegacao">Mapa</RouterLink></li>
-          <li><RouterLink to="/explorar" class="linkNavegacao">Explorar</RouterLink></li>
           <li>
-            <RouterLink to="/como-funciona" class="linkNavegacao">Como funciona</RouterLink>
+            <RouterLink to="/mapa" class="linkNavegacao" exact-active-class="ativo">
+              Mapa
+            </RouterLink>
+          </li>
+          <li>
+            <RouterLink to="/explorar" class="linkNavegacao" exact-active-class="ativo">
+              Explorar
+            </RouterLink>
+          </li>
+          <li>
+            <RouterLink to="/como-funciona" class="linkNavegacao" exact-active-class="ativo">
+              Como funciona
+            </RouterLink>
           </li>
         </ul>
       </nav>
@@ -94,7 +98,7 @@ const route = useRoute()
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  padding-bottom: 8px;
+  padding-bottom: 4px;
   color: var(--ink-800);
   text-decoration: none;
   font-size: 0.95rem;
@@ -117,7 +121,7 @@ const route = useRoute()
   position: absolute;
   left: 0;
   right: 0;
-  bottom: -2px;
+  bottom: -1px;
   height: 2px;
   background: var(--brand-700);
   border-radius: 999px;

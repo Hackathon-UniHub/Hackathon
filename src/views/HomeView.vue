@@ -260,7 +260,7 @@
   background: linear-gradient(135deg, #f5efe9, #ede4dd);
   border: 1px solid rgba(28, 28, 34, 0.06);
   border-radius: 30px;
-  padding: 18px 18px 16px;
+  padding: 18px 18px 8px;
   box-shadow: 0 18px 36px rgba(28, 28, 34, 0.08);
 }
 
@@ -325,7 +325,7 @@
 .legendaFoto p {
   color: var(--ink-700);
   font-size: 0.82rem;
-  line-height: 1.5;
+  line-height: 1.35;
 }
 
 .secaoUniversidades {
@@ -561,6 +561,14 @@
 .acoesChamada {
   display: flex;
   flex-wrap: wrap;
+  gap: 8px;
+}
+
+.chamadaFinal .botaoPrimario {
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--white);
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.15);
 }
 
 @media (max-width: 640px) {
