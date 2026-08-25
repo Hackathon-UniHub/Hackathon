@@ -1,3 +1,25 @@
+<script setup>
+import { onMounted } from 'vue'
+
+onMounted(() => {
+  const elementosAnimados = document.querySelectorAll('.pagina > section')
+
+  const observador = new IntersectionObserver(
+    (entradas) => {
+      entradas.forEach((entrada) => {
+        if (entrada.isIntersecting) {
+          entrada.target.classList.add('visivel')
+          observador.unobserve(entrada.target)
+        }
+      })
+    },
+    { threshold: 0.18 },
+  )
+
+  elementosAnimados.forEach((elemento) => observador.observe(elemento))
+})
+</script>
+
 <template>
   <main class="pagina">
     <section class="secaoPrincipal">
@@ -125,6 +147,19 @@
 <style scoped>
 .pagina {
   background: var(--cream-50);
+}
+
+.pagina > section {
+  opacity: 0.96;
+  transform: translateY(10px);
+  transition:
+    opacity 0.45s ease,
+    transform 0.45s ease;
+}
+
+.pagina > section.visivel {
+  opacity: 1;
+  transform: translateY(0);
 }
 
 .secaoPrincipal {
@@ -456,7 +491,7 @@
 .comoFunciona {
   background: linear-gradient(180deg, var(--ink-950) 0%, #1a1a22 100%);
   color: var(--white);
-  padding: 54px 0 36px;
+  padding: clamp(72px, 10vh, 112px) 0;
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
 }
 
@@ -472,7 +507,6 @@
 
 .textoDestaque {
   color: var(--brand-400);
-  font-weight: 700;
 }
 
 .comoFunciona p {
@@ -484,16 +518,22 @@
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 22px;
-  margin-top: 36px;
+  margin-top: clamp(42px, 6vh, 72px);
 }
 
 .cartaoPasso {
   border: 1px solid rgba(255, 255, 255, 0.08);
   background: linear-gradient(180deg, rgba(255, 255, 255, 0.04), rgba(122, 15, 26, 0.05));
   border-radius: 20px;
-  padding: 22px 18px;
+  min-height: 196px;
+  padding: 24px 20px;
   text-align: left;
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
+  transition: border-color 0.2s ease;
+}
+
+.cartaoPasso:hover {
+  border-color: rgba(208, 111, 120, 0.5);
 }
 
 .numeroPasso {
@@ -522,22 +562,23 @@
 }
 
 .caixaAcao {
-  margin-top: 28px;
+  margin-top: clamp(36px, 5vh, 56px);
   display: flex;
   justify-content: center;
 }
 
 .chamadaFinal {
-  padding: 60px 0 82px;
+  padding: clamp(72px, 10vh, 112px) 0;
 }
 
 .conteudoChamadaFinal {
   display: flex;
   flex-direction: column;
+  align-items: flex-start;
   gap: 24px;
   justify-content: center;
-  min-height: 260px;
-  padding: 46px 34px;
+  min-height: min(460px, 66vh);
+  padding: clamp(48px, 8vh, 92px) clamp(28px, 6vw, 84px);
   border-radius: 30px;
   background: linear-gradient(135deg, var(--brand-700), var(--brand-500));
   color: var(--white);
@@ -547,7 +588,8 @@
 }
 
 .textoChamada h2 {
-  font-size: clamp(2rem, 3vw, 3rem);
+  max-width: 680px;
+  font-size: clamp(2.2rem, 4vw, 4rem);
   line-height: 1.1;
   letter-spacing: -0.05em;
 }
@@ -571,10 +613,17 @@
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.15);
 }
 
+/* === RESPONSIVO === */
 @media (max-width: 640px) {
-  .acoesChamada {
-    flex-direction: column;
-    align-items: stretch;
+  .comoFunciona,
+  .chamadaFinal {
+    padding: 64px 0;
+  }
+
+  .conteudoChamadaFinal {
+    min-height: 440px;
+    gap: 28px;
+    padding: 32px 20px;
   }
 
   .botao {
@@ -590,8 +639,82 @@
     grid-template-columns: 1fr 1fr;
   }
 
-  .conteudoChamadaFinal {
-    padding: 24px 20px;
+  .acoesChamada {
+    min-width: 0;
+  }
+}
+
+@media (max-width: 900px) {
+  .layoutPrincipal {
+    grid-template-columns: 1fr;
+    gap: 48px;
+  }
+
+  .textoPrincipal {
+    max-width: 680px;
+    margin-inline: auto;
+    text-align: center;
+  }
+
+  .textoPrincipal h1,
+  .textoPrincipal p {
+    margin-inline: auto;
+  }
+
+  .acoesPrincipal,
+  .gradeEstatisticas {
+    margin-inline: auto;
+  }
+
+  .visualPrincipal {
+    order: -1;
+  }
+
+  .gradeUniversidades,
+  .gradePassos {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 640px) {
+  .secaoPrincipal {
+    padding-top: 36px;
+  }
+
+  .layoutPrincipal {
+    gap: 32px;
+  }
+
+  .acoesPrincipal {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .cartaoFoto {
+    padding: 12px 12px 8px;
+    border-radius: 22px;
+  }
+
+  .retrato,
+  .imagemEstudante {
+    min-height: 360px;
+  }
+
+  .gradeUniversidades,
+  .gradePassos {
+    grid-template-columns: 1fr;
+  }
+
+  .cartaoPasso {
+    min-height: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pagina > section {
+    opacity: 1;
+    transform: none;
+    transition: none;
   }
 }
 </style>

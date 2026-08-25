@@ -121,6 +121,7 @@ import { InstagramIcon, Facebook01Icon, NewTwitterIcon } from '@hugeicons/core-f
   font-size: 0.96rem;
   line-height: 1.7;
   margin-bottom: 22px;
+  /* === RESPONSIVO === */
 }
 
 .redesSociais {
@@ -215,6 +216,7 @@ import { InstagramIcon, Facebook01Icon, NewTwitterIcon } from '@hugeicons/core-f
 
   .linksRodape {
     width: 100%;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 }
 
@@ -226,6 +228,10 @@ import { InstagramIcon, Facebook01Icon, NewTwitterIcon } from '@hugeicons/core-f
   .linksRodape {
     grid-template-columns: 1fr;
     gap: 22px;
+  }
+
+  .grupoLinks {
+    width: 100%;
   }
 
   .rodapeInferior {
