@@ -1,6 +1,6 @@
 <script setup>
 import { HugeiconsIcon } from '@hugeicons/vue'
-import { Search01Icon } from '@hugeicons/core-free-icons'
+import { Search01Icon, HeartAddIcon } from '@hugeicons/core-free-icons'
 import { RouterLink } from 'vue-router'
 </script>
 
@@ -15,7 +15,7 @@ import { RouterLink } from 'vue-router'
         <ul class="menuNavegacao">
           <li>
             <RouterLink class="linkNavegacao" :to="{ name: 'home' }" exact-active-class="ativo">
-              Home
+              Início
             </RouterLink>
           </li>
           <li>
@@ -40,6 +40,9 @@ import { RouterLink } from 'vue-router'
         <RouterLink class="botaoPesquisa" to="/explorar" aria-label="Explorar">
           <HugeiconsIcon :icon="Search01Icon" :size="22" color="currentColor" :stroke-width="1.8" />
         </RouterLink>
+        <RouterLink class="botaoPesquisa" :to="{ name: 'login' }" aria-label="Favoritos">
+          <HugeiconsIcon :icon="HeartAddIcon" :size="22" color="currentColor" :stroke-width="1.8" />
+        </RouterLink>
         <RouterLink class="botaoEntrar" to="/entrar">Entrar</RouterLink>
         <RouterLink class="botaoCriarConta" to="/criar-conta">Criar conta</RouterLink>
       </div>
@@ -49,9 +52,18 @@ import { RouterLink } from 'vue-router'
 
 <style scoped>
 .cabecalho {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 100;
+  width: 100%;
   background: rgba(255, 255, 255, 0.8);
   backdrop-filter: blur(8px);
   border-bottom: 1px solid var(--color-border);
+  transition:
+    box-shadow 0.25s ease,
+    background 0.25s ease;
 }
 
 .cabecalhoConteudo {
@@ -197,23 +209,52 @@ import { RouterLink } from 'vue-router'
   box-shadow: 0 8px 18px rgba(122, 15, 26, 0.14);
 }
 
+/* === RESPONSIVO === */
 @media (max-width: 768px) {
   .cabecalhoConteudo {
-    flex-wrap: wrap;
-    justify-content: center;
-    padding: 14px 0;
-    gap: 12px;
+    display: grid;
+    grid-template-columns: 1fr auto;
+    padding: 10px 0;
+    gap: 8px 16px;
   }
 
   .menuNavegacao {
+    grid-column: 1 / -1;
+    grid-row: 2;
     width: 100%;
     flex-wrap: wrap;
+    justify-content: center;
     gap: 10px 18px;
   }
 
   .areaAcoes {
-    width: 100%;
+    grid-column: 2;
+    grid-row: 1;
     justify-content: center;
+  }
+}
+
+@media (max-width: 480px) {
+  .cabecalhoConteudo {
+    display: flex;
+    flex-direction: column;
+    padding: 10px 0 12px;
+    gap: 10px;
+  }
+
+  .menuNavegacao,
+  .areaAcoes {
+    width: 100%;
+  }
+
+  .areaAcoes {
+    flex-wrap: wrap;
+  }
+
+  .botaoEntrar,
+  .botaoCriarConta {
+    min-height: 38px;
+    padding: 0.65rem 0.85rem;
   }
 }
 

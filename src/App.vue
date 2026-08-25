@@ -5,11 +5,30 @@ import { RouterView } from 'vue-router'
 </script>
 
 <template>
-  <AppHeader />
+  <div class="cabecalhoReserva">
+    <AppHeader />
+  </div>
   <main>
     <RouterView />
   </main>
   <AppFooter />
 </template>
 
-<style scoped></style>
+<style scoped>
+.cabecalhoReserva {
+  height: 76px;
+}
+
+/* === RESPONSIVO === */
+@media (max-width: 768px) {
+  .cabecalhoReserva {
+    height: 140px;
+  }
+}
+
+@media (max-width: 480px) {
+  .cabecalhoReserva {
+    height: 190px;
+  }
+}
+</style>
