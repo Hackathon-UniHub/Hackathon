@@ -1,5 +1,5 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import { useAuthStore } from '@/stores/auth'
+/*import { useAuthStore } from '@/stores/auth'*/
 
 const routes = [
   {
@@ -14,9 +14,9 @@ const routes = [
     component: () => import('@/views/auth/LoginView.vue'),
   },
   {
-    path: '/complete-profile',
-    name: 'complete-profile',
-    component: () => import('@/views/CompleteProfileView.vue'),
+    path: '/create-account',
+    name: 'create-account',
+    component: () => import('@/views/CreateAccountView.vue'),
     meta: { requiresAuth: true },
   },
 ]
@@ -26,7 +26,8 @@ const router = createRouter({
   routes,
 })
 
-router.beforeEach((to) => {
+/*  Esse trecho faz com que a página de login fique travada se o usuario nao estiver logado  */
+/*router.beforeEach((to) => {
   const authStore = useAuthStore()
 
   if (to.meta.requiresAuth && !authStore.isLoggedIn) {
@@ -44,6 +45,6 @@ router.beforeEach((to) => {
   ) {
     return { name: 'home' }
   }
-})
+})*/
 
 export default router
