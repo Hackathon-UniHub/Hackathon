@@ -62,7 +62,9 @@ export const useAuthStore = defineStore('auth', {
     },
 
     async initAuthListener() {
-      const { data: { session } } = await supabase.auth.getSession()
+      const {
+        data: { session },
+      } = await supabase.auth.getSession()
       this.session = session
       this.user = session?.user ?? null
       if (this.user) await this.fetchProfile()
