@@ -19,13 +19,13 @@ import { RouterLink } from 'vue-router'
             </RouterLink>
           </li>
           <li>
-            <RouterLink to="/mapa" class="linkNavegacao" exact-active-class="ativo">
-              Mapa
+            <RouterLink to="/universidades" class="linkNavegacao" exact-active-class="ativo">
+              Universidades
             </RouterLink>
           </li>
           <li>
-            <RouterLink to="/explorar" class="linkNavegacao" exact-active-class="ativo">
-              Explorar
+            <RouterLink to="/mapa" class="linkNavegacao" exact-active-class="ativo">
+              Mapa
             </RouterLink>
           </li>
           <li>
