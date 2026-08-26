@@ -68,7 +68,16 @@ function selecionarRating(r) {
       <div class="containerTres">
         <h2>Rankings atualizados</h2>
         <p>Baseados nos principais índices nacionais: RUF, IGC, ENADE e Folha Universitária.</p>
-        <strong>Top 100</strong>
+
+        <div class="rankingLinha">
+          <div class="rankingTexto">
+            <span class="topLabel">Top</span>
+            <div class="numeroLinha">
+              <span class="top100">100</span>
+              <img class="img" src="/src/components/icons/rank.svg" alt="rank" />
+            </div>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -139,6 +148,7 @@ function selecionarRating(r) {
             :situacao="universidade.situacao"
             :site="universidade.site"
             :rating="universidade.igc"
+            :quantidade_alunos="universidade.quantidade_alunos"
           />
         </div>
       </div>
@@ -147,6 +157,46 @@ function selecionarRating(r) {
 </template>
 
 <style scoped>
+.rankingLinha {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  margin-top: 1rem;
+}
+
+.rankingTexto {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.2rem;
+}
+
+.topLabel {
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: #fffcf7;
+  line-height: 1;
+}
+
+.numeroLinha {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.top100 {
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: #fffcf7;
+  line-height: 1;
+}
+
+.img {
+  width: 50px;
+  height: 50px;
+  display: block;
+}
+
 .paginaFiltro {
   min-height: 100vh;
   background: #fffcf7;
@@ -222,7 +272,7 @@ h1 {
 
 .containerDois h2,
 .divDois h2 {
-  color: #1c1c22;
+  color: #320102;
 }
 
 .containerDois p,
@@ -242,7 +292,7 @@ h1 {
 }
 
 .containerTres {
-  background: #7a0f1a;
+  background: linear-gradient(135deg, #9e1f2e, #7a0f1a);
   color: #fff;
   padding: 2.8rem 2rem;
   justify-content: space-between;
@@ -252,11 +302,6 @@ h1 {
 .containerTres p {
   color: #e3a3a8;
   margin: 0;
-}
-
-.containerTres strong {
-  font-size: 1.8rem;
-  color: #fffcf7;
 }
 
 h2 {
@@ -273,7 +318,7 @@ h2 {
 }
 
 .pesquisa {
-  background: #7a0f1a;
+  background: linear-gradient(135deg, #9e1f2e, #7a0f1a);
   color: #fff;
   padding: 2.5rem 2rem;
   border-radius: 16px;

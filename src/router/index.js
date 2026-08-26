@@ -12,7 +12,7 @@ const router = createRouter({
       component: HomeView,
     },
     {
-      path: '/universidadesfiltro',
+      path: '/universidades',
       name: 'filtro',
       component: paginaFiltroList,
     },
