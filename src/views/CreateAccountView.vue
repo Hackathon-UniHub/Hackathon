@@ -10,17 +10,23 @@ import { EyeIcon } from '@hugeicons/core-free-icons'
 import { ViewOffIcon } from '@hugeicons/core-free-icons'
 import { ChromeIcon } from '@hugeicons/core-free-icons'
 import { MicrosoftIcon } from '@hugeicons/core-free-icons'
-
+import { MailIcon } from '@hugeicons/core-free-icons'
 
 const router = useRouter()
 const authStore = useAuthStore()
-const username = ref('')
+
 const fullName = ref(authStore.user?.user_metadata?.full_name || '')
+const email = ref('')
+const password = ref('')
+const showPassword = ref(false)
 const errorMsg = ref('')
 const loading = ref(false)
 
 const canSubmit = computed(() =>
-  username.value.trim().length > 0 && fullName.value.trim().length > 0 && !loading.value
+  fullName.value.trim().length > 0 &&
+  email.value.trim().length > 0 &&
+  password.value.length >= 6 &&
+  !loading.value
 )
 
 async function handleSubmit() {
@@ -29,35 +35,28 @@ async function handleSubmit() {
   loading.value = true
   errorMsg.value = ''
   try {
+    await authStore.signUp({
+      email: email.value.trim(),
+      password: password.value,
+    })
     await authStore.createProfile({
-      username: username.value.trim(),
       full_name: fullName.value.trim(),
     })
     router.push('/')
-  } catch {
-    errorMsg.value = 'Erro ao salvar perfil. O username pode já estar em uso.'
+  } catch (error) {
+    if (error.message?.includes('already registered')) {
+      errorMsg.value = 'Esse email já está cadastrado.'
+    } else {
+      errorMsg.value = 'Erro ao criar conta. Tente novamente.'
+    }
   } finally {
     loading.value = false
   }
 }
 
-onMounted(() => {
-  document.body.style.background = 'linear-gradient(to bottom, #920205, #2C0102)'
-})
-
-onUnmounted(() => {
-  document.body.style.background = ''
-})
-
-
-
-const email = ref('')
-const password = ref('')
-const showPassword = ref(false)
-
 async function handleGoogleSignUp() {
   try {
-    await authStore.signInWithGoogle()
+    await authStore.loginWithGoogle()
   } catch {
     errorMsg.value = 'Não foi possível continuar com o Google.'
   }
@@ -65,7 +64,7 @@ async function handleGoogleSignUp() {
 
 async function handleMicrosoftSignUp() {
   try {
-    await authStore.signInWithMicrosoft()
+    await authStore.loginWithMicrosoft()
   } catch {
     errorMsg.value = 'Não foi possível continuar com a Microsoft.'
   }
@@ -82,96 +81,91 @@ onUnmounted(() => {
 
 <template>
   <div class="page">
-
     <main class="auth-card">
       <h1>Crie uma conta</h1>
       <p class="subtitle">Junte-se a nós em alguns segundos</p>
 
       <form @submit.prevent="handleSubmit">
-      <div class="field">
-        <label for="fullName">Nome completo</label>
-        <div class="input-wrap">
-          <HugeiconsIcon class="icon" :icon="User02Icon" :size="32" color="currentColor" :stroke-width="1.5"/>
-          <input
-            id="fullName"
-            v-model="fullName"
-            type="text"
-            placeholder="João da silva..."
-            autocomplete="name"
-            required
-          />
-        </div>
-      </div>
-
-      <div class="field">
-        <label for="email">Endereço de email</label>
-        <div class="input-wrap">
+        <div class="field">
+          <label for="fullName">Nome completo</label>
+          <div class="input-wrap">
             <HugeiconsIcon class="icon" :icon="User02Icon" :size="32" color="currentColor" :stroke-width="1.5"/>
-          <input
-            id="email"
-            v-model="email"
-            type="email"
-            placeholder="voceexemplo@gmail.com"
-            autocomplete="email"
-            required
-          />
+            <input
+              id="fullName"
+              v-model="fullName"
+              type="text"
+              placeholder="João da silva..."
+              autocomplete="name"
+              required
+            />
+          </div>
         </div>
-      </div>
 
-      <div class="field">
-        <label for="password">Senha</label>
-        <div class="input-wrap">
-          <HugeiconsIcon class="icon" :icon="CircleLockIcon" :size="32" color="currentColor" :stroke-width="1.5"/>
-          <input
-            id="password"
-            v-model="password"
-            :type="showPassword ? 'text' : 'password'"
-            placeholder="••••••••••"
-            autocomplete="new-password"
-            required
-          />
-          <button
-            type="button"
-            class="toggle-visibility"
-            @click="showPassword = !showPassword"
-            :aria-label="showPassword ? 'Ocultar senha' : 'Mostrar senha'"
+        <div class="field">
+          <label for="email">Endereço de email</label>
+          <div class="input-wrap">
+            <HugeiconsIcon class="icon" :icon="MailIcon" :size="32" color="currentColor" :stroke-width="1.5"/>
+            <input
+              id="email"
+              v-model="email"
+              type="email"
+              placeholder="voceexemplo@gmail.com"
+              autocomplete="email"
+              required
+            />
+          </div>
+        </div>
+
+        <div class="field">
+          <label for="password">Senha</label>
+          <div class="input-wrap">
+            <HugeiconsIcon class="icon" :icon="CircleLockIcon" :size="32" color="currentColor" :stroke-width="1.5"/>
+            <input
+              id="password"
+              v-model="password"
+              :type="showPassword ? 'text' : 'password'"
+              placeholder="••••••••••"
+              autocomplete="new-password"
+              required
+            />
+            <button
+              type="button"
+              class="toggle-visibility"
+              @click="showPassword = !showPassword"
+              :aria-label="showPassword ? 'Ocultar senha' : 'Mostrar senha'"
             >
-            <HugeiconsIcon v-if="!showPassword" :icon="ViewOffIcon" :size="24" color="currentColor" :stroke-width="1.5"/>
-            <HugeiconsIcon v-else :icon="EyeIcon" :size="24" color="currentColor" :stroke-width="1.5"/>
-          </button>
+              <HugeiconsIcon v-if="!showPassword" :icon="ViewOffIcon" :size="24" color="currentColor" :stroke-width="1.5"/>
+              <HugeiconsIcon v-else :icon="EyeIcon" :size="24" color="currentColor" :stroke-width="1.5"/>
+            </button>
+          </div>
         </div>
+
+        <button type="submit" class="primary-btn" :disabled="!canSubmit">
+          {{ loading ? 'Criando...' : 'Inscrever-se' }}
+        </button>
+      </form>
+
+      <div class="divider"><span>ou</span></div>
+
+      <div class="social-row">
+        <button type="button" class="social-btn" @click="handleGoogleSignUp">
+          <HugeiconsIcon class="continue-with" :icon="ChromeIcon" :size="24" :stroke-width="1.5"/>
+          <p>Google</p>
+        </button>
+        <button type="button" class="social-btn" @click="handleMicrosoftSignUp">
+          <HugeiconsIcon class="continue-with" :icon="MicrosoftIcon" :size="24" :stroke-width="1.5"/>
+          <p>Microsoft</p>
+        </button>
       </div>
 
-      <button type="submit" class="primary-btn" :disabled="!canSubmit">
-        {{ loading ? 'Criando...' : 'Inscrever-se' }}
-      </button>
-    </form>
+      <p v-if="errorMsg" class="error" role="alert">{{ errorMsg }}</p>
 
-    <div class="divider"><span>ou</span></div>
-
-    <div class="social-row">
-      <button type="button" class="social-btn" @click="handleGoogleSignUp">
-        <HugeiconsIcon class="continue-with" :icon="ChromeIcon" :size="24"  :stroke-width="1.5"/>
-        <p>
-          Google
-        </p>
-      </button>
-      <button type="button" class="social-btn" @click="handleMicrosoftSignUp">
-        <HugeiconsIcon class="continue-with" :icon="MicrosoftIcon" :size="24"  :stroke-width="1.5"/>
-        <p>
-          Microsoft
-        </p>
-      </button>
-    </div>
-
-    <p v-if="errorMsg" class="error" role="alert">{{ errorMsg }}</p>
-
-    <p class="footer-link">
-      Já tem uma conta?
-      <router-link to="/login">Entrar</router-link>
-    </p>
-  </main>
-</div>
+      <p class="footer-link">
+        Já tem uma conta?
+        <router-link to="/login">Entrar</router-link>
+      </p>
+    </main>
+  </div>
 </template>
 
 <style scoped>
@@ -238,6 +232,17 @@ form {
   align-items: center;
 }
 
+.input-wrap input:-webkit-autofill,
+.input-wrap input:-webkit-autofill:hover,
+.input-wrap input:-webkit-autofill:focus,
+.input-wrap input:-webkit-autofill:active {
+  -webkit-text-fill-color: #fff;
+  -webkit-box-shadow: 0 0 0px 1000px rgba(143, 135, 135, 0.15) inset;
+  box-shadow: 0 0 0px 1000px rgba(143, 135, 135, 0.15) inset;
+  transition: background-color 5000s ease-in-out 0s;
+  caret-color: #fff;
+}
+
 .input-wrap .icon {
   position: absolute;
   left: 12px;
@@ -251,7 +256,7 @@ form {
   color: rgba(255, 255, 255, 0.295);
 }
 
-.social-row button p{
+.social-row button p {
   color: rgba(255, 255, 255, 0.295);
   font-weight: 600;
   font-size: 0.9rem;

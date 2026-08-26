@@ -15,6 +15,28 @@ export const useAuthStore = defineStore('auth', {
   },
 
   actions: {
+    async signIn({ email, password }) {
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      })
+      if (error) throw error
+      this.session = data.session
+      this.user = data.user
+      if (this.user) await this.fetchProfile()
+      return data
+    },
+    async signUp({ email, password }) {
+       const { data, error } = await supabase.auth.signUp({
+         email,
+         password,
+       })
+      if (error) throw error
+      this.session = data.session
+      this.user = data.user
+      return data
+    },
+
     async loginWithGoogle() {
       const { error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
@@ -44,22 +66,21 @@ export const useAuthStore = defineStore('auth', {
       return data
     },
 
-    async createProfile({ username, full_name }) {
-      const { data, error } = await supabase
-        .from('profiles')
-        .insert({
-          id: this.user.id,
-          username,
-          full_name,
-          avatar_url: this.user.user_metadata?.avatar_url,
-        })
-        .select()
-        .single()
+async createProfile({ full_name }) {
+  const { data, error } = await supabase
+    .from('profiles')
+    .insert({
+      id: this.user.id,
+      full_name,
+      avatar_url: this.user.user_metadata?.avatar_url,
+    })
+    .select()
+    .single()
 
-      if (error) throw error
-      this.profile = data
-      return data
-    },
+  if (error) throw error
+  this.profile = data
+  return data
+},
 
     async initAuthListener() {
       const { data: { session } } = await supabase.auth.getSession()

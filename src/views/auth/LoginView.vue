@@ -6,6 +6,8 @@ import { useRouter } from 'vue-router'
 
 import { HugeiconsIcon } from '@hugeicons/vue'
 import { CircleLockIcon } from '@hugeicons/core-free-icons'
+import { EyeIcon } from '@hugeicons/core-free-icons'
+import { ViewOffIcon } from '@hugeicons/core-free-icons'
 import { MailIcon } from '@hugeicons/core-free-icons'
 import { GoogleIcon } from '@hugeicons/core-free-icons'
 
@@ -100,10 +102,8 @@ const userInitial = computed(() => {
           @click="showPassword = !showPassword"
           :aria-label="showPassword ? 'Ocultar senha' : 'Mostrar senha'"
         >
-          <svg v-if="showPassword" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
-            <path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7Z" />
-            <circle cx="12" cy="12" r="3" />
-          </svg>
+            <HugeiconsIcon v-if="!showPassword" :icon="ViewOffIcon" :size="24" color="currentColor" :stroke-width="1.5"/>
+            <HugeiconsIcon v-else :icon="EyeIcon" :size="24" color="currentColor" :stroke-width="1.5"/>
         </button>
       </div>
 
@@ -197,6 +197,17 @@ form {
   position: relative;
   display: flex;
   align-items: center;
+}
+
+.input-wrap input:-webkit-autofill,
+.input-wrap input:-webkit-autofill:hover,
+.input-wrap input:-webkit-autofill:focus,
+.input-wrap input:-webkit-autofill:active {
+  -webkit-text-fill-color: #fff;
+  -webkit-box-shadow: 0 0 0px 1000px rgba(143, 135, 135, 0.15) inset;
+  box-shadow: 0 0 0px 1000px rgba(143, 135, 135, 0.15) inset;
+  transition: background-color 5000s ease-in-out 0s;
+  caret-color: #fff;
 }
 
 .input-wrap .icon {
