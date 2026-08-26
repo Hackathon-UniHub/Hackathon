@@ -13,8 +13,10 @@
     "format": "prettier --write --experimental-cli src/"
   },
   "dependencies": {
-    "@supabase/supabase-js": "^2.111.0",
-    "pinia": "^3.0.4",
+    "@hugeicons/core-free-icons": "^4.3.0",
+    "@hugeicons/vue": "^1.0.8",
+    "@supabase/supabase-js": "^2.112.3",
+    "pinia": "^4.0.3",
     "vue": "^3.5.32",
     "vue-router": "^5.0.4"
   },

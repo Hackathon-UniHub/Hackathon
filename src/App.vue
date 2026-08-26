@@ -16,9 +16,18 @@ const authStore = useAuthStore()
   box-sizing: border-box;
 }
 
+html,
 body {
+  height: 100%;
   margin: 0;
+}
+
+body {
   font-family: system-ui, sans-serif;
+}
+
+#app {
+  min-height: 100vh;
 }
 
 .loading {
