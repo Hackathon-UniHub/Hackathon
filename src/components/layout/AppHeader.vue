@@ -5,6 +5,22 @@ import { RouterLink } from 'vue-router'
 </script>
 
 <template>
+<<<<<<< HEAD
+  <header>
+    <div class="container">
+      <div class="logo">
+        <RouterLink to="/"><img src="../icons/UniHub.png" alt="Logo UniHub" /></RouterLink>
+      </div>
+
+      <nav>
+        <ul>
+          <li><RouterLink to="/">Home</RouterLink></li>
+          <li><RouterLink to="/universidades">Filtro</RouterLink></li>
+          <li><RouterLink to="#">Favoritos</RouterLink></li>
+          <li><RouterLink to="#">Sobre Nós</RouterLink></li>
+          <li>
+            <span class="nav-border"><RouterLink to="#">Explore pelo Mapa!</RouterLink></span>
+=======
   <header class="cabecalho">
     <div class="cabecalhoConteudo">
       <RouterLink class="linkLogo" to="/" aria-label="UniHub">
@@ -32,10 +48,20 @@ import { RouterLink } from 'vue-router'
             <RouterLink to="/como-funciona" class="linkNavegacao" exact-active-class="ativo">
               Como funciona
             </RouterLink>
+>>>>>>> dev
           </li>
         </ul>
       </nav>
 
+<<<<<<< HEAD
+      <div class="login">
+        <ul>
+          <li><RouterLink to="#">Entrar</RouterLink></li>
+          <li>
+            <span class="login-border"><RouterLink to="#">Criar Conta</RouterLink></span>
+          </li>
+        </ul>
+=======
       <div class="areaAcoes">
         <RouterLink class="botaoPesquisa" to="/explorar" aria-label="Explorar">
           <HugeiconsIcon :icon="Search01Icon" :size="22" color="currentColor" :stroke-width="1.8" />
@@ -45,6 +71,7 @@ import { RouterLink } from 'vue-router'
         </RouterLink>
         <RouterLink class="botaoEntrar" to="/entrar">Entrar</RouterLink>
         <RouterLink class="botaoCriarConta" to="/criar-conta">Criar conta</RouterLink>
+>>>>>>> dev
       </div>
     </div>
   </header>
@@ -399,7 +426,12 @@ header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 1px 2vw;
+  padding: 0.1rem 2vw;
+}
+
+.logo img {
+  height: 72px;
+  width: auto;
 }
 
 nav ul li > a,
@@ -448,7 +480,7 @@ nav ul li {
 .nav-border,
 .login-border {
   background-color: #e4c97d;
-  padding: 5px 1vw;
+  padding: 2px 1vw;
   border-radius: 10px;
   display: inline-block;
   transition: all 0.2s ease-in-out;
