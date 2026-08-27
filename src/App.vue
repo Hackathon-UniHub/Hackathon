@@ -1,37 +1,34 @@
 <script setup>
-import { useAuthStore } from '@/stores/auth'
-
-const authStore = useAuthStore()
+import AppFooter from './components/layout/AppFooter.vue'
+import AppHeader from './components/layout/AppHeader.vue'
+import { RouterView } from 'vue-router'
 </script>
 
 <template>
-  <div id="app">
-    <router-view v-if="!authStore.loading" />
-    <div v-else class="loading">Carregando...</div>
+  <div class="cabecalhoReserva">
+    <AppHeader />
   </div>
+  <main>
+    <RouterView />
+  </main>
+  <AppFooter />
 </template>
 
-<style>
-* {
-  box-sizing: border-box;
+<style scoped>
+.cabecalhoReserva {
+  height: 76px;
 }
 
-html,
-body {
-  height: 100%;
-  margin: 0;
+/* === RESPONSIVO === */
+@media (max-width: 768px) {
+  .cabecalhoReserva {
+    height: 140px;
+  }
 }
 
-body {
-  font-family: system-ui, sans-serif;
-}
-
-#app {
-  min-height: 100vh;
-}
-
-.loading {
-  text-align: center;
-  margin-top: 100px;
+@media (max-width: 480px) {
+  .cabecalhoReserva {
+    height: 190px;
+  }
 }
 </style>
