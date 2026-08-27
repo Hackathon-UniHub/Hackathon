@@ -1,5 +1,5 @@
 import { createRouter, createWebHistory } from 'vue-router'
-<<<<<<< HEAD
+import ErroView from '@/views/ErroView.vue'
 import HomeView from '../views/HomeView.vue'
 import paginaFiltroList from '@/components/paginaFiltro/paginaFiltroList.vue'
 import paginaUniversidade from '@/components/paginaUniversidades/paginaUniversidade.vue'
@@ -24,7 +24,6 @@ const router = createRouter({
     },
   ],
   component: () => import('../views/AboutView.vue'),
-=======
 //import { useAuthStore } from '@/stores/auth'
 
 const routes = [
@@ -44,12 +43,16 @@ const routes = [
     component: () => import('@/views/CompleteProfileView.vue'),
     meta: { requiresAuth: true },
   },
+  {
+    path: '/:pathMatch(.*)*',
+    name: 'erro',
+    component: ErroView,
+  },
 ]
 
 const router = createRouter({
   history: createWebHistory(),
   routes,
->>>>>>> dev
 })
 
 /*router.beforeEach((to) => {
