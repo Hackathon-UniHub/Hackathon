@@ -87,7 +87,7 @@ onMounted(() => {
         <div class="cabecalhoSecao">
           <span class="destaque">Universidades</span>
           <h2>Universidades mais buscadas</h2>
-          <RouterLink to="/explorar">Ver todas</RouterLink>
+          <RouterLink to="/universidades">Ver todas</RouterLink>
         </div>
 
         <div class="gradeUniversidades"></div>

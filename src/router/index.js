@@ -34,9 +34,14 @@ const routes = [
     meta: { requiresAuth: true },
   },
   {
-    path: '/:pathMatch(.*)*',
-    name: 'erro',
-    component: ErroView,
+    path: '/universidades',
+    name: 'filtro',
+    component: () => import('@/components/paginaFiltro/paginaFiltroList.vue'),
+  },
+  {
+    path: '/universidade/:id',
+    name: 'universidade',
+    component: () => import('@/components/paginaUniversidades/paginaUniversidade.vue'),
   },
 ]
 
