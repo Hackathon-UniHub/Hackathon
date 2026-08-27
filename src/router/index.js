@@ -23,6 +23,7 @@ const routes = [
   name: 'universidade',
   component: () => import('@/components/paginaUniversidades/paginaUniversidade.vue'),
 },
+
 ]
 
 const router = createRouter({
@@ -51,3 +52,4 @@ const router = createRouter({
 })*/
 
 export default router
+
