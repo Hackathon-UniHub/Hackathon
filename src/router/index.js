@@ -1,30 +1,4 @@
 import { createRouter, createWebHistory } from 'vue-router'
-<<<<<<< HEAD
-import HomeView from '../views/HomeView.vue'
-import paginaFiltroList from '@/components/paginaFiltro/paginaFiltroList.vue'
-import paginaUniversidade from '@/components/paginaUniversidades/paginaUniversidade.vue'
-
-const router = createRouter({
-  history: createWebHistory(import.meta.env.BASE_URL),
-  routes: [
-    {
-      path: '/',
-      name: 'home',
-      component: HomeView,
-    },
-    {
-      path: '/universidades',
-      name: 'filtro',
-      component: paginaFiltroList,
-    },
-    {
-      path: '/universidade/:id',
-      name: 'universidade',
-      component: paginaUniversidade,
-    },
-  ],
-  component: () => import('../views/AboutView.vue'),
-=======
 //import { useAuthStore } from '@/stores/auth'
 
 const routes = [
@@ -44,12 +18,21 @@ const routes = [
     component: () => import('@/views/CompleteProfileView.vue'),
     meta: { requiresAuth: true },
   },
+  {
+    path: '/universidades',
+    name: 'filtro',
+    component: () => import('@/components/paginaFiltro/paginaFiltroList.vue'),
+  },
+  {
+    path: '/universidade/:id',
+    name: 'universidade',
+    component: () => import('@/components/paginaUniversidades/paginaUniversidade.vue'),
+  },
 ]
 
 const router = createRouter({
   history: createWebHistory(),
   routes,
->>>>>>> dev
 })
 
 /*router.beforeEach((to) => {
