@@ -1,24 +1,19 @@
 <script setup>
 import { computed } from 'vue'
 import { useRoute } from 'vue-router'
-import { UniversidadePorId } from '@/utils/universidadesUtils.js'
+import {
+  UniversidadePorId,
+  getIniciais,
+  getAnoFundacao,
+  UniversidadePublica,
+} from '@/utils/universidadesUtils.js'
 
 const route = useRoute()
 const universidade = computed(() => UniversidadePorId(route.params.id))
 
-const iniciais = computed(() => {
-  if (!universidade.value) return ''
-  return universidade.value.sigla
-    ? universidade.value.sigla.slice(0, 3)
-    : universidade.value.nome.slice(0, 3)
-})
-
-const anoFundacao = computed(() => {
-  if (!universidade.value?.data_criacao_ies) return null
-  return universidade.value.data_criacao_ies.split('-')[0]
-})
-
-const isPublica = computed(() => universidade.value?.categoria?.toLowerCase() === 'publica')
+const iniciais = computed(() => getIniciais(universidade.value))
+const anoFundacao = computed(() => getAnoFundacao(universidade.value))
+const isPublica = computed(() => UniversidadePublica(universidade.value))
 </script>
 
 <template>
@@ -45,7 +40,8 @@ const isPublica = computed(() => universidade.value?.categoria?.toLowerCase() ==
 
         <div class="acoesCabecalho">
           <div class="nota" v-if="universidade.igc && universidade.igc !== '-'">
-            {{ universidade.igc }} <img class="estrela" src="/src/components/icons/estrela.svg" alt="Estrela">
+            {{ universidade.igc }}
+            <img class="estrela" src="/src/components/icons/estrela.svg" alt="Estrela" />
             <span class="notaLegenda">IGC/MEC</span>
           </div>
           <button class="botaoFavoritar">Favoritar</button>
@@ -65,7 +61,7 @@ const isPublica = computed(() => universidade.value?.categoria?.toLowerCase() ==
       </div>
 
       <div class="conteudo">
-        <div class="colunaPrincipal">
+        <div class="secoesSuperiores">
           <div class="secao" v-if="universidade.descricao">
             <h2>Sobre a instituição</h2>
             <p class="descricao">{{ universidade.descricao }}</p>
@@ -77,8 +73,8 @@ const isPublica = computed(() => universidade.value?.categoria?.toLowerCase() ==
                 :key="curso"
               >
                 {{ curso }}
-            </span>
-            <img class="graduacao" src="/src/components/icons/graduacao.svg" alt="Graduação">
+              </span>
+              <img class="graduacao" src="/src/components/icons/graduacao.svg" alt="Graduação" />
             </div>
           </div>
 
@@ -117,75 +113,71 @@ const isPublica = computed(() => universidade.value?.categoria?.toLowerCase() ==
               </div>
             </div>
           </div>
+        </div>
 
-          <div class="secao" v-if="universidade.fontes_pesquisa?.length">
-            <h2>Fontes de pesquisa</h2>
-            <ul class="listaFontes">
-              <li v-for="fonte in universidade.fontes_pesquisa" :key="fonte">{{ fonte }}</li>
-            </ul>
+        <div class="caixaInstitucional">
+          <div class="tituloInstitucional">
+            <h3>Informações institucionais</h3>
+            <img class="medalha" src="/src/components/icons/medalha.svg" alt="medalha" />
+          </div>
+          <div class="linhaDado" v-if="universidade.razao_social">
+            <span class="dadoRotulo">Razão social</span>
+            <span class="dadoValor">{{ universidade.razao_social }}</span>
+          </div>
+          <div class="linhaDado" v-if="universidade.cnpj">
+            <span class="dadoRotulo">CNPJ</span>
+            <span class="dadoValor">{{ universidade.cnpj }}</span>
+          </div>
+          <div class="linhaDado" v-if="anoFundacao">
+            <span class="dadoRotulo">Fundação</span>
+            <span class="dadoValor">{{ anoFundacao }}</span>
+          </div>
+          <div class="linhaDado" v-if="universidade.natureza_juridica">
+            <span class="dadoRotulo">Natureza jurídica</span>
+            <span class="dadoValor">{{ universidade.natureza_juridica }}</span>
+          </div>
+          <div class="linhaDado" v-if="universidade.organizacao_academica">
+            <span class="dadoRotulo">Organização acadêmica</span>
+            <span class="dadoValor">{{ universidade.organizacao_academica }}</span>
+          </div>
+          <div class="linhaDado" v-if="universidade.tipo_credenciamento">
+            <span class="dadoRotulo">Credenciamento</span>
+            <span class="dadoValor">{{ universidade.tipo_credenciamento }}</span>
+          </div>
+          <div class="linhaDado" v-if="universidade.endereco_sede">
+            <span class="dadoRotulo">Endereço</span>
+            <span class="dadoValor">{{ universidade.endereco_sede }}</span>
+          </div>
+          <div class="linhaDado" v-if="universidade.site">
+            <span class="dadoRotulo">Site</span>
+            <span class="dadoValor">{{ universidade.site }}</span>
+          </div>
+          <div class="linhaDado" v-if="universidade.telefone">
+            <span class="dadoRotulo">Telefone</span>
+            <span class="dadoValor">{{ universidade.telefone }}</span>
+          </div>
+          <div class="linhaDado" v-if="universidade.email">
+            <span class="dadoRotulo">E-mail</span>
+            <span class="dadoValor">{{ universidade.email }}</span>
+          </div>
+          <div class="linhaDado" v-if="universidade.sinalizacoes_vigentes">
+            <span class="dadoRotulo">Sinalizações vigentes</span>
+            <span class="dadoValor alerta">{{ universidade.sinalizacoes_vigentes }}</span>
           </div>
         </div>
 
-        <div class="colunaLateral">
-          <div class="caixaInstitucional">
-            <div class="tituloInstitucional">
-              <h3>Informações institucionais</h3>
-              <img class="medalha" src="/src/components/icons/medalha.svg" alt="medalha">
-            </div>
-            <div class="linhaDado" v-if="universidade.razao_social">
-              <span class="dadoRotulo">Razão social</span>
-              <span class="dadoValor">{{ universidade.razao_social }}</span>
-            </div>
-            <div class="linhaDado" v-if="universidade.cnpj">
-              <span class="dadoRotulo">CNPJ</span>
-              <span class="dadoValor">{{ universidade.cnpj }}</span>
-            </div>
-            <div class="linhaDado" v-if="anoFundacao">
-              <span class="dadoRotulo">Fundação</span>
-              <span class="dadoValor">{{ anoFundacao }}</span>
-            </div>
-            <div class="linhaDado" v-if="universidade.natureza_juridica">
-              <span class="dadoRotulo">Natureza jurídica</span>
-              <span class="dadoValor">{{ universidade.natureza_juridica }}</span>
-            </div>
-            <div class="linhaDado" v-if="universidade.organizacao_academica">
-              <span class="dadoRotulo">Organização acadêmica</span>
-              <span class="dadoValor">{{ universidade.organizacao_academica }}</span>
-            </div>
-            <div class="linhaDado" v-if="universidade.tipo_credenciamento">
-              <span class="dadoRotulo">Credenciamento</span>
-              <span class="dadoValor">{{ universidade.tipo_credenciamento }}</span>
-            </div>
-            <div class="linhaDado" v-if="universidade.endereco_sede">
-              <span class="dadoRotulo">Endereço</span>
-              <span class="dadoValor">{{ universidade.endereco_sede }}</span>
-            </div>
-            <div class="linhaDado" v-if="universidade.site">
-              <span class="dadoRotulo">Site</span>
-              <span class="dadoValor">{{ universidade.site }}</span>
-            </div>
-            <div class="linhaDado" v-if="universidade.telefone">
-              <span class="dadoRotulo">Telefone</span>
-              <span class="dadoValor">{{ universidade.telefone }}</span>
-            </div>
-            <div class="linhaDado" v-if="universidade.email">
-              <span class="dadoRotulo">E-mail</span>
-              <span class="dadoValor">{{ universidade.email }}</span>
-            </div>
-            <div class="linhaDado" v-if="universidade.sinalizacoes_vigentes">
-              <span class="dadoRotulo">Sinalizações vigentes</span>
-              <span class="dadoValor alerta">{{ universidade.sinalizacoes_vigentes }}</span>
-            </div>
-          </div>
+        <div class="secao" v-if="universidade.fontes_pesquisa?.length">
+          <h2>Fontes de pesquisa</h2>
+          <ul class="listaFontes">
+            <li v-for="fonte in universidade.fontes_pesquisa" :key="fonte">{{ fonte }}</li>
+          </ul>
+        </div>
 
-          <div class="caixaCadastro">
-            <h3>Interessado em {{ universidade.sigla || universidade.nome }}?</h3>
-            <p>
-              Crie uma conta para salvar favoritos, ver mais instituições e localizalas no mapa.
-            </p>
-            <button class="botaoPrimario">Criar conta grátis</button>
-            <RouterLink to="/universidades" class="botaoSecundario">Outras universidades</RouterLink>
-          </div>
+        <div class="caixaCadastro">
+          <h3>Interessado em {{ universidade.sigla || universidade.nome }}?</h3>
+          <p>Crie uma conta para salvar favoritos, ver mais instituições e localizalas no mapa.</p>
+          <button class="botaoPrimario">Criar conta grátis</button>
+          <RouterLink to="/universidades" class="botaoSecundario">Outras universidades</RouterLink>
         </div>
       </div>
     </div>
@@ -208,7 +200,6 @@ const isPublica = computed(() => universidade.value?.categoria?.toLowerCase() ==
 .tituloInstitucional {
   display: flex;
   gap: 0.5rem;
-
 }
 .tituloInstitucional h3 {
   margin: 20px 0 0 0;
@@ -397,9 +388,51 @@ const isPublica = computed(() => universidade.value?.categoria?.toLowerCase() ==
   margin-top: 1rem;
 }
 
+.secoesSuperiores {
+  grid-column: 1;
+  grid-row: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+.secoesSuperiores > *:last-child {
+  flex-grow: 1;
+}
+
+.caixaInstitucional {
+  grid-column: 2;
+  grid-row: 1;
+}
+
+.conteudo > .secao {
+  grid-column: 1;
+  grid-row: 2;
+}
+
+.caixaCadastro {
+  grid-column: 2;
+  grid-row: 2;
+}
+
 @media (max-width: 800px) {
   .conteudo {
     grid-template-columns: 1fr;
+  }
+  .secoesSuperiores {
+    grid-column: 1;
+    grid-row: 1;
+  }
+  .conteudo > .secao {
+    grid-column: 1;
+    grid-row: 2;
+  }
+  .caixaInstitucional {
+    grid-column: 1;
+    grid-row: 3;
+  }
+  .caixaCadastro {
+    grid-column: 1;
+    grid-row: 4;
   }
 }
 
@@ -408,7 +441,6 @@ const isPublica = computed(() => universidade.value?.categoria?.toLowerCase() ==
   border: 1px solid #eeeef0;
   border-radius: 16px;
   padding: 1.5rem;
-  margin-bottom: 1.5rem;
 }
 
 .secao h2 {
@@ -506,7 +538,6 @@ const isPublica = computed(() => universidade.value?.categoria?.toLowerCase() ==
   border: 1px solid #eeeef0;
   border-radius: 16px;
   padding: 1.5rem;
-  margin-bottom: 1.5rem;
 }
 
 .caixaInstitucional h3 {
@@ -551,24 +582,27 @@ const isPublica = computed(() => universidade.value?.categoria?.toLowerCase() ==
 }
 .botaoPrimario,
 .botaoSecundario {
+  display: flex;
+  align-items: center;
+  justify-content: center;
   width: 100%;
-  padding: 0.7rem;
+  padding: 0.55rem;
   border-radius: 999px;
   font-weight: 500;
   border: none;
   cursor: pointer;
   margin-bottom: 0.6rem;
+  box-sizing: border-box;
+  text-decoration: none;
 }
 .botaoPrimario {
   background-color: #ffffff;
   color: #1c1c22;
 }
 .botaoSecundario {
-  padding: 0.6rem 4.37rem;
   background-color: transparent;
   color: #ffffff;
   border: 1px solid #4c4c57;
-  margin: 0 0 0 0;
 }
 
 .naoEncontrada {
