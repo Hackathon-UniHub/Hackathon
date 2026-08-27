@@ -17,14 +17,9 @@ const routes = [
     component: () => import('@/views/auth/LoginView.vue'),
   },
   {
-    path: '/mapa',
-    name: 'mapa',
-    component: () => import('@/views/MapaView.vue'),
-  },
-  {
-    path: '/complete-profile',
-    name: 'complete-profile',
-    component: () => import('@/views/CompleteProfileView.vue'),
+    path: '/create-account',
+    name: 'create-account',
+    component: () => import('@/views/CreateAccountView.vue'),
     meta: { requiresAuth: true },
   },
   {
