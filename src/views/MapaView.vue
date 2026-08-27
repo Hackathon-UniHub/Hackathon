@@ -2,13 +2,17 @@
 import { ref, reactive, computed, onMounted, onUnmounted } from 'vue'
 import { RouterLink, useRouter } from 'vue-router'
 import ComponenteMapa from '@/components/ComponenteMapa.vue'
-import { universidades } from '@/data/universidades.js'
+import universidades from '@/data/universidades.js'
+import { coordenadasMapa } from '@/data/coordenadasMapa.js'
 
 const router = useRouter()
 
-const universidadesNoMapa = universidades.filter(
-  (universidade) => universidade.latitude && universidade.longitude,
-)
+const universidadesNoMapa = universidades
+  .filter((universidade) => coordenadasMapa[universidade.sigla])
+  .map((universidade) => ({
+    ...universidade,
+    ...coordenadasMapa[universidade.sigla],
+  }))
 
 const componenteMapaRef = ref(null)
 const estadosExpandidos = reactive({})

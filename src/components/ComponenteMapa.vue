@@ -30,13 +30,19 @@ function iniciaisDaSigla(sigla) {
   return sigla.replace(/[^A-Z]/gi, '').slice(0, 2).toUpperCase()
 }
 
-function descricaoProvisoria(universidade) {
-  const categoria = universidade.categoria_administrativa || 'Instituição de ensino superior'
-  return `${categoria} em ${universidade.municipio}/${universidade.uf}.`
+function descricaoResumida(universidade) {
+  if (!universidade.descricao) {
+    return `${universidade.categoria_administrativa || 'Instituição de ensino'} em ${universidade.municipio}/${universidade.uf}.`
+  }
+
+  const limite = 120
+  if (universidade.descricao.length <= limite) return universidade.descricao
+
+  return universidade.descricao.slice(0, limite).trim() + '...'
 }
 
 function notaIgc(universidade) {
-  if (!universidade.igc) return 'IGC não informado'
+  if (!universidade.igc || universidade.igc === '-') return 'IGC não informado'
   return `IGC ${universidade.igc}/5`
 }
 
@@ -52,7 +58,7 @@ function montarPopup(universidade) {
           <div class="popupCidade">${universidade.municipio}/${universidade.uf}</div>
         </div>
       </div>
-      <p class="popupDescricao">${descricaoProvisoria(universidade)}</p>
+      <p class="popupDescricao">${descricaoResumida(universidade)}</p>
       <div class="popupRodape">
         <span class="popupIgc">${notaIgc(universidade)}</span>
         <button class="popupBotao" type="button" onclick="window.dispatchEvent(new CustomEvent('abrir-universidade', { detail: '${universidade.sigla}' }))">
@@ -75,7 +81,7 @@ onMounted(() => {
     if (universidade.latitude && universidade.longitude) {
       const marcador = L.marker([universidade.latitude, universidade.longitude])
         .addTo(mapa)
-        .bindPopup(montarPopup(universidade), { maxWidth: 240 })
+        .bindPopup(montarPopup(universidade), { maxWidth: 260 })
 
       marcadores[universidade.sigla] = marcador
     }
@@ -114,7 +120,7 @@ onUnmounted(() => {
 
 <style>
 .popupUniversidade {
-  min-width: 200px;
+  min-width: 210px;
   font-family: inherit;
 }
 
@@ -182,4 +188,4 @@ onUnmounted(() => {
 .popupBotao:hover {
   background: #5c0a13;
 }
-</style>    
+</style>
