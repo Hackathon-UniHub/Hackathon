@@ -1,11 +1,26 @@
 import { createRouter, createWebHistory } from 'vue-router'
+import ErroView from '@/views/ErroView.vue'
+import HomeView from '../views/HomeView.vue'
+import paginaFiltroList from '@/components/paginaFiltro/paginaFiltroList.vue'
+import paginaUniversidade from '@/components/paginaUniversidades/paginaUniversidade.vue'
+
 //import { useAuthStore } from '@/stores/auth'
 
 const routes = [
   {
     path: '/',
     name: 'home',
-    component: () => import('@/views/HomeView.vue'),
+    component: HomeView,
+  },
+  {
+    path: '/universidades',
+    name: 'filtro',
+    component: paginaFiltroList,
+  },
+  {
+    path: '/universidade/:id',
+    name: 'universidade',
+    component: paginaUniversidade,
   },
   {
     path: '/login',
