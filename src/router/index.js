@@ -7,12 +7,19 @@ const routes = [
   {
     path: '/',
     name: 'home',
+    alias: ['/explorar', '/como-funciona'],
     component: () => import('@/views/HomeView.vue'),
   },
   {
     path: '/login',
     name: 'login',
+    alias: ['/entrar', '/criar-conta'],
     component: () => import('@/views/auth/LoginView.vue'),
+  },
+  {
+    path: '/mapa',
+    name: 'mapa',
+    component: () => import('@/views/MapaView.vue'),
   },
   {
     path: '/complete-profile',
