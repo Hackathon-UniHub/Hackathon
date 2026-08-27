@@ -1,4 +1,6 @@
 <script setup>
+import { HugeiconsIcon } from '@hugeicons/vue'
+import { InstagramIcon, Facebook01Icon, NewTwitterIcon } from '@hugeicons/core-free-icons'
 </script>
 
 <template>
@@ -16,13 +18,28 @@
 
         <div class="redesSociais" aria-label="Redes sociais">
           <a href="https://instagram.com" target="_blank" rel="noreferrer" aria-label="Instagram">
-            <img src="../icons/instagram.svg" alt="" />
+            <HugeiconsIcon
+              :icon="InstagramIcon"
+              :size="20"
+              color="currentColor"
+              :stroke-width="1.8"
+            />
           </a>
           <a href="https://facebook.com" target="_blank" rel="noreferrer" aria-label="Facebook">
-            <span aria-hidden="true">f</span>
+            <HugeiconsIcon
+              :icon="Facebook01Icon"
+              :size="20"
+              color="currentColor"
+              :stroke-width="1.8"
+            />
           </a>
           <a href="https://x.com" target="_blank" rel="noreferrer" aria-label="X">
-            <img src="../icons/x.svg" alt="" />
+            <HugeiconsIcon
+              :icon="NewTwitterIcon"
+              :size="20"
+              color="currentColor"
+              :stroke-width="1.8"
+            />
           </a>
         </div>
       </div>
@@ -104,6 +121,7 @@
   font-size: 0.96rem;
   line-height: 1.7;
   margin-bottom: 22px;
+  /* === RESPONSIVO === */
 }
 
 .redesSociais {
@@ -198,6 +216,7 @@
 
   .linksRodape {
     width: 100%;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 }
 
@@ -209,6 +228,10 @@
   .linksRodape {
     grid-template-columns: 1fr;
     gap: 22px;
+  }
+
+  .grupoLinks {
+    width: 100%;
   }
 
   .rodapeInferior {
@@ -415,5 +438,36 @@ footer {
 
 .contato p {
   font-size: 1.1rem;
+}
+
+.rodape > .container {
+  width: 100%;
+  max-width: none;
+  margin-inline: auto;
+}
+
+.rodapeConteudo {
+  align-items: center;
+  justify-content: center;
+}
+
+.blocoMarca {
+  text-align: center;
+}
+
+.redesSociais {
+  justify-content: center;
+}
+
+.linksRodape {
+  justify-items: center;
+  text-align: center;
+}
+
+.rodapeInferior {
+  justify-content: center;
+  gap: 18px;
+  align-items: center;
+  text-align: center;
 }
 </style>

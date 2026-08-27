@@ -1,7 +1,7 @@
 <script setup>
-import { RouterLink, useRoute } from 'vue-router'
-
-const route = useRoute()
+import { HugeiconsIcon } from '@hugeicons/vue'
+import { Search01Icon, HeartAddIcon } from '@hugeicons/core-free-icons'
+import { RouterLink } from 'vue-router'
 </script>
 
 <template>
@@ -14,25 +14,34 @@ const route = useRoute()
       <nav aria-label="Navegação principal">
         <ul class="menuNavegacao">
           <li>
-            <RouterLink
-              class="linkNavegacao"
-              :class="{ ativo: route.name === 'home' }"
-              :to="{ name: 'home' }"
-            >
-              Home
+            <RouterLink class="linkNavegacao" :to="{ name: 'home' }" exact-active-class="ativo">
+              Início
             </RouterLink>
           </li>
-          <li><RouterLink to="/mapa" class="linkNavegacao">Mapa</RouterLink></li>
-          <li><RouterLink to="/explorar" class="linkNavegacao">Explorar</RouterLink></li>
           <li>
-            <RouterLink to="/como-funciona" class="linkNavegacao">Como funciona</RouterLink>
+            <RouterLink to="/universidades" class="linkNavegacao" exact-active-class="ativo">
+              Universidades
+            </RouterLink>
+          </li>
+          <li>
+            <RouterLink to="/mapa" class="linkNavegacao" exact-active-class="ativo">
+              Mapa
+            </RouterLink>
+          </li>
+          <li>
+            <RouterLink to="/como-funciona" class="linkNavegacao" exact-active-class="ativo">
+              Como funciona
+            </RouterLink>
           </li>
         </ul>
       </nav>
 
       <div class="areaAcoes">
         <RouterLink class="botaoPesquisa" to="/explorar" aria-label="Explorar">
-          <span aria-hidden="true">⌕</span>
+          <HugeiconsIcon :icon="Search01Icon" :size="22" color="currentColor" :stroke-width="1.8" />
+        </RouterLink>
+        <RouterLink class="botaoPesquisa" :to="{ name: 'login' }" aria-label="Favoritos">
+          <HugeiconsIcon :icon="HeartAddIcon" :size="22" color="currentColor" :stroke-width="1.8" />
         </RouterLink>
         <RouterLink class="botaoEntrar" to="/entrar">Entrar</RouterLink>
         <RouterLink class="botaoCriarConta" to="/criar-conta">Criar conta</RouterLink>
@@ -43,9 +52,18 @@ const route = useRoute()
 
 <style scoped>
 .cabecalho {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 100;
+  width: 100%;
   background: rgba(255, 255, 255, 0.8);
   backdrop-filter: blur(8px);
   border-bottom: 1px solid var(--color-border);
+  transition:
+    box-shadow 0.25s ease,
+    background 0.25s ease;
 }
 
 .cabecalhoConteudo {
@@ -92,7 +110,7 @@ const route = useRoute()
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  padding-bottom: 8px;
+  padding-bottom: 4px;
   color: var(--ink-800);
   text-decoration: none;
   font-size: 0.95rem;
@@ -115,7 +133,7 @@ const route = useRoute()
   position: absolute;
   left: 0;
   right: 0;
-  bottom: -2px;
+  bottom: -1px;
   height: 2px;
   background: var(--brand-700);
   border-radius: 999px;
@@ -191,23 +209,52 @@ const route = useRoute()
   box-shadow: 0 8px 18px rgba(122, 15, 26, 0.14);
 }
 
+/* === RESPONSIVO === */
 @media (max-width: 768px) {
   .cabecalhoConteudo {
-    flex-wrap: wrap;
-    justify-content: center;
-    padding: 14px 0;
-    gap: 12px;
+    display: grid;
+    grid-template-columns: 1fr auto;
+    padding: 10px 0;
+    gap: 8px 16px;
   }
 
   .menuNavegacao {
+    grid-column: 1 / -1;
+    grid-row: 2;
     width: 100%;
     flex-wrap: wrap;
+    justify-content: center;
     gap: 10px 18px;
   }
 
   .areaAcoes {
-    width: 100%;
+    grid-column: 2;
+    grid-row: 1;
     justify-content: center;
+  }
+}
+
+@media (max-width: 480px) {
+  .cabecalhoConteudo {
+    display: flex;
+    flex-direction: column;
+    padding: 10px 0 12px;
+    gap: 10px;
+  }
+
+  .menuNavegacao,
+  .areaAcoes {
+    width: 100%;
+  }
+
+  .areaAcoes {
+    flex-wrap: wrap;
+  }
+
+  .botaoEntrar,
+  .botaoCriarConta {
+    min-height: 38px;
+    padding: 0.65rem 0.85rem;
   }
 }
 
@@ -352,7 +399,12 @@ header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 1px 2vw;
+  padding: 0.1rem 2vw;
+}
+
+.logo img {
+  height: 72px;
+  width: auto;
 }
 
 nav ul li > a,
@@ -401,7 +453,7 @@ nav ul li {
 .nav-border,
 .login-border {
   background-color: #e4c97d;
-  padding: 5px 1vw;
+  padding: 2px 1vw;
   border-radius: 10px;
   display: inline-block;
   transition: all 0.2s ease-in-out;
