@@ -41,7 +41,6 @@ const isPublica = computed(() => UniversidadePublica(universidade.value))
         <div class="acoesCabecalho">
           <div class="nota" v-if="universidade.igc && universidade.igc !== '-'">
             {{ universidade.igc }}
-            <img class="estrela" src="/src/components/icons/estrela.svg" alt="Estrela" />
             <span class="notaLegenda">IGC/MEC</span>
           </div>
           <button class="botaoFavoritar">Favoritar</button>
