@@ -1,7 +1,13 @@
 <script setup>
 import { ref, computed } from 'vue'
 import paginaFiltroCard from './paginaFiltroCard.vue'
-import { getEstados, getRatings, filtrar } from '@/utils/filtroUtils.js'
+import {
+  getEstados,
+  getRatings,
+  getUniversidadesFiltradas,
+  alternarEstado,
+  alternarRating,
+} from '@/utils/filtroUtils.js'
 
 const estadoAtivo = ref('')
 const ratingAtivo = ref('Todas')
@@ -11,31 +17,23 @@ const estados = getEstados()
 const ratings = getRatings()
 
 const universidades = computed(() =>
-  filtrar(
-    estadoAtivo.value,
-    pesquisa.value,
-    ratingAtivo.value === 'Todas' ? '' : ratingAtivo.value,
-  ),
+  getUniversidadesFiltradas({
+    estadoAtivo: estadoAtivo.value,
+    pesquisa: pesquisa.value,
+    ratingAtivo: ratingAtivo.value,
+  }),
 )
 
 function selecionarEstado(uf) {
-  if (estadoAtivo.value === uf) {
-    estadoAtivo.value = ''
-    pesquisa.value = ''
-  } else {
-    estadoAtivo.value = uf
-    pesquisa.value = ''
-  }
+  const proximoEstado = alternarEstado(estadoAtivo.value, uf)
+  estadoAtivo.value = proximoEstado.estadoAtivo
+  pesquisa.value = proximoEstado.pesquisa
 }
 
 function selecionarRating(r) {
-  if (ratingAtivo.value === r) {
-    ratingAtivo.value = 'Todas'
-    pesquisa.value = ''
-  } else {
-    ratingAtivo.value = r
-    pesquisa.value = ''
-  }
+  const proximoRating = alternarRating(ratingAtivo.value, r)
+  ratingAtivo.value = proximoRating.ratingAtivo
+  pesquisa.value = proximoRating.pesquisa
 }
 </script>
 
