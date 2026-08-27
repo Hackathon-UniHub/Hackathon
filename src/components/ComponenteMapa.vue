@@ -6,14 +6,25 @@
 import { ref, onMounted, onUnmounted } from 'vue'
 import L from 'leaflet'
 import 'leaflet/dist/leaflet.css'
-import icone from 'leaflet/dist/images/marker-icon.png'
-import sombraIcone from 'leaflet/dist/images/marker-shadow.png'
 
-delete L.Icon.Default.prototype._getIconUrl
-L.Icon.Default.mergeOptions({
-  iconUrl: icone,
-  shadowUrl: sombraIcone,
-})
+const iconesUniversidade = new Map()
+
+function obterIconeUniversidade(zoom) {
+  const tamanho = Math.round(Math.min(65, Math.max(38, 38 + (zoom - 4) * 3.375)))
+  const iconeExistente = iconesUniversidade.get(tamanho)
+  if (iconeExistente) return iconeExistente
+
+  const proporcao = tamanho / 65
+  const icone = L.icon({
+    iconUrl: '/gemini-svg%201.svg',
+    iconSize: [tamanho, tamanho],
+    iconAnchor: [tamanho / 2, Math.round(54 * proporcao)],
+    popupAnchor: [0, -Math.round(54 * proporcao)],
+  })
+
+  iconesUniversidade.set(tamanho, icone)
+  return icone
+}
 
 const props = defineProps({
   universidades: {
@@ -80,11 +91,17 @@ onMounted(() => {
   props.universidades.forEach((universidade) => {
     if (universidade.latitude && universidade.longitude) {
       const marcador = L.marker([universidade.latitude, universidade.longitude])
+        .setIcon(obterIconeUniversidade(mapa.getZoom()))
         .addTo(mapa)
         .bindPopup(montarPopup(universidade), { maxWidth: 260 })
 
       marcadores[universidade.sigla] = marcador
     }
+  })
+
+  mapa.on('zoom', () => {
+    const icone = obterIconeUniversidade(mapa.getZoom())
+    Object.values(marcadores).forEach((marcador) => marcador.setIcon(icone))
   })
 })
 

@@ -4,6 +4,14 @@ import { RouterLink, useRouter } from 'vue-router'
 import ComponenteMapa from '@/components/ComponenteMapa.vue'
 import universidades from '@/data/universidades.js'
 import { coordenadasMapa } from '@/data/coordenadasMapa.js'
+import {
+  agruparUniversidadesPorEstado,
+  alternarEstado,
+  criarManipuladorAberturaUniversidade,
+  estadoEstaAberto,
+  filtrarUniversidades,
+  selecionarUniversidade,
+} from '@/data/mapaUtils.js'
 
 const router = useRouter()
 
@@ -16,37 +24,14 @@ const universidadesNoMapa = universidades
 
 const componenteMapaRef = ref(null)
 const estadosExpandidos = reactive({})
+const busca = ref('')
 
-const universidadesPorEstado = computed(() => {
-  const grupos = {}
+const universidadesFiltradas = computed(() => filtrarUniversidades(universidadesNoMapa, busca.value))
 
-  universidadesNoMapa.forEach((universidade) => {
-    if (!grupos[universidade.uf]) {
-      grupos[universidade.uf] = []
-    }
-    grupos[universidade.uf].push(universidade)
-  })
-
-  return Object.keys(grupos)
-    .sort()
-    .map((uf) => ({
-      uf,
-      universidades: grupos[uf],
-    }))
-})
-
-function alternarEstado(uf) {
-  estadosExpandidos[uf] = !estadosExpandidos[uf]
-}
-
-function selecionarUniversidade(universidade) {
-  componenteMapaRef.value?.focarUniversidade(universidade.sigla)
-}
-
-function aoAbrirUniversidade(evento) {
-  const sigla = evento.detail
-  router.push({ name: 'universidade', params: { sigla } })
-}
+const universidadesPorEstado = computed(() =>
+  agruparUniversidadesPorEstado(universidadesFiltradas.value),
+)
+const aoAbrirUniversidade = criarManipuladorAberturaUniversidade(router)
 
 onMounted(() => {
   window.addEventListener('abrir-universidade', aoAbrirUniversidade)
@@ -64,51 +49,85 @@ onUnmounted(() => {
     </section>
 
     <aside class="mapaInformacoes">
-      <RouterLink class="voltar" to="/">← Voltar</RouterLink>
+      <div class="mapaInformacoesCabecalho">
+        <RouterLink class="voltar" to="/">← Voltar</RouterLink>
 
-      <span class="sobretitulo">Exploração</span>
-      <h1>Mapa interativo</h1>
-      <p class="descricao">
-        Clique num estado para expandir e depois clique numa universidade para ir até ela no mapa.
-      </p>
+        <span class="sobretitulo">Exploração</span>
+        <h1>Mapa interativo</h1>
+        <p class="descricao">
+          Busque ou clique num estado para expandir e ir até a universidade no mapa.
+        </p>
 
-      <div class="listaTitulo">Estados</div>
-      <ul class="estadosLista">
-        <li v-for="grupo in universidadesPorEstado" :key="grupo.uf" class="estadoItem">
-          <button class="estadoCabecalho" type="button" @click="alternarEstado(grupo.uf)">
-            <span
-              class="estadoSeta"
-              :class="{ estadoSetaAberta: estadosExpandidos[grupo.uf] }"
-              >▸</span
-            >
-            <span class="estadoNome">{{ grupo.uf }}</span>
-            <span class="estadoContagem">{{ grupo.universidades.length }}</span>
+        <div class="buscaContainer">
+          <input
+            v-model="busca"
+            type="text"
+            class="buscaInput"
+            placeholder="Buscar universidade, sigla ou cidade..."
+          />
+          <button
+            v-if="busca"
+            class="buscaLimpar"
+            type="button"
+            @click="busca = ''"
+            aria-label="Limpar busca"
+          >
+            ×
           </button>
+        </div>
+      </div>
 
-          <ul v-if="estadosExpandidos[grupo.uf]" class="universidadesLista">
-            <li
-              v-for="universidade in grupo.universidades"
-              :key="universidade.sigla"
-              class="universidadeItem"
+      <div class="mapaInformacoesLista">
+        <ul class="estadosLista">
+          <li v-for="grupo in universidadesPorEstado" :key="grupo.uf" class="estadoItem">
+            <button
+              class="estadoCabecalho"
+              type="button"
+              @click="alternarEstado(estadosExpandidos, grupo.uf)"
             >
-              <button
-                class="universidadeBotao"
-                type="button"
-                @click="selecionarUniversidade(universidade)"
+              <span
+                class="estadoSeta"
+                :class="{
+                  estadoSetaAberta: estadoEstaAberto(estadosExpandidos, busca, grupo.uf),
+                }"
+                >▸</span
               >
-                <span class="universidadeNome">
-                  <span
-                    class="universidadePonto"
-                    :style="{ backgroundColor: universidade.cor }"
-                  ></span>
-                  {{ universidade.sigla }}
-                </span>
-                <span class="universidadeCidade">{{ universidade.municipio }}</span>
-              </button>
-            </li>
-          </ul>
-        </li>
-      </ul>
+              <span class="estadoNome">{{ grupo.uf }}</span>
+              <span class="estadoContagem">{{ grupo.universidades.length }}</span>
+            </button>
+
+            <ul
+              v-if="estadoEstaAberto(estadosExpandidos, busca, grupo.uf)"
+              class="universidadesLista"
+            >
+              <li
+                v-for="universidade in grupo.universidades"
+                :key="universidade.id"
+                class="universidadeItem"
+              >
+                <button
+                  class="universidadeBotao"
+                  type="button"
+                  @click="selecionarUniversidade(componenteMapaRef, universidade)"
+                >
+                  <span class="universidadeNome">
+                    <span
+                      class="universidadePonto"
+                      :style="{ backgroundColor: universidade.cor }"
+                    ></span>
+                    {{ universidade.sigla }}
+                  </span>
+                  <span class="universidadeCidade">{{ universidade.municipio }}</span>
+                </button>
+              </li>
+            </ul>
+          </li>
+        </ul>
+
+        <p v-if="universidadesPorEstado.length === 0" class="semResultados">
+          Nenhuma universidade encontrada para "{{ busca }}".
+        </p>
+      </div>
     </aside>
   </div>
 </template>
@@ -132,14 +151,27 @@ onUnmounted(() => {
   top: 20px;
   left: 20px;
   z-index: 1000;
-  width: 280px;
-  max-height: calc(100% - 40px);
-  overflow-y: auto;
-  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  width: 310px;
+  max-height: 600px;
+  overflow: hidden;
   border: 1px solid rgba(28, 28, 34, 0.1);
   border-radius: 16px;
   background: #ffffff;
   box-shadow: 0 12px 28px rgba(28, 28, 34, 0.12);
+}
+
+.mapaInformacoesCabecalho {
+  flex: 0 0 auto;
+  padding: 20px 20px 14px;
+}
+
+.mapaInformacoesLista {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  padding: 0 20px 16px;
 }
 
 .voltar {
@@ -153,8 +185,7 @@ onUnmounted(() => {
   color: #7a0f1a;
 }
 
-.sobretitulo,
-.listaTitulo {
+.sobretitulo {
   color: #9e1f2e;
   font-size: 0.7rem;
   font-weight: 800;
@@ -176,14 +207,55 @@ onUnmounted(() => {
   line-height: 1.6;
 }
 
-.listaTitulo {
-  margin-top: 20px;
+.buscaContainer {
+  position: relative;
+  margin-top: 16px;
+}
+
+.buscaInput {
+  width: 100%;
+  padding: 9px 32px 9px 12px;
+  border: 1px solid rgba(28, 28, 34, 0.14);
+  border-radius: 10px;
+  background: #fdfaf4;
+  color: #1c1c22;
+  font-size: 0.8rem;
+  outline: none;
+  transition: border-color 0.15s ease;
+}
+
+.buscaInput::placeholder {
+  color: #a1a1aa;
+}
+
+.buscaInput:focus {
+  border-color: #9e1f2e;
+  background: #ffffff;
+}
+
+.buscaLimpar {
+  position: absolute;
+  top: 50%;
+  right: 6px;
+  display: grid;
+  width: 22px;
+  height: 22px;
+  transform: translateY(-50%);
+  place-items: center;
+  border: none;
+  border-radius: 50%;
+  background: none;
   color: #91919f;
-  font-size: 0.65rem;
+  font-size: 1rem;
+  cursor: pointer;
+}
+
+.buscaLimpar:hover {
+  color: #7a0f1a;
 }
 
 .estadosLista {
-  margin-top: 10px;
+  margin: 0;
   padding: 0;
   list-style: none;
 }
@@ -276,12 +348,23 @@ onUnmounted(() => {
   width: 8px;
   height: 8px;
   border-radius: 50%;
+  flex-shrink: 0;
 }
 
 .universidadeCidade {
+  overflow: hidden;
   color: #a1a1aa;
   font-size: 0.68rem;
   text-align: right;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.semResultados {
+  padding: 16px 4px;
+  color: #91919f;
+  font-size: 0.78rem;
+  text-align: center;
 }
 
 @media (max-width: 700px) {
@@ -291,7 +374,7 @@ onUnmounted(() => {
     left: 16px;
     right: 16px;
     width: auto;
-    max-height: 45%;
+    max-height: 50%;
   }
 }
 </style>
