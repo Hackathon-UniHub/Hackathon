@@ -17,7 +17,9 @@ export default {
 
       <div class="grupoBotoes">
         <RouterLink to="/" class="botao botaoPrimario">Voltar ao Início</RouterLink>
-        <RouterLink to="/explorar" class="botao botaoSecundario">Explorar Universidades</RouterLink>
+        <RouterLink to="/universidades" class="botao botaoSecundario"
+          >Explorar Universidades</RouterLink
+        >
       </div>
     </div>
   </div>
