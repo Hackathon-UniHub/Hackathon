@@ -18,11 +18,16 @@ const routes = [
     component: () => import('@/views/CompleteProfileView.vue'),
     meta: { requiresAuth: true },
   },
-{
-  path: '/universidades/:id',
-  name: 'universidade',
-  component: () => import('@/components/paginaUniversidades/paginaUniversidade.vue'),
-},
+  {
+    path: '/universidades',
+    name: 'filtro',
+    component: () => import('@/components/paginaFiltro/paginaFiltroList.vue'),
+  },
+  {
+    path: '/universidade/:id',
+    name: 'universidade',
+    component: () => import('@/components/paginaUniversidades/paginaUniversidade.vue'),
+  },
 ]
 
 const router = createRouter({
