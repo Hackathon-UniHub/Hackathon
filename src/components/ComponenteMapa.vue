@@ -1,0 +1,185 @@
+<template>
+  <div ref="containerMapa" class="mapa"></div>
+</template>
+
+<script setup>
+import { ref, onMounted, onUnmounted } from 'vue'
+import L from 'leaflet'
+import 'leaflet/dist/leaflet.css'
+import icone from 'leaflet/dist/images/marker-icon.png'
+import sombraIcone from 'leaflet/dist/images/marker-shadow.png'
+
+delete L.Icon.Default.prototype._getIconUrl
+L.Icon.Default.mergeOptions({
+  iconUrl: icone,
+  shadowUrl: sombraIcone,
+})
+
+const props = defineProps({
+  universidades: {
+    type: Array,
+    default: () => [],
+  },
+})
+
+const containerMapa = ref(null)
+let mapa = null
+const marcadores = {}
+
+function iniciaisDaSigla(sigla) {
+  return sigla.replace(/[^A-Z]/gi, '').slice(0, 2).toUpperCase()
+}
+
+function descricaoProvisoria(universidade) {
+  const categoria = universidade.categoria_administrativa || 'Instituição de ensino superior'
+  return `${categoria} em ${universidade.municipio}/${universidade.uf}.`
+}
+
+function notaIgc(universidade) {
+  if (!universidade.igc) return 'IGC não informado'
+  return `IGC ${universidade.igc}/5`
+}
+
+function montarPopup(universidade) {
+  return `
+    <div class="popupUniversidade">
+      <div class="popupCabecalho">
+        <span class="popupSelo" style="background:${universidade.cor}">
+          ${iniciaisDaSigla(universidade.sigla)}
+        </span>
+        <div>
+          <strong class="popupSigla">${universidade.sigla}</strong>
+          <div class="popupCidade">${universidade.municipio}/${universidade.uf}</div>
+        </div>
+      </div>
+      <p class="popupDescricao">${descricaoProvisoria(universidade)}</p>
+      <div class="popupRodape">
+        <span class="popupIgc">${notaIgc(universidade)}</span>
+        <button class="popupBotao" type="button" onclick="window.dispatchEvent(new CustomEvent('abrir-universidade', { detail: '${universidade.sigla}' }))">
+          Ver mais
+        </button>
+      </div>
+    </div>
+  `
+}
+
+onMounted(() => {
+  mapa = L.map(containerMapa.value).setView([-15.7801, -47.9292], 4)
+
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    maxZoom: 19,
+    attribution: '&copy; OpenStreetMap contributors',
+  }).addTo(mapa)
+
+  props.universidades.forEach((universidade) => {
+    if (universidade.latitude && universidade.longitude) {
+      const marcador = L.marker([universidade.latitude, universidade.longitude])
+        .addTo(mapa)
+        .bindPopup(montarPopup(universidade), { maxWidth: 240 })
+
+      marcadores[universidade.sigla] = marcador
+    }
+  })
+})
+
+function focarUniversidade(sigla) {
+  const universidade = props.universidades.find((item) => item.sigla === sigla)
+  const marcador = marcadores[sigla]
+
+  if (!mapa || !universidade || !marcador) return
+
+  mapa.flyTo([universidade.latitude, universidade.longitude], 12, {
+    duration: 1.2,
+  })
+  marcador.openPopup()
+}
+
+defineExpose({
+  focarUniversidade,
+})
+
+onUnmounted(() => {
+  if (mapa) {
+    mapa.remove()
+  }
+})
+</script>
+
+<style scoped>
+.mapa {
+  height: 100%;
+  width: 100%;
+}
+</style>
+
+<style>
+.popupUniversidade {
+  min-width: 200px;
+  font-family: inherit;
+}
+
+.popupCabecalho {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.popupSelo {
+  display: grid;
+  flex: 0 0 36px;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  color: #ffffff;
+  font-size: 0.7rem;
+  font-weight: 800;
+}
+
+.popupSigla {
+  font-size: 0.9rem;
+}
+
+.popupCidade {
+  color: #91919f;
+  font-size: 0.7rem;
+}
+
+.popupDescricao {
+  margin-top: 8px;
+  color: #5d5d6b;
+  font-size: 0.75rem;
+  line-height: 1.5;
+}
+
+.popupRodape {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 10px;
+}
+
+.popupIgc {
+  padding: 3px 8px;
+  border-radius: 999px;
+  background: #f2ede4;
+  color: #7a0f1a;
+  font-size: 0.65rem;
+  font-weight: 700;
+}
+
+.popupBotao {
+  padding: 5px 10px;
+  border: none;
+  border-radius: 8px;
+  background: #7a0f1a;
+  color: #ffffff;
+  font-size: 0.68rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.popupBotao:hover {
+  background: #5c0a13;
+}
+</style>    

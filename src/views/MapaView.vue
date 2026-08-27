@@ -1,107 +1,152 @@
 <script setup>
-import { RouterLink } from 'vue-router'
+import { ref, reactive, computed, onMounted, onUnmounted } from 'vue'
+import { RouterLink, useRouter } from 'vue-router'
+import ComponenteMapa from '@/components/ComponenteMapa.vue'
+import { universidades } from '@/data/universidades.js'
 
-const universidadesNoMapa = [
-  { sigla: 'USP', cidade: 'São Paulo', cor: '#8f1727' },
-  { sigla: 'UNICAMP', cidade: 'Campinas', cor: '#2857a4' },
-  { sigla: 'UFRGS', cidade: 'Porto Alegre', cor: '#24604e' },
-  { sigla: 'UFRJ', cidade: 'Rio de Janeiro', cor: '#294b7e' },
-  { sigla: 'UFMG', cidade: 'Belo Horizonte', cor: '#743038' },
-  { sigla: 'UNESP', cidade: 'São Paulo', cor: '#3f712d' },
-  { sigla: 'PUC-Rio', cidade: 'Rio de Janeiro', cor: '#a6263a' },
-  { sigla: 'UFSC', cidade: 'Florianópolis', cor: '#1c6870' },
-]
+const router = useRouter()
+
+const universidadesNoMapa = universidades.filter(
+  (universidade) => universidade.latitude && universidade.longitude,
+)
+
+const componenteMapaRef = ref(null)
+const estadosExpandidos = reactive({})
+
+const universidadesPorEstado = computed(() => {
+  const grupos = {}
+
+  universidadesNoMapa.forEach((universidade) => {
+    if (!grupos[universidade.uf]) {
+      grupos[universidade.uf] = []
+    }
+    grupos[universidade.uf].push(universidade)
+  })
+
+  return Object.keys(grupos)
+    .sort()
+    .map((uf) => ({
+      uf,
+      universidades: grupos[uf],
+    }))
+})
+
+function alternarEstado(uf) {
+  estadosExpandidos[uf] = !estadosExpandidos[uf]
+}
+
+function selecionarUniversidade(universidade) {
+  componenteMapaRef.value?.focarUniversidade(universidade.sigla)
+}
+
+function aoAbrirUniversidade(evento) {
+  const sigla = evento.detail
+  router.push({ name: 'universidade', params: { sigla } })
+}
+
+onMounted(() => {
+  window.addEventListener('abrir-universidade', aoAbrirUniversidade)
+})
+
+onUnmounted(() => {
+  window.removeEventListener('abrir-universidade', aoAbrirUniversidade)
+})
 </script>
 
 <template>
   <div class="mapaPagina">
-    <div class="mapaContainer">
+    <section class="mapaArea" aria-label="Mapa interativo de universidades">
+      <ComponenteMapa ref="componenteMapaRef" :universidades="universidadesNoMapa" />
+    </section>
+
+    <aside class="mapaInformacoes">
       <RouterLink class="voltar" to="/">← Voltar</RouterLink>
 
-      <div class="mapaLayout">
-        <aside class="mapaInformacoes">
-          <span class="sobretitulo">Exploração</span>
-          <h1>Mapa interativo</h1>
-          <p class="descricao">
-            Clique nos pins para conhecer universidades em todo o Brasil. Filtre depois na página
-            Explorar para refinar sua busca.
-          </p>
+      <span class="sobretitulo">Exploração</span>
+      <h1>Mapa interativo</h1>
+      <p class="descricao">
+        Clique num estado para expandir e depois clique numa universidade para ir até ela no mapa.
+      </p>
 
-          <div class="aviso">
-            <span class="avisoIcone">i</span>
-            <p>
-              Os pins representam instituições de destaque. Toque para ver o resumo e abrir o perfil
-              completo.
-            </p>
-          </div>
+      <div class="listaTitulo">Estados</div>
+      <ul class="estadosLista">
+        <li v-for="grupo in universidadesPorEstado" :key="grupo.uf" class="estadoItem">
+          <button class="estadoCabecalho" type="button" @click="alternarEstado(grupo.uf)">
+            <span
+              class="estadoSeta"
+              :class="{ estadoSetaAberta: estadosExpandidos[grupo.uf] }"
+              >▸</span
+            >
+            <span class="estadoNome">{{ grupo.uf }}</span>
+            <span class="estadoContagem">{{ grupo.universidades.length }}</span>
+          </button>
 
-          <div class="listaTitulo">No mapa</div>
-          <ul class="universidadesLista">
+          <ul v-if="estadosExpandidos[grupo.uf]" class="universidadesLista">
             <li
-              v-for="universidade in universidadesNoMapa"
+              v-for="universidade in grupo.universidades"
               :key="universidade.sigla"
               class="universidadeItem"
             >
-              <span class="universidadeNome">
-                <span
-                  class="universidadePonto"
-                  :style="{ backgroundColor: universidade.cor }"
-                ></span>
-                {{ universidade.sigla }}
-              </span>
-              <span class="universidadeCidade">{{ universidade.cidade }}</span>
+              <button
+                class="universidadeBotao"
+                type="button"
+                @click="selecionarUniversidade(universidade)"
+              >
+                <span class="universidadeNome">
+                  <span
+                    class="universidadePonto"
+                    :style="{ backgroundColor: universidade.cor }"
+                  ></span>
+                  {{ universidade.sigla }}
+                </span>
+                <span class="universidadeCidade">{{ universidade.municipio }}</span>
+              </button>
             </li>
           </ul>
-        </aside>
-
-        <section class="mapaPlaceholder" aria-label="Espaço reservado para o mapa">
-          <div class="placeholderConteudo">
-            <div class="placeholderIcone">⌖</div>
-            <h2>Mapa em breve</h2>
-            <p>Este espaço está preparado para receber o mapa interativo.</p>
-          </div>
-          <span class="contadorMapa"
-            >{{ universidadesNoMapa.length }} universidades de exemplo</span
-          >
-        </section>
-      </div>
-    </div>
+        </li>
+      </ul>
+    </aside>
   </div>
 </template>
 
 <style scoped>
 .mapaPagina {
-  min-height: calc(100vh - 88px);
-  padding: 42px 0 86px;
+  position: relative;
+  height: calc(100vh - 88px);
+  overflow: hidden;
   background: #fffcf7;
   color: #1c1c22;
 }
 
-.mapaContainer {
-  width: min(100% - 40px, 800px);
-  margin: 0 auto;
+.mapaArea {
+  position: absolute;
+  inset: 0;
+}
+
+.mapaInformacoes {
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  z-index: 1000;
+  width: 280px;
+  max-height: calc(100% - 40px);
+  overflow-y: auto;
+  padding: 20px;
+  border: 1px solid rgba(28, 28, 34, 0.1);
+  border-radius: 16px;
+  background: #ffffff;
+  box-shadow: 0 12px 28px rgba(28, 28, 34, 0.12);
 }
 
 .voltar {
   display: inline-block;
-  margin-bottom: 18px;
+  margin-bottom: 14px;
   color: #737384;
   font-size: 0.85rem;
 }
 
 .voltar:hover {
   color: #7a0f1a;
-}
-
-.mapaLayout {
-  display: grid;
-  grid-template-columns: minmax(230px, 0.72fr) minmax(0, 1.28fr);
-  gap: 28px;
-  align-items: start;
-}
-
-.mapaInformacoes {
-  padding-top: 4px;
 }
 
 .sobretitulo,
@@ -115,73 +160,105 @@ const universidadesNoMapa = [
 
 .mapaInformacoes h1 {
   margin-top: 8px;
-  font-size: clamp(2rem, 3vw, 2.6rem);
+  font-size: 1.6rem;
   letter-spacing: -0.04em;
   line-height: 1.05;
 }
 
 .descricao {
-  max-width: 290px;
-  margin-top: 14px;
+  margin-top: 12px;
   color: #5d5d6b;
-  font-size: 0.9rem;
-  line-height: 1.65;
-}
-
-.aviso {
-  display: flex;
-  gap: 12px;
-  align-items: flex-start;
-  max-width: 300px;
-  margin-top: 18px;
-  padding: 14px;
-  border: 1px solid rgba(28, 28, 34, 0.08);
-  border-radius: 12px;
-  background: #ffffff;
-  box-shadow: 0 8px 20px rgba(28, 28, 34, 0.06);
-}
-
-.avisoIcone {
-  display: grid;
-  flex: 0 0 18px;
-  place-items: center;
-  width: 18px;
-  height: 18px;
-  border: 1px solid #b83d4a;
-  border-radius: 50%;
-  color: #b83d4a;
-  font-size: 0.7rem;
-  font-weight: 800;
-}
-
-.aviso p {
-  color: #737384;
-  font-size: 0.73rem;
-  line-height: 1.55;
+  font-size: 0.85rem;
+  line-height: 1.6;
 }
 
 .listaTitulo {
-  margin-top: 24px;
+  margin-top: 20px;
   color: #91919f;
   font-size: 0.65rem;
 }
 
+.estadosLista {
+  margin-top: 10px;
+  padding: 0;
+  list-style: none;
+}
+
+.estadoItem {
+  border-bottom: 1px solid rgba(28, 28, 34, 0.06);
+}
+
+.estadoCabecalho {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  padding: 10px 4px;
+  border: none;
+  background: none;
+  color: #41414a;
+  font-size: 0.85rem;
+  font-weight: 600;
+  text-align: left;
+  cursor: pointer;
+}
+
+.estadoCabecalho:hover {
+  color: #7a0f1a;
+}
+
+.estadoSeta {
+  display: inline-block;
+  color: #9e1f2e;
+  font-size: 0.65rem;
+  transition: transform 0.15s ease;
+}
+
+.estadoSetaAberta {
+  transform: rotate(90deg);
+}
+
+.estadoContagem {
+  margin-left: auto;
+  padding: 2px 7px;
+  border-radius: 999px;
+  background: #f2ede4;
+  color: #91919f;
+  font-size: 0.65rem;
+  font-weight: 700;
+}
+
 .universidadesLista {
   display: grid;
-  gap: 14px;
-  margin-top: 12px;
+  gap: 4px;
+  margin: 2px 0 10px 20px;
   padding: 0;
   list-style: none;
 }
 
 .universidadeItem {
+  display: block;
+}
+
+.universidadeBotao {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 12px;
-  max-width: 300px;
+  width: 100%;
+  padding: 6px 8px;
+  border: none;
+  border-radius: 8px;
+  background: none;
   color: #41414a;
   font-size: 0.78rem;
+  text-align: left;
+  cursor: pointer;
+}
+
+.universidadeBotao:hover {
+  background: #fdf5f5;
+  color: #7a0f1a;
 }
 
 .universidadeNome {
@@ -203,85 +280,14 @@ const universidadesNoMapa = [
   text-align: right;
 }
 
-.mapaPlaceholder {
-  position: relative;
-  display: grid;
-  min-height: 372px;
-  place-items: center;
-  overflow: hidden;
-  border: 1px solid rgba(28, 28, 34, 0.1);
-  border-radius: 18px;
-  background-color: #ffffff;
-  background-image: radial-gradient(#e5e1d9 0.8px, transparent 0.8px);
-  background-size: 18px 18px;
-  box-shadow: 0 12px 28px rgba(28, 28, 34, 0.06);
-}
-
-.placeholderConteudo {
-  position: relative;
-  z-index: 1;
-  padding: 28px;
-  text-align: center;
-}
-
-.placeholderIcone {
-  display: grid;
-  width: 52px;
-  height: 52px;
-  margin: 0 auto 14px;
-  place-items: center;
-  border: 1px solid rgba(122, 15, 26, 0.18);
-  border-radius: 50%;
-  background: #fdf5f5;
-  color: #7a0f1a;
-  font-size: 1.7rem;
-}
-
-.placeholderConteudo h2 {
-  font-size: 1.3rem;
-}
-
-.placeholderConteudo p {
-  max-width: 240px;
-  margin-top: 8px;
-  color: #91919f;
-  font-size: 0.8rem;
-  line-height: 1.5;
-}
-
-.contadorMapa {
-  position: absolute;
-  right: 16px;
-  bottom: 16px;
-  padding: 10px 12px;
-  border: 1px solid rgba(28, 28, 34, 0.08);
-  border-radius: 10px;
-  background: rgba(255, 255, 255, 0.9);
-  color: #5d5d6b;
-  font-size: 0.68rem;
-}
-
 @media (max-width: 700px) {
-  .mapaPagina {
-    padding-top: 28px;
-  }
-
-  .mapaContainer {
-    width: min(100% - 32px, 520px);
-  }
-
-  .mapaLayout {
-    grid-template-columns: 1fr;
-  }
-
-  .descricao,
-  .aviso,
-  .universidadeItem {
-    max-width: none;
-  }
-
-  .mapaPlaceholder {
-    min-height: 300px;
+  .mapaInformacoes {
+    top: auto;
+    bottom: 16px;
+    left: 16px;
+    right: 16px;
+    width: auto;
+    max-height: 45%;
   }
 }
 </style>
