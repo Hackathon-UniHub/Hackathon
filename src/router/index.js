@@ -1,4 +1,5 @@
 import { createRouter, createWebHistory } from 'vue-router'
+import ErroView from '@/views/ErroView.vue'
 //import { useAuthStore } from '@/stores/auth'
 
 const routes = [
@@ -17,6 +18,11 @@ const routes = [
     name: 'complete-profile',
     component: () => import('@/views/CompleteProfileView.vue'),
     meta: { requiresAuth: true },
+  },
+  {
+    path: '/:pathMatch(.*)*',
+    name: 'erro',
+    component: ErroView,
   },
 ]
 
