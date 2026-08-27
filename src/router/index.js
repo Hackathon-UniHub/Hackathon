@@ -1,8 +1,5 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import ErroView from '@/views/ErroView.vue'
-import HomeView from '../views/HomeView.vue'
-import paginaFiltroList from '@/components/paginaFiltro/paginaFiltroList.vue'
-import paginaUniversidade from '@/components/paginaUniversidades/paginaUniversidade.vue'
 
 //import { useAuthStore } from '@/stores/auth'
 
@@ -10,17 +7,7 @@ const routes = [
   {
     path: '/',
     name: 'home',
-    component: HomeView,
-  },
-  {
-    path: '/universidades',
-    name: 'filtro',
-    component: paginaFiltroList,
-  },
-  {
-    path: '/universidade/:id',
-    name: 'universidade',
-    component: paginaUniversidade,
+    component: () => import('@/views/HomeView.vue'),
   },
   {
     path: '/login',
@@ -42,6 +29,11 @@ const routes = [
     path: '/universidade/:id',
     name: 'universidade',
     component: () => import('@/components/paginaUniversidades/paginaUniversidade.vue'),
+  },
+  {
+    path: '/:pathMatch(.*)*',
+    name: 'not-found',
+    component: ErroView,
   },
 ]
 
