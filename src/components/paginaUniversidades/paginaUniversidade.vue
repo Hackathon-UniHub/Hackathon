@@ -15,7 +15,16 @@ const router = useRouter()
 const authStore = useAuthStore()
 const favoritosStore = useFavoritosStore()
 
-const universidade = computed(() => UniversidadePorId(route.params.id))
+const siteOficial = computed(() => {
+  const site = universidade.value?.site
+
+  if (!site) return '#'
+  if (/^https?:\/\//i.test(site)) return site
+  if (site.startsWith('//')) return `https:${site}`
+
+  return `https://${site}`
+})
+
 const iniciais = computed(() => getIniciais(universidade.value))
 const anoFundacao = computed(() => getAnoFundacao(universidade.value))
 const isPublica = computed(() => UniversidadePublica(universidade.value))
@@ -208,9 +217,24 @@ function alternarFavorito() {
   </div>
 
   <div class="paginaFundo" v-else>
-    <div class="naoEncontrada">
-      <p>Universidade não encontrada.</p>
-      <RouterLink to="/universidades">Voltar ao catálogo</RouterLink>
+    <div class="paginaErro">
+      <div class="conteudoErro">
+        <h1 class="codigoStatus">404</h1>
+        <h2 class="tituloPrincipal">Universidade não encontrada</h2>
+
+        <p class="textoDescritivo">
+          O site oficial dessa instituição não está disponível no momento ou não foi informado
+          corretamente. Volte para a listagem e explore outras opções no
+          <span class="textoDestacado">UniHub</span>.
+        </p>
+
+        <div class="grupoBotoes">
+          <RouterLink to="/" class="erroBotao erroBotaoPrimario">Voltar ao Início</RouterLink>
+          <RouterLink to="/universidades" class="erroBotao erroBotaoSecundario">
+            Explorar Universidades
+          </RouterLink>
+        </div>
+      </div>
     </div>
   </div>
 </template>
@@ -629,8 +653,99 @@ function alternarFavorito() {
   border: 1px solid #4c4c57;
 }
 
-.naoEncontrada {
+.paginaErro {
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: linear-gradient(135deg, var(--cream-50) 0%, var(--cream-100) 100%);
+  padding: 20px;
+  box-sizing: border-box;
+  font-family: 'Inter', sans-serif;
+}
+
+.conteudoErro {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
   text-align: center;
-  padding: 4rem 1rem;
+  max-width: 500px;
+  width: 100%;
+}
+
+.codigoStatus {
+  font-size: 120px;
+  font-weight: 800;
+  color: var(--brand-700);
+  line-height: 1;
+  margin-bottom: 16px;
+  letter-spacing: -2px;
+}
+
+.tituloPrincipal {
+  font-size: 32px;
+  font-weight: 700;
+  color: var(--ink-900);
+  margin-bottom: 20px;
+  line-height: 1.2;
+}
+
+.textoDescritivo {
+  font-size: 16px;
+  color: var(--ink-600);
+  line-height: 1.6;
+  margin-bottom: 32px;
+}
+
+.textoDestacado {
+  font-weight: 700;
+  color: var(--brand-700);
+}
+
+.grupoBotoes {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  flex-wrap: wrap;
+}
+
+.erroBotao {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 14px 28px;
+  font-size: 15px;
+  font-weight: 700;
+  text-decoration: none;
+  border-radius: 999px;
+  transition: all 0.3s ease;
+  cursor: pointer;
+  border: none;
+  min-width: 160px;
+}
+
+.erroBotaoPrimario {
+  background: linear-gradient(135deg, var(--brand-700) 0%, var(--brand-500) 100%);
+  color: #ffffff;
+  box-shadow: 0 10px 24px rgba(122, 15, 26, 0.2);
+}
+
+.erroBotaoPrimario:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 14px 32px rgba(122, 15, 26, 0.3);
+}
+
+.erroBotaoSecundario {
+  background: #ffffff;
+  color: var(--brand-700);
+  border: 2px solid var(--brand-700);
+  box-shadow: 0 4px 12px rgba(122, 15, 26, 0.08);
+}
+
+.erroBotaoSecundario:hover {
+  background: var(--cream-100);
+  transform: translateY(-2px);
 }
 </style>
