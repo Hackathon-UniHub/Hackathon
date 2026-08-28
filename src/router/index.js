@@ -28,6 +28,11 @@ const routes = [
     component: () => import('@/components/paginaFiltro/paginaFiltroList.vue'),
   },
   {
+    path: '/mapa',
+    name: 'mapa',
+    component: () => import('@/views/MapaView.vue'),
+  },
+  {
     path: '/universidade/:id',
     name: 'universidade',
     component: () => import('@/components/paginaUniversidades/paginaUniversidade.vue'),
