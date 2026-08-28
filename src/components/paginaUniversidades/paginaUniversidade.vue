@@ -15,6 +15,8 @@ const router = useRouter()
 const authStore = useAuthStore()
 const favoritosStore = useFavoritosStore()
 
+const universidade = computed(() => UniversidadePorId(route.params.id))
+
 const siteOficial = computed(() => {
   const site = universidade.value?.site
 
@@ -30,7 +32,7 @@ const anoFundacao = computed(() => getAnoFundacao(universidade.value))
 const isPublica = computed(() => UniversidadePublica(universidade.value))
 
 const favorito = computed(() =>
-  universidade.value ? favoritosStore.isFavorito(Number(universidade.value.id)) : false
+  universidade.value ? favoritosStore.isFavorito(Number(universidade.value.id)) : false,
 )
 
 function alternarFavorito() {
@@ -78,7 +80,9 @@ function alternarFavorito() {
           <button class="botaoFavoritar" type="button" @click="alternarFavorito">
             {{ favorito ? 'Remover favorito' : 'Favoritar' }}
           </button>
-          <a class="botaoSite" :href="universidade.site" target="_blank">Site oficial</a>
+          <a class="botaoSite" :href="siteOficial" target="_blank" rel="noopener noreferrer">
+            Site oficial
+          </a>
         </div>
       </div>
 
