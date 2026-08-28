@@ -1,6 +1,6 @@
 <script setup>
 import { HugeiconsIcon } from '@hugeicons/vue'
-import { Search01Icon, HeartAddIcon } from '@hugeicons/core-free-icons'
+import { /*Search01Icon,*/ HeartAddIcon } from '@hugeicons/core-free-icons'
 import { RouterLink } from 'vue-router'
 </script>
 
@@ -37,9 +37,9 @@ import { RouterLink } from 'vue-router'
       </nav>
 
       <div class="areaAcoes">
-        <RouterLink class="botaoPesquisa" to="/explorar" aria-label="Explorar">
+        <!--<RouterLink class="botaoPesquisa" to="/explorar" aria-label="Explorar">
           <HugeiconsIcon :icon="Search01Icon" :size="22" color="currentColor" :stroke-width="1.8" />
-        </RouterLink>
+        </RouterLink> -->
         <RouterLink class="botaoPesquisa" :to="{ name: 'login' }" aria-label="Favoritos">
           <HugeiconsIcon :icon="HeartAddIcon" :size="22" color="currentColor" :stroke-width="1.8" />
         </RouterLink>

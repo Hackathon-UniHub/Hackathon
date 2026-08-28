@@ -78,7 +78,7 @@ onMounted(() => {
             </article>
             <article class="cartaoEstatistica">
               <strong>4.9</strong>
-              <span>Ranking</span>
+              <span>Avaliação</span>
             </article>
           </div>
         </div>
