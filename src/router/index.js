@@ -14,12 +14,14 @@ const routes = [
     name: 'login',
     alias: ['/entrar'],
     component: () => import('@/views/auth/LoginView.vue'),
+    meta: { hideLayout: true },
   },
   {
     path: '/create-account',
     name: 'create-account',
     alias: ['/criar-conta'],
     component: () => import('@/views/CreateAccountView.vue'),
+    meta: { hideLayout: true },
   },
   {
     path: '/universidades',

@@ -56,11 +56,6 @@ watch(() => authStore.loading, carregarFavoritos)
               Mapa
             </RouterLink>
           </li>
-          <li>
-            <RouterLink to="/favoritos" class="linkNavegacao" exact-active-class="ativo">
-              Favoritos
-            </RouterLink>
-          </li>
         </ul>
       </nav>
 
