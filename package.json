@@ -12,6 +12,9 @@
     "lint:eslint": "eslint . --fix --cache",
     "format": "prettier --write --experimental-cli src/"
   },
+  "overrides": {
+  "@oxc-project/types": "0.146.0"
+},
   "dependencies": {
     "@hugeicons/core-free-icons": "^4.3.0",
     "@hugeicons/vue": "^1.0.8",
