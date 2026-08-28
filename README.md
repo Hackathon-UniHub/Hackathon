@@ -23,14 +23,10 @@ Durante o planejamento do projeto, foram definidas as seguintes funcionalidades:
 - 🗺️ Mapa interativo do Brasil;
 - 📍 Localização das universidades no mapa;
 - 🔎 Filtro de universidades;
-- 🏛️ Pesquisa por estado;
-- 🌆 Pesquisa por cidade;
-- 🎓 Pesquisa por curso/graduação;
 - ⭐ Sistema de favoritos;
 - 👤 Cadastro e login de usuários;
 - 🏫 Página com informações das universidades;
 - 🎓 Informações sobre cursos oferecidos;
-- 🗄️ Banco de dados para armazenamento das informações.
 
 ---
 
@@ -45,27 +41,9 @@ Ao longo do desenvolvimento, foram implementadas as principais estruturas e func
 - Estruturação do mapa interativo;
 - Implementação do sistema de favoritos;
 - Estrutura de cadastro e login;
-- Criação e organização do banco de dados;
 - Cadastro de estados, cidades, universidades e graduações;
-- Estruturação dos relacionamentos entre as tabelas;
-- Organização do projeto utilizando **Git e GitHub**.
 
 Algumas funcionalidades ainda podem receber melhorias e aperfeiçoamentos em versões futuras.
-
----
-
-## Tecnologias Utilizadas
-
-As principais tecnologias utilizadas no desenvolvimento foram:
-
-- **Vue.js**
-- **JavaScript**
-- **HTML5**
-- **CSS3**
-- **Vite**
-- **MySQL / Banco de Dados**
-- **Git**
-- **GitHub**
 
 ---
 
@@ -79,10 +57,6 @@ Entre os principais desafios estão:
 - Aprendizado e utilização do Vue.js;
 - Organização dos componentes e páginas;
 - Configuração das rotas;
-- Criação e organização do banco de dados;
-- Definição das chaves primárias e estrangeiras;
-- Criação dos relacionamentos entre as tabelas;
-- Integração entre frontend e banco de dados;
 - Organização dos dados das universidades;
 - Resolução de conflitos no Git e GitHub;
 - Sincronização do trabalho realizado pelos integrantes.
@@ -95,14 +69,11 @@ Essas dificuldades contribuíram para o aprendizado do grupo e foram solucionada
 
 As atividades foram divididas entre os integrantes de acordo com as diferentes áreas necessárias para o desenvolvimento do projeto.
 
-| Área | Responsabilidades |
-|---|---|
-| **Frontend** | Desenvolvimento das páginas, componentes e interface utilizando Vue.js |
-| **Banco de Dados** | Criação das tabelas, relacionamentos e organização dos dados |
-| **Integração** | Integração entre as funcionalidades da aplicação e o banco de dados |
-| **Design/UI** | Organização visual e experiência do usuário |
-| **Pesquisa** | Levantamento e organização das informações sobre universidades e cursos |
-| **Git/GitHub** | Organização do repositório e integração do trabalho dos integrantes |
+| **Miguel principalmente mas todso ajudaram no geral** | Desenvolvimento das páginas, componentes e interface utilizando Vue.js |
+| **Kaue** | Criação das tabelas, relacionamentos e organização dos dados |
+| **Todos** | Organização visual e experiência do usuário |
+| **Matheus e Rafael** | Levantamento e organização das informações sobre universidades e cursos |
+| **Todos** | Organização do repositório e integração do trabalho dos integrantes |
 
 > As responsabilidades foram distribuídas entre os integrantes de acordo com as necessidades do projeto e o andamento do desenvolvimento.
 
@@ -124,12 +95,4 @@ A nota não foi máxima porque algumas funcionalidades ainda podem ser aprimorad
 
 Mesmo com essas limitações, o projeto representa uma evolução significativa do grupo e demonstra a aplicação dos conhecimentos adquiridos durante o desenvolvimento.
 
----
 
-## Conclusão
-
-O desenvolvimento do **UniHub** proporcionou ao grupo experiência prática em desenvolvimento web, banco de dados, controle de versão e trabalho colaborativo.
-
-Além de desenvolver uma plataforma com uma proposta voltada à facilitação da busca por universidades, o projeto permitiu que os integrantes colocassem em prática conceitos de programação, organização de projetos e desenvolvimento de aplicações.
-
-O projeto ainda possui possibilidades de expansão e melhorias futuras, podendo receber novas funcionalidades e aprimoramentos conforme seu desenvolvimento continue.
