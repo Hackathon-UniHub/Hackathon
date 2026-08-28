@@ -69,8 +69,8 @@ Essas dificuldades contribuíram para o aprendizado do grupo e foram solucionada
 
 As atividades foram divididas entre os integrantes de acordo com as diferentes áreas necessárias para o desenvolvimento do projeto.
 
-| **Miguel principalmente mas todso ajudaram no geral** | Desenvolvimento das páginas, componentes e interface utilizando Vue.js |
-| **Kaue** | Criação das tabelas, relacionamentos e organização dos dados |
+| **Miguel principalmente mas todos ajudaram no geral** | Desenvolvimento das páginas, componentes e interface utilizando Vue.js |
+| **Kaue** | Criação das tabelas, relacionamentos, organização dos dados, login e criar conta |
 | **Todos** | Organização visual e experiência do usuário |
 | **Matheus e Rafael** | Levantamento e organização das informações sobre universidades e cursos |
 | **Todos** | Organização do repositório e integração do trabalho dos integrantes |
@@ -80,6 +80,8 @@ As atividades foram divididas entre os integrantes de acordo com as diferentes �
 ---
 
 ## Avaliação do Projeto
+
+** 9 **
 
 ### Nota do Grupo
 
