@@ -40,7 +40,7 @@ import { RouterLink } from 'vue-router'
         <RouterLink class="botaoPesquisa" to="/explorar" aria-label="Explorar">
           <HugeiconsIcon :icon="Search01Icon" :size="22" color="currentColor" :stroke-width="1.8" />
         </RouterLink>
-        <RouterLink class="botaoPesquisa" :to="{ name: 'login' }" aria-label="Favoritos">
+        <RouterLink class="botaoPesquisa" :to="{ name: 'favoritos' }" aria-label="Favoritos">
           <HugeiconsIcon :icon="HeartAddIcon" :size="22" color="currentColor" :stroke-width="1.8" />
         </RouterLink>
         <RouterLink class="botaoEntrar" to="/entrar">Entrar</RouterLink>

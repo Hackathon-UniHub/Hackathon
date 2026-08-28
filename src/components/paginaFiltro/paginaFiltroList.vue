@@ -1,4 +1,4 @@
-<script setup>
+ <script setup>
 import { ref, computed } from 'vue'
 import paginaFiltroCard from './paginaFiltroCard.vue'
 import {

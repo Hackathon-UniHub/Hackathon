@@ -1,7 +1,6 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import ErroView from '@/views/ErroView.vue'
-
-//import { useAuthStore } from '@/stores/auth'
+import { useAuthStore } from '@/stores/auth'
 
 const routes = [
   {
@@ -13,14 +12,14 @@ const routes = [
   {
     path: '/login',
     name: 'login',
-    alias: ['/entrar', '/criar-conta'],
+    alias: ['/entrar'],
     component: () => import('@/views/auth/LoginView.vue'),
   },
   {
     path: '/create-account',
     name: 'create-account',
+    alias: ['/criar-conta'],
     component: () => import('@/views/CreateAccountView.vue'),
-    meta: { requiresAuth: true },
   },
   {
     path: '/universidades',
@@ -33,10 +32,15 @@ const routes = [
     component: () => import('@/components/paginaUniversidades/paginaUniversidade.vue'),
   },
   {
+    path: '/favoritos',
+    name: 'favoritos',
+    component: () => import('@/views/FavoritosView.vue'),
+  },
+  {
     path: '/:pathMatch(.*)*',
     name: 'not-found',
     component: ErroView,
-  },
+  }
 ]
 
 const router = createRouter({
@@ -44,25 +48,27 @@ const router = createRouter({
   routes,
 })
 
-/*router.beforeEach((to) => {
+router.beforeEach(async (to) => {
   const authStore = useAuthStore()
 
+  if (authStore.loading) {
+    await new Promise((resolve) => {
+      const unwatch = authStore.$subscribe((mutation, state) => {
+        if (!state.loading) {
+          unwatch()
+          resolve()
+        }
+      })
+    })
+  }
+
   if (to.meta.requiresAuth && !authStore.isLoggedIn) {
-    return { name: 'login' }
+    return { name: 'login', query: { redirect: to.fullPath } }
   }
 
-  if (authStore.isLoggedIn && !authStore.hasProfile && to.name !== 'complete-profile') {
-    return { name: 'complete-profile' }
-  }
-
-  if (
-    authStore.isLoggedIn &&
-    authStore.hasProfile &&
-    (to.name === 'login' || to.name === 'complete-profile')
-  ) {
+  if (authStore.isLoggedIn && (to.name === 'login' || to.name === 'create-account')) {
     return { name: 'home' }
   }
-})*/
+})
 
 export default router
-
