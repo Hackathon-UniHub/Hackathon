@@ -46,7 +46,7 @@ const routes = [
     path: '/:pathMatch(.*)*',
     name: 'not-found',
     component: ErroView,
-  }
+  },
 ]
 
 const router = createRouter({
@@ -58,9 +58,20 @@ const router = createRouter({
   },
 })
 
-
-router.beforeEach((to) => {
+router.beforeEach(async (to) => {
   const authStore = useAuthStore()
+
+  // espera a sessão inicial terminar de carregar antes de decidir qualquer coisa
+  if (authStore.loading) {
+    await new Promise((resolve) => {
+      const unwatch = authStore.$subscribe((mutation, state) => {
+        if (!state.loading) {
+          unwatch()
+          resolve()
+        }
+      })
+    })
+  }
 
   if (to.meta.requiresAuth && !authStore.isLoggedIn) {
     return { name: 'login', query: { redirect: to.fullPath } }

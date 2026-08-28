@@ -1,8 +1,8 @@
 <script setup>
-import { onMounted, ref } from 'vue'
-import { useRouter } from 'vue-router'
+import { computed } from 'vue'
+import { useRouter, useRoute } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
-import { supabase } from '@/services/supabase'
+import { useFavoritosStore } from '@/stores/favoritos'
 
 const props = defineProps([
   'id',
@@ -18,47 +18,24 @@ const props = defineProps([
 ])
 
 const router = useRouter()
+const route = useRoute()
 const authStore = useAuthStore()
-const favorito = ref(false)
-const carregandoFavorito = ref(false)
-const erroFavorito = ref('')
+const favoritosStore = useFavoritosStore()
 
-async function carregarFavorito() {
-  if (!authStore.user) return
+const favorito = computed(() => favoritosStore.isFavorito(Number(props.id)))
 
-  const { data, error } = await supabase
-    .from('favoritos')
-    .select('id_uni')
-    .eq('id_user', authStore.user.id)
-    .eq('id_uni', props.id)
-    .maybeSingle()
-
-  if (!error) favorito.value = !!data
-}
-
-async function alternarFavorito() {
+function alternarFavorito() {
   if (!authStore.isLoggedIn) {
-    router.push({ name: 'login', query: { redirect: router.currentRoute.value.fullPath } })
+    router.push({ name: 'login', query: { redirect: route.fullPath } })
     return
   }
 
-  carregandoFavorito.value = true
-  erroFavorito.value = ''
-  const consulta = supabase.from('favoritos')
-  const resultado = favorito.value
-    ? await consulta.delete().eq('id_user', authStore.user.id).eq('id_uni', Number(props.id))
-    : await consulta.insert({ id_user: authStore.user.id, id_uni: Number(props.id) })
-
-  if (resultado.error) {
-    erroFavorito.value = 'Não foi possível atualizar este favorito.'
-    console.error('Erro ao atualizar favorito:', resultado.error.message)
+  if (favorito.value) {
+    favoritosStore.removerFavorito(Number(props.id))
   } else {
-    favorito.value = !favorito.value
+    favoritosStore.adicionarFavorito(Number(props.id))
   }
-  carregandoFavorito.value = false
 }
-
-onMounted(carregarFavorito)
 </script>
 
 <template>
@@ -87,7 +64,6 @@ onMounted(carregarFavorito)
       <button
         class="botaoCor"
         type="button"
-        :disabled="carregandoFavorito"
         :aria-label="favorito ? 'Remover dos favoritos' : 'Adicionar aos favoritos'"
         @click="alternarFavorito"
       >
@@ -104,7 +80,6 @@ onMounted(carregarFavorito)
           alt="Favoritado"
         />
       </button>
-      <span v-if="erroFavorito" class="erroFavorito" role="alert">{{ erroFavorito }}</span>
       <RouterLink class="botao" :to="{ name: 'universidade', params: { id } }">
         Página da universidade
       </RouterLink>
@@ -173,12 +148,10 @@ onMounted(carregarFavorito)
 .botaoCor {
   color: #ffffff;
   border: none;
+  background: transparent;
+  cursor: pointer;
 }
 
-.erroFavorito {
-  color: #9e1f2e;
-  font-size: 0.75rem;
-}
 .botaoCor:hover {
   background-color: #f4e3e4;
 }

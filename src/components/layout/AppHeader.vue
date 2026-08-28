@@ -2,10 +2,18 @@
 import { HugeiconsIcon } from '@hugeicons/vue'
 import { /*Search01Icon,*/ HeartAddIcon } from '@hugeicons/core-free-icons'
 import { RouterLink } from 'vue-router'
-import { computed } from 'vue'
+import { computed, onMounted, watch } from 'vue'
 import { useAuthStore } from '@/stores/auth'
+import { useFavoritosStore } from '@/stores/favoritos'
 
 const authStore = useAuthStore()
+const favoritosStore = useFavoritosStore()
+
+const quantidadeFavoritos = computed(() => favoritosStore.idsFavoritos.length)
+
+async function sairDaConta() {
+  await authStore.logout()
+}
 
 const userInitial = computed(() => {
   const name =
@@ -15,6 +23,13 @@ const userInitial = computed(() => {
 
   return name.trim().charAt(0).toUpperCase() || '?'
 })
+
+function carregarFavoritos() {
+  if (!authStore.loading) favoritosStore.carregarFavoritos()
+}
+
+onMounted(carregarFavoritos)
+watch(() => authStore.loading, carregarFavoritos)
 </script>
 
 <template>
@@ -59,11 +74,15 @@ const userInitial = computed(() => {
           :aria-label="authStore.isLoggedIn ? 'Favoritos' : 'Entrar para ver favoritos'"
         >
           <HugeiconsIcon :icon="HeartAddIcon" :size="22" color="currentColor" :stroke-width="1.8" />
+          <span v-if="authStore.isLoggedIn && quantidadeFavoritos" class="contadorFavoritos">
+            {{ quantidadeFavoritos > 99 ? '99+' : quantidadeFavoritos }}
+          </span>
         </RouterLink>
         <template v-if="authStore.isLoggedIn">
           <div class="avatarUsuario" :aria-label="`Usuário: ${userInitial}`" role="img">
             {{ userInitial }}
           </div>
+          <button class="botaoSair" type="button" @click="sairDaConta">Sair</button>
         </template>
         <template v-else>
           <RouterLink class="botaoEntrar" to="/entrar">Entrar</RouterLink>
@@ -170,6 +189,7 @@ const userInitial = computed(() => {
 }
 
 .botaoPesquisa {
+  position: relative;
   width: 42px;
   height: 42px;
   display: inline-flex;
@@ -189,6 +209,23 @@ const userInitial = computed(() => {
   background: rgba(122, 15, 26, 0.08);
 }
 
+.contadorFavoritos {
+  position: absolute;
+  top: -5px;
+  right: -5px;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 4px;
+  border: 2px solid var(--white);
+  border-radius: 999px;
+  background: var(--brand-700);
+  color: var(--white);
+  font-size: 0.65rem;
+  font-weight: 800;
+  line-height: 14px;
+  text-align: center;
+}
+
 .avatarUsuario {
   width: 42px;
   height: 42px;
@@ -201,6 +238,21 @@ const userInitial = computed(() => {
   font-size: 1rem;
   font-weight: 700;
   line-height: 1;
+}
+
+.botaoSair {
+  min-height: 42px;
+  padding: 0.7rem 1rem;
+  border: 1px solid rgba(122, 15, 26, 0.18);
+  border-radius: 10px;
+  background: transparent;
+  color: var(--brand-700);
+  cursor: pointer;
+  font-weight: 700;
+}
+
+.botaoSair:hover {
+  background: rgba(122, 15, 26, 0.06);
 }
 
 .botaoPesquisa svg {
