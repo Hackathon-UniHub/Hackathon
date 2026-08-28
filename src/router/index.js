@@ -1,23 +1,83 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import HomeView from '../views/HomeView.vue'
+import ErroView from '@/views/ErroView.vue'
+import { useAuthStore } from '@/stores/auth'
+
+const routes = [
+  {
+    path: '/',
+    name: 'home',
+    alias: ['/explorar', '/como-funciona'],
+    component: () => import('@/views/HomeView.vue'),
+  },
+  {
+    path: '/login',
+    name: 'login',
+    alias: ['/entrar'],
+    component: () => import('@/views/auth/LoginView.vue'),
+    meta: { hideLayout: true },
+  },
+  {
+    path: '/create-account',
+    name: 'create-account',
+    alias: ['/criar-conta'],
+    component: () => import('@/views/CreateAccountView.vue'),
+    meta: { hideLayout: true },
+  },
+  {
+    path: '/universidades',
+    name: 'filtro',
+    component: () => import('@/components/paginaFiltro/paginaFiltroList.vue'),
+  },
+  {
+    path: '/mapa',
+    name: 'mapa',
+    component: () => import('@/views/MapaView.vue'),
+  },
+  {
+    path: '/universidade/:id',
+    name: 'universidade',
+    component: () => import('@/components/paginaUniversidades/paginaUniversidade.vue'),
+  },
+  {
+    path: '/favoritos',
+    name: 'favoritos',
+    component: () => import('@/views/FavoritosView.vue'),
+    meta: { requiresAuth: true },
+  },
+  {
+    path: '/:pathMatch(.*)*',
+    name: 'not-found',
+    component: ErroView,
+  },
+]
 
 const router = createRouter({
-  history: createWebHistory(import.meta.env.BASE_URL),
-  routes: [
-    {
-      path: '/',
-      name: 'home',
-      component: HomeView,
-    },
-    {
-      path: '/about',
-      name: 'about',
-      // route level code-splitting
-      // this generates a separate chunk (About.[hash].js) for this route
-      // which is lazy-loaded when the route is visited.
-      component: () => import('../views/AboutView.vue'),
-    },
-  ],
+  history: createWebHistory(),
+  routes,
+  scrollBehavior(to, from, savedPosition) {
+    if (savedPosition) return savedPosition
+    return { top: 0 }
+  },
+})
+
+router.beforeEach(async (to) => {
+  const authStore = useAuthStore()
+
+  // espera a sessão inicial terminar de carregar antes de decidir qualquer coisa
+  if (authStore.loading) {
+    await new Promise((resolve) => {
+      const unwatch = authStore.$subscribe((mutation, state) => {
+        if (!state.loading) {
+          unwatch()
+          resolve()
+        }
+      })
+    })
+  }
+
+  if (to.meta.requiresAuth && !authStore.isLoggedIn) {
+    return { name: 'login', query: { redirect: to.fullPath } }
+  }
 })
 
 export default router
