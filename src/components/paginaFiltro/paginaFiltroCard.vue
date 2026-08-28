@@ -1,7 +1,10 @@
 <script setup>
-import { ref } from 'vue'
+import { computed } from 'vue'
+import { useRouter, useRoute } from 'vue-router'
+import { useAuthStore } from '@/stores/auth'
+import { useFavoritosStore } from '@/stores/favoritos'
 
-defineProps([
+const props = defineProps([
   'id',
   'nome',
   'sigla',
@@ -14,7 +17,25 @@ defineProps([
   'quantidade_alunos',
 ])
 
-const favorito = ref(false)
+const router = useRouter()
+const route = useRoute()
+const authStore = useAuthStore()
+const favoritosStore = useFavoritosStore()
+
+const favorito = computed(() => favoritosStore.isFavorito(Number(props.id)))
+
+function alternarFavorito() {
+  if (!authStore.isLoggedIn) {
+    router.push({ name: 'login', query: { redirect: route.fullPath } })
+    return
+  }
+
+  if (favorito.value) {
+    favoritosStore.removerFavorito(Number(props.id))
+  } else {
+    favoritosStore.adicionarFavorito(Number(props.id))
+  }
+}
 </script>
 
 <template>
@@ -40,7 +61,12 @@ const favorito = ref(false)
     <p v-if="quantidade_alunos" class="alunos">{{ quantidade_alunos }}</p>
 
     <div class="botoes">
-      <button class="botaoCor" type="button" @click="favorito = !favorito">
+      <button
+        class="botaoCor"
+        type="button"
+        :aria-label="favorito ? 'Remover dos favoritos' : 'Adicionar aos favoritos'"
+        @click="alternarFavorito"
+      >
         <img
           v-if="!favorito"
           class="imgDois"
@@ -122,7 +148,10 @@ const favorito = ref(false)
 .botaoCor {
   color: #ffffff;
   border: none;
+  background: transparent;
+  cursor: pointer;
 }
+
 .botaoCor:hover {
   background-color: #f4e3e4;
 }

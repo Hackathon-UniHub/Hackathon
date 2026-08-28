@@ -1,6 +1,7 @@
-<script setup>
+ <script setup>
 import { ref, computed } from 'vue'
 import paginaFiltroCard from './paginaFiltroCard.vue'
+import notasUniversidades from '@/data/notasUniversidades.js'
 import {
   getEstados,
   getRatings,
@@ -15,6 +16,13 @@ const pesquisa = ref('')
 
 const estados = getEstados()
 const ratings = getRatings()
+
+const rankingUniversidades = computed(() => {
+  return [...notasUniversidades]
+    .filter((universidade) => Number.isFinite(Number(universidade.Nota)))
+    .sort((primeira, segunda) => Number(segunda.Nota) - Number(primeira.Nota))
+    .slice(0, 5)
+})
 
 const universidades = computed(() =>
   getUniversidadesFiltradas({
@@ -65,15 +73,19 @@ function selecionarRating(r) {
       </div>
       <div class="containerTres">
         <h2>Rankings atualizados</h2>
-        <p>Baseados nos principais índices nacionais: RUF, IGC, ENADE e Folha Universitária.</p>
+        <p>Ranking baseado nas notas do Ranking Universitário Folha (RUF), da Folha de S.Paulo/UOL.</p>
 
-        <div class="rankingLinha">
-          <div class="rankingTexto">
-            <span class="topLabel">Top</span>
-            <div class="numeroLinha">
-              <span class="top100">100</span>
-              <img class="img" src="/src/components/icons/rank.svg" alt="rank" />
-            </div>
+        <div class="listaRanking">
+          <div
+            v-for="(universidade, indice) in rankingUniversidades"
+            :key="universidade.Ranking"
+            class="itemRanking"
+          >
+            <span class="posicaoRanking">{{ indice + 1 }}º</span>
+            <span class="siglaRanking" :title="universidade.Universidade">
+              {{ universidade.Universidade }}
+            </span>
+            <span class="notaRanking">{{ universidade.Nota.toFixed(2) }}</span>
           </div>
         </div>
       </div>
@@ -155,44 +167,42 @@ function selecionarRating(r) {
 </template>
 
 <style scoped>
-.rankingLinha {
+.listaRanking {
+  display: grid;
   width: 100%;
-  display: flex;
-  justify-content: center;
-  margin-top: 1rem;
+  gap: 0.55rem;
+  margin-top: 1.2rem;
 }
 
-.rankingTexto {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 0.2rem;
-}
-
-.topLabel {
-  font-size: 1.8rem;
-  font-weight: 700;
-  color: #fffcf7;
-  line-height: 1;
-}
-
-.numeroLinha {
-  display: flex;
+.itemRanking {
+  display: grid;
+  grid-template-columns: 2rem 1fr auto;
   align-items: center;
   gap: 0.5rem;
+  width: 100%;
+  padding: 0.45rem 0.6rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+  text-align: left;
 }
 
-.top100 {
-  font-size: 1.8rem;
+.posicaoRanking {
+  color: #f0cdd0;
   font-weight: 700;
-  color: #fffcf7;
-  line-height: 1;
 }
 
-.img {
-  width: 50px;
-  height: 50px;
-  display: block;
+.siglaRanking {
+  overflow: hidden;
+  color: #fff;
+  font-size: 0.85rem;
+  font-weight: 700;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.notaRanking {
+  color: #fff;
+  font-size: 0.85rem;
+  font-weight: 700;
 }
 
 .paginaFiltro {
@@ -399,12 +409,17 @@ h2 {
 }
 
 .botoesEstados {
-  display: flex;
-  flex-wrap: wrap;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 8px;
 }
 
 .botoesEstados .botao {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  min-height: 36px;
   background: #f7f7f8;
   border: 1px solid #eeeef0;
   color: #5d5d6b;
@@ -431,6 +446,9 @@ h2 {
 
 .cardsUniversidades {
   flex: 1;
+  max-height: 680px;
+  overflow-y: auto;
+  padding: 4px 8px 4px 4px;
 }
 
 .cardsUniversidades > div {

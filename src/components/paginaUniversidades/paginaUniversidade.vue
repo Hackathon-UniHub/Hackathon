@@ -1,6 +1,8 @@
 <script setup>
 import { computed } from 'vue'
-import { useRoute } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
+import { useAuthStore } from '@/stores/auth'
+import { useFavoritosStore } from '@/stores/favoritos'
 import {
   UniversidadePorId,
   getIniciais,
@@ -9,7 +11,9 @@ import {
 } from '@/utils/universidadesUtils.js'
 
 const route = useRoute()
-const universidade = computed(() => UniversidadePorId(route.params.id))
+const router = useRouter()
+const authStore = useAuthStore()
+const favoritosStore = useFavoritosStore()
 
 const siteOficial = computed(() => {
   const site = universidade.value?.site
@@ -24,6 +28,24 @@ const siteOficial = computed(() => {
 const iniciais = computed(() => getIniciais(universidade.value))
 const anoFundacao = computed(() => getAnoFundacao(universidade.value))
 const isPublica = computed(() => UniversidadePublica(universidade.value))
+
+const favorito = computed(() =>
+  universidade.value ? favoritosStore.isFavorito(Number(universidade.value.id)) : false
+)
+
+function alternarFavorito() {
+  if (!authStore.isLoggedIn) {
+    router.push({ name: 'login', query: { redirect: route.fullPath } })
+    return
+  }
+
+  const id = Number(universidade.value.id)
+  if (favorito.value) {
+    favoritosStore.removerFavorito(id)
+  } else {
+    favoritosStore.adicionarFavorito(id)
+  }
+}
 </script>
 
 <template>
@@ -53,10 +75,10 @@ const isPublica = computed(() => UniversidadePublica(universidade.value))
             {{ universidade.igc }}
             <span class="notaLegenda">IGC/MEC</span>
           </div>
-          <button class="botaoFavoritar">Favoritar</button>
-          <a class="botaoSite" :href="siteOficial" target="_blank" rel="noopener noreferrer">
-            Site oficial
-          </a>
+          <button class="botaoFavoritar" type="button" @click="alternarFavorito">
+            {{ favorito ? 'Remover favorito' : 'Favoritar' }}
+          </button>
+          <a class="botaoSite" :href="universidade.site" target="_blank">Site oficial</a>
         </div>
       </div>
 
@@ -184,10 +206,10 @@ const isPublica = computed(() => UniversidadePublica(universidade.value))
           </ul>
         </div>
 
-        <div class="caixaCadastro">
+        <div v-if="!authStore.loading && !authStore.isLoggedIn" class="caixaCadastro">
           <h3>Interessado em {{ universidade.sigla || universidade.nome }}?</h3>
           <p>Crie uma conta para salvar favoritos, ver mais instituições e localizalas no mapa.</p>
-          <button class="botaoPrimario">Criar conta grátis</button>
+          <RouterLink to="/criar-conta" class="botaoPrimario">Criar conta grátis</RouterLink>
           <RouterLink to="/universidades" class="botaoSecundario">Outras universidades</RouterLink>
         </div>
       </div>

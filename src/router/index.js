@@ -1,7 +1,6 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import ErroView from '@/views/ErroView.vue'
-
-//import { useAuthStore } from '@/stores/auth'
+import { useAuthStore } from '@/stores/auth'
 
 const routes = [
   {
@@ -13,19 +12,16 @@ const routes = [
   {
     path: '/login',
     name: 'login',
-    alias: ['/entrar', '/criar-conta'],
+    alias: ['/entrar'],
     component: () => import('@/views/auth/LoginView.vue'),
+    meta: { hideLayout: true },
   },
   {
-    path: '/mapa',
-    name: 'mapa',
-    component: () => import('@/views/MapaView.vue'),
-  },
-  {
-    path: '/complete-profile',
-    name: 'complete-profile',
-    component: () => import('@/views/CompleteProfileView.vue'),
-    meta: { requiresAuth: true },
+    path: '/create-account',
+    name: 'create-account',
+    alias: ['/criar-conta'],
+    component: () => import('@/views/CreateAccountView.vue'),
+    meta: { hideLayout: true },
   },
   {
     path: '/universidades',
@@ -33,9 +29,20 @@ const routes = [
     component: () => import('@/components/paginaFiltro/paginaFiltroList.vue'),
   },
   {
+    path: '/mapa',
+    name: 'mapa',
+    component: () => import('@/views/MapaView.vue'),
+  },
+  {
     path: '/universidade/:id',
     name: 'universidade',
     component: () => import('@/components/paginaUniversidades/paginaUniversidade.vue'),
+  },
+  {
+    path: '/favoritos',
+    name: 'favoritos',
+    component: () => import('@/views/FavoritosView.vue'),
+    meta: { requiresAuth: true },
   },
   {
     path: '/:pathMatch(.*)*',
@@ -47,26 +54,30 @@ const routes = [
 const router = createRouter({
   history: createWebHistory(),
   routes,
+  scrollBehavior(to, from, savedPosition) {
+    if (savedPosition) return savedPosition
+    return { top: 0 }
+  },
 })
 
-/*router.beforeEach((to) => {
+router.beforeEach(async (to) => {
   const authStore = useAuthStore()
 
+  // espera a sessão inicial terminar de carregar antes de decidir qualquer coisa
+  if (authStore.loading) {
+    await new Promise((resolve) => {
+      const unwatch = authStore.$subscribe((mutation, state) => {
+        if (!state.loading) {
+          unwatch()
+          resolve()
+        }
+      })
+    })
+  }
+
   if (to.meta.requiresAuth && !authStore.isLoggedIn) {
-    return { name: 'login' }
+    return { name: 'login', query: { redirect: to.fullPath } }
   }
-
-  if (authStore.isLoggedIn && !authStore.hasProfile && to.name !== 'complete-profile') {
-    return { name: 'complete-profile' }
-  }
-
-  if (
-    authStore.isLoggedIn &&
-    authStore.hasProfile &&
-    (to.name === 'login' || to.name === 'complete-profile')
-  ) {
-    return { name: 'home' }
-  }
-})*/
+})
 
 export default router

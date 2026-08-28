@@ -6,20 +6,21 @@
 import { ref, onMounted, onUnmounted } from 'vue'
 import L from 'leaflet'
 import 'leaflet/dist/leaflet.css'
+import logoSemNome from '@/assets/logo-semNome.svg'
 
 const iconesUniversidade = new Map()
 
 function obterIconeUniversidade(zoom) {
-  const tamanho = Math.round(Math.min(65, Math.max(38, 38 + (zoom - 4) * 3.375)))
+  const tamanho = Math.round(Math.min(55, Math.max(32, 32 + (zoom - 4) * 2.875)))
   const iconeExistente = iconesUniversidade.get(tamanho)
   if (iconeExistente) return iconeExistente
 
-  const proporcao = tamanho / 65
+  const largura = Math.round(tamanho * (1064 / 1494))
   const icone = L.icon({
-    iconUrl: '/gemini-svg%201.svg',
-    iconSize: [tamanho, tamanho],
-    iconAnchor: [tamanho / 2, Math.round(54 * proporcao)],
-    popupAnchor: [0, -Math.round(54 * proporcao)],
+    iconUrl: logoSemNome,
+    iconSize: [largura, tamanho],
+    iconAnchor: [largura / 2, tamanho],
+    popupAnchor: [0, -tamanho],
   })
 
   iconesUniversidade.set(tamanho, icone)
@@ -32,6 +33,11 @@ const props = defineProps({
     default: () => [],
   },
 })
+
+const limitesBrasil = L.latLngBounds(
+  [-33.8, -73.99],
+  [5.3, -34.7],
+)
 
 const containerMapa = ref(null)
 let mapa = null
@@ -72,7 +78,7 @@ function montarPopup(universidade) {
       <p class="popupDescricao">${descricaoResumida(universidade)}</p>
       <div class="popupRodape">
         <span class="popupIgc">${notaIgc(universidade)}</span>
-        <button class="popupBotao" type="button" onclick="window.dispatchEvent(new CustomEvent('abrir-universidade', { detail: '${universidade.sigla}' }))">
+        <button class="popupBotao" type="button" onclick="window.dispatchEvent(new CustomEvent('abrir-universidade', { detail: '${universidade.id}' }))">
           Ver mais
         </button>
       </div>
@@ -81,7 +87,10 @@ function montarPopup(universidade) {
 }
 
 onMounted(() => {
-  mapa = L.map(containerMapa.value).setView([-15.7801, -47.9292], 4)
+  mapa = L.map(containerMapa.value, {
+    maxBounds: limitesBrasil,
+    maxBoundsViscosity: 1,
+  }).setView([-15.7801, -47.9292], 4)
 
   L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
     maxZoom: 19,

@@ -1,7 +1,35 @@
 <script setup>
 import { HugeiconsIcon } from '@hugeicons/vue'
-import { Search01Icon, HeartAddIcon } from '@hugeicons/core-free-icons'
+import { /*Search01Icon,*/ HeartAddIcon } from '@hugeicons/core-free-icons'
 import { RouterLink } from 'vue-router'
+import { computed, onMounted, watch } from 'vue'
+import { useAuthStore } from '@/stores/auth'
+import { useFavoritosStore } from '@/stores/favoritos'
+
+const authStore = useAuthStore()
+const favoritosStore = useFavoritosStore()
+
+const quantidadeFavoritos = computed(() => favoritosStore.idsFavoritos.length)
+
+async function sairDaConta() {
+  await authStore.logout()
+}
+
+const userInitial = computed(() => {
+  const name =
+    authStore.user?.user_metadata?.full_name ||
+    authStore.user?.email ||
+    ''
+
+  return name.trim().charAt(0).toUpperCase() || '?'
+})
+
+function carregarFavoritos() {
+  if (!authStore.loading) favoritosStore.carregarFavoritos()
+}
+
+onMounted(carregarFavoritos)
+watch(() => authStore.loading, carregarFavoritos)
 </script>
 
 <template>
@@ -28,23 +56,33 @@ import { RouterLink } from 'vue-router'
               Mapa
             </RouterLink>
           </li>
-          <li>
-            <RouterLink to="/como-funciona" class="linkNavegacao" exact-active-class="ativo">
-              Como funciona
-            </RouterLink>
-          </li>
         </ul>
       </nav>
 
       <div class="areaAcoes">
-        <RouterLink class="botaoPesquisa" to="/explorar" aria-label="Explorar">
+        <!--<RouterLink class="botaoPesquisa" to="/explorar" aria-label="Explorar">
           <HugeiconsIcon :icon="Search01Icon" :size="22" color="currentColor" :stroke-width="1.8" />
-        </RouterLink>
-        <RouterLink class="botaoPesquisa" :to="{ name: 'login' }" aria-label="Favoritos">
+        </RouterLink> -->
+        <RouterLink
+          class="botaoPesquisa"
+          :to="authStore.isLoggedIn ? { name: 'favoritos' } : { name: 'login' }"
+          :aria-label="authStore.isLoggedIn ? 'Favoritos' : 'Entrar para ver favoritos'"
+        >
           <HugeiconsIcon :icon="HeartAddIcon" :size="22" color="currentColor" :stroke-width="1.8" />
+          <span v-if="authStore.isLoggedIn && quantidadeFavoritos" class="contadorFavoritos">
+            {{ quantidadeFavoritos > 99 ? '99+' : quantidadeFavoritos }}
+          </span>
         </RouterLink>
-        <RouterLink class="botaoEntrar" to="/entrar">Entrar</RouterLink>
-        <RouterLink class="botaoCriarConta" to="/criar-conta">Criar conta</RouterLink>
+        <template v-if="authStore.isLoggedIn">
+          <div class="avatarUsuario" :aria-label="`Usuário: ${userInitial}`" role="img">
+            {{ userInitial }}
+          </div>
+          <button class="botaoSair" type="button" @click="sairDaConta">Sair</button>
+        </template>
+        <template v-else>
+          <RouterLink class="botaoEntrar" to="/entrar">Entrar</RouterLink>
+          <RouterLink class="botaoCriarConta" to="/create-account">Criar conta</RouterLink>
+        </template>
       </div>
     </div>
   </header>
@@ -146,6 +184,7 @@ import { RouterLink } from 'vue-router'
 }
 
 .botaoPesquisa {
+  position: relative;
   width: 42px;
   height: 42px;
   display: inline-flex;
@@ -163,6 +202,52 @@ import { RouterLink } from 'vue-router'
 .botaoPesquisa:hover {
   transform: translateY(-1px);
   background: rgba(122, 15, 26, 0.08);
+}
+
+.contadorFavoritos {
+  position: absolute;
+  top: -5px;
+  right: -5px;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 4px;
+  border: 2px solid var(--white);
+  border-radius: 999px;
+  background: var(--brand-700);
+  color: var(--white);
+  font-size: 0.65rem;
+  font-weight: 800;
+  line-height: 14px;
+  text-align: center;
+}
+
+.avatarUsuario {
+  width: 42px;
+  height: 42px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: var(--brand-700);
+  color: var(--white);
+  font-size: 1rem;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.botaoSair {
+  min-height: 42px;
+  padding: 0.7rem 1rem;
+  border: 1px solid rgba(122, 15, 26, 0.18);
+  border-radius: 10px;
+  background: transparent;
+  color: var(--brand-700);
+  cursor: pointer;
+  font-weight: 700;
+}
+
+.botaoSair:hover {
+  background: rgba(122, 15, 26, 0.06);
 }
 
 .botaoPesquisa svg {
