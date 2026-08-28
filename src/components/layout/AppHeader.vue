@@ -29,8 +29,8 @@ import { RouterLink } from 'vue-router'
             </RouterLink>
           </li>
           <li>
-            <RouterLink to="/como-funciona" class="linkNavegacao" exact-active-class="ativo">
-              Como funciona
+            <RouterLink to="/favoritos" class="linkNavegacao" exact-active-class="ativo">
+              Favoritos
             </RouterLink>
           </li>
         </ul>

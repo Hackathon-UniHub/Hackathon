@@ -1,5 +1,13 @@
 import universidades from '@/data/universidades.js'
 
+export function normalizarNome(nome) {
+  return nome
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase()
+    .replace(/[^a-z0-9]/g, '')
+}
+
 export function UniversidadePorId(id) {
   if (id == null) return null
   const num = Number(id)
@@ -25,6 +33,7 @@ export function getUniversidadePorRota(route) {
 }
 
 export default {
+  normalizarNome,
   UniversidadePorId,
   getIniciais,
   getAnoFundacao,

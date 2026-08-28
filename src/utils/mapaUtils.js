@@ -53,6 +53,6 @@ export function selecionarUniversidade(componenteMapa, universidade) {
 
 export function criarManipuladorAberturaUniversidade(router) {
 	return (evento) => {
-		router.push({ name: 'universidade', params: { sigla: evento.detail } })
+		router.push({ name: 'universidade', params: { id: evento.detail } })
 	}
 }
