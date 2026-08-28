@@ -1,7 +1,20 @@
 <script setup>
 import { HugeiconsIcon } from '@hugeicons/vue'
-import { Search01Icon, HeartAddIcon } from '@hugeicons/core-free-icons'
+import { /*Search01Icon,*/ HeartAddIcon } from '@hugeicons/core-free-icons'
 import { RouterLink } from 'vue-router'
+import { computed } from 'vue'
+import { useAuthStore } from '@/stores/auth'
+
+const authStore = useAuthStore()
+
+const userInitial = computed(() => {
+  const name =
+    authStore.user?.user_metadata?.full_name ||
+    authStore.user?.email ||
+    ''
+
+  return name.trim().charAt(0).toUpperCase() || '?'
+})
 </script>
 
 <template>
@@ -29,22 +42,33 @@ import { RouterLink } from 'vue-router'
             </RouterLink>
           </li>
           <li>
-            <RouterLink to="/como-funciona" class="linkNavegacao" exact-active-class="ativo">
-              Como funciona
+            <RouterLink to="/favoritos" class="linkNavegacao" exact-active-class="ativo">
+              Favoritos
             </RouterLink>
           </li>
         </ul>
       </nav>
 
       <div class="areaAcoes">
-        <RouterLink class="botaoPesquisa" to="/explorar" aria-label="Explorar">
+        <!--<RouterLink class="botaoPesquisa" to="/explorar" aria-label="Explorar">
           <HugeiconsIcon :icon="Search01Icon" :size="22" color="currentColor" :stroke-width="1.8" />
-        </RouterLink>
-        <RouterLink class="botaoPesquisa" :to="{ name: 'favoritos' }" aria-label="Favoritos">
+        </RouterLink> -->
+        <RouterLink
+          class="botaoPesquisa"
+          :to="authStore.isLoggedIn ? { name: 'favoritos' } : { name: 'login' }"
+          :aria-label="authStore.isLoggedIn ? 'Favoritos' : 'Entrar para ver favoritos'"
+        >
           <HugeiconsIcon :icon="HeartAddIcon" :size="22" color="currentColor" :stroke-width="1.8" />
         </RouterLink>
-        <RouterLink class="botaoEntrar" to="/entrar">Entrar</RouterLink>
-        <RouterLink class="botaoCriarConta" to="/criar-conta">Criar conta</RouterLink>
+        <template v-if="authStore.isLoggedIn">
+          <div class="avatarUsuario" :aria-label="`Usuário: ${userInitial}`" role="img">
+            {{ userInitial }}
+          </div>
+        </template>
+        <template v-else>
+          <RouterLink class="botaoEntrar" to="/entrar">Entrar</RouterLink>
+          <RouterLink class="botaoCriarConta" to="/create-account">Criar conta</RouterLink>
+        </template>
       </div>
     </div>
   </header>
@@ -163,6 +187,20 @@ import { RouterLink } from 'vue-router'
 .botaoPesquisa:hover {
   transform: translateY(-1px);
   background: rgba(122, 15, 26, 0.08);
+}
+
+.avatarUsuario {
+  width: 42px;
+  height: 42px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: var(--brand-700);
+  color: var(--white);
+  font-size: 1rem;
+  font-weight: 700;
+  line-height: 1;
 }
 
 .botaoPesquisa svg {

@@ -27,6 +27,11 @@ const routes = [
     component: () => import('@/components/paginaFiltro/paginaFiltroList.vue'),
   },
   {
+    path: '/mapa',
+    name: 'mapa',
+    component: () => import('@/views/MapaView.vue'),
+  },
+  {
     path: '/universidade/:id',
     name: 'universidade',
     component: () => import('@/components/paginaUniversidades/paginaUniversidade.vue'),
@@ -35,6 +40,7 @@ const routes = [
     path: '/favoritos',
     name: 'favoritos',
     component: () => import('@/views/FavoritosView.vue'),
+    meta: { requiresAuth: true },
   },
   {
     path: '/:pathMatch(.*)*',
@@ -46,28 +52,18 @@ const routes = [
 const router = createRouter({
   history: createWebHistory(),
   routes,
+  scrollBehavior(to, from, savedPosition) {
+    if (savedPosition) return savedPosition
+    return { top: 0 }
+  },
 })
 
-router.beforeEach(async (to) => {
-  const authStore = useAuthStore()
 
-  if (authStore.loading) {
-    await new Promise((resolve) => {
-      const unwatch = authStore.$subscribe((mutation, state) => {
-        if (!state.loading) {
-          unwatch()
-          resolve()
-        }
-      })
-    })
-  }
+router.beforeEach((to) => {
+  const authStore = useAuthStore()
 
   if (to.meta.requiresAuth && !authStore.isLoggedIn) {
     return { name: 'login', query: { redirect: to.fullPath } }
-  }
-
-  if (authStore.isLoggedIn && (to.name === 'login' || to.name === 'create-account')) {
-    return { name: 'home' }
   }
 })
 

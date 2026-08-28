@@ -1,228 +1,150 @@
 <script setup>
-import { ref, computed, onMounted, watch } from 'vue'
-import { supabase } from '@/services/supabase' 
+import { computed, onMounted, ref } from 'vue'
 import { useAuthStore } from '@/stores/auth'
-import { universidades } from '@/data/universidades'
+import { supabase } from '@/services/supabase'
+import universidades from '@/data/universidades.js'
 
 const authStore = useAuthStore()
-
 const favoritos = ref([])
 const carregando = ref(true)
+const erro = ref('')
 
-const estaAutenticado = computed(() => !!authStore.user)
-const nomeUsuario = computed(() => authStore.user?.user_metadata?.full_name || authStore.user?.email?.split('@')[0] || 'Estudante')
-const quantidadeFavoritos = computed(() => favoritos.value.length)
+const nomeUsuario = computed(
+  () =>
+    authStore.user?.user_metadata?.full_name ||
+    authStore.user?.email?.split('@')[0] ||
+    'Estudante',
+)
 
 async function carregarFavoritos() {
+  if (!authStore.user) return
+
   carregando.value = true
-
-  let userId = authStore.user?.id
-
-  if (!userId) {
-    const { data: { session } } = await supabase.auth.getSession()
-    userId = session?.user?.id
-  }
-
-  if (!userId) {
-    favoritos.value = []
-    carregando.value = false
-    return
-  }
+  erro.value = ''
 
   const { data, error } = await supabase
     .from('favoritos')
     .select('id_uni')
-    .eq('id_user', userId)
+    .eq('id_user', authStore.user.id)
 
   if (error) {
-    console.error('Erro ao buscar favoritos:', error.message)
-    carregando.value = false
-    return
+    erro.value = 'Não foi possível carregar seus favoritos.'
+  } else {
+    const idsSalvos = data.map((item) => item.id_uni)
+    favoritos.value = universidades.filter((universidade) => idsSalvos.includes(universidade.id))
   }
-
-  const idsSalvos = data.map(item => item.id_uni)
-  favoritos.value = universidades.filter(uni => idsSalvos.includes(uni.id))
 
   carregando.value = false
 }
 
-
-onMounted(() => {
-  carregarFavoritos()
-
-  supabase.auth.onAuthStateChange((_event, session) => {
-    if (session?.user) {
-      authStore.user = session.user
-    } else {
-      authStore.user = null
-    }
-    carregarFavoritos()
-  })
-})
-
-watch(estaAutenticado, () => {
-  carregarFavoritos()
-})
+onMounted(carregarFavoritos)
 </script>
 
 <template>
-  <div class="paginaFundo">
-    <div class="container">
+  <section class="paginaFavoritos">
+    <div class="containerFavoritos">
+      <p class="eyebrow">SUA LISTA</p>
+      <h1>Universidades favoritas</h1>
+      <p class="saudacao">Olá, <strong>{{ nomeUsuario }}</strong>.</p>
 
-      <div v-if="!estaAutenticado" class="estadoCaixa">
-        <div class="iconeCoracao">
-          <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#7a0f1a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg>
-        </div>
-        <h2>Seus favoritos</h2>
-        <p class="subtitulo">Entre na sua conta para ver e gerenciar as universidades que você favoritou.</p>
-        <div class="acoesCentradas">
-          <RouterLink to="/login" class="botaoEntrar">Entrar</RouterLink>
-          <RouterLink to="/create-account" class="botaoCriarConta">Criar conta</RouterLink>
-        </div>
+      <p v-if="carregando" class="mensagem">Carregando favoritos...</p>
+      <p v-else-if="erro" class="mensagem erro">{{ erro }}</p>
+      <p v-else-if="favoritos.length === 0" class="mensagem">
+        Você ainda não salvou nenhuma universidade.
+        <RouterLink to="/universidades" class="botaoVoltar">Voltar para universidades</RouterLink>
+      </p>
+
+      <div v-else class="listaFavoritos">
+        <article v-for="universidade in favoritos" :key="universidade.id" class="favorito">
+          <h2>{{ universidade.nome }}</h2>
+          <p>{{ universidade.municipio }} - {{ universidade.uf }}</p>
+          <RouterLink :to="`/universidade/${universidade.id}`">Ver detalhes</RouterLink>
+        </article>
       </div>
-
-      <template v-else>
-        <div class="cabecalhoSecao">
-          <div>
-            <span class="tagLista">SUA LISTA</span>
-            <h1>Universidades favoritas</h1>
-            <p class="saudacao">Olá, <strong>{{ nomeUsuario }}</strong> — {{ quantidadeFavoritos }} universidades salvas.</p>
-          </div>
-          <RouterLink to="/universidades" class="linkExplorar">Explorar mais &rarr;</RouterLink>
-        </div>
-
-        <div v-if="carregando" class="carregando">
-          <p>Carregando favoritos...</p>
-        </div>
-
-        <div v-else-if="favoritos.length === 0" class="caixaVazia">
-          <div class="iconeCoracao">
-            <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#7a0f1a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg>
-          </div>
-          <h3>Nenhum favorito ainda</h3>
-          <p>Toque no coração nos cards ou no perfil da universidade para salvar aqui.</p>
-          <RouterLink to="/universidades" class="botaoExplorar">Explorar universidades</RouterLink>
-        </div>
-
-        <div v-else class="gridUniversidades">
-          <div v-for="uni in favoritos" :key="uni.id" class="cardUni">
-            <h4>{{ uni.nome }}</h4>
-            <p>{{ uni.municipio }} - {{ uni.uf }}</p>
-            <RouterLink :to="`/universidade/${uni.id}`" class="linkDetalhes">Ver detalhes</RouterLink>
-          </div>
-        </div>
-      </template>
-
     </div>
-  </div>
+  </section>
 </template>
 
 <style scoped>
-.paginaFundo {
-  min-height: 80vh;
-  background-color: #fffcf7;
+.paginaFavoritos {
+  min-height: 70vh;
   padding: 3rem 1.5rem;
-  font-family: inherit;
+  background: #fffcf7;
   color: #1c1c22;
 }
 
-.container {
-  max-width: 1000px;
+.containerFavoritos {
+  width: min(1000px, 100%);
   margin: 0 auto;
 }
 
-.tagLista {
+.eyebrow {
+  margin: 0;
+  color: #9e1f2e;
   font-size: 0.75rem;
   font-weight: 700;
-  color: #9e1f2e;
   letter-spacing: 1px;
+  background: linear-gradient(135deg, var(--brand-700), var(--brand-600));
+  color: var(--white);
+  box-shadow: 0 12px 24px rgba(122, 15, 26, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.2);
 }
 
-.cabecalhoSecao {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-end;
-  margin-bottom: 2rem;
-}
-
-.cabecalhoSecao h1 {
-  font-size: 2rem;
-  margin: 0.2rem 0;
+h1 {
+  margin: 0.3rem 0;
 }
 
 .saudacao {
   color: #6e6e78;
-  margin: 0;
 }
 
-.linkExplorar {
-  color: #7a0f1a;
-  text-decoration: none;
-  font-weight: 600;
-}
-
-.estadoCaixa, .caixaVazia {
-  background: #ffffff;
+.mensagem {
+  padding: 2rem;
   border: 1px dashed #e2e2e8;
-  border-radius: 16px;
-  padding: 4rem 2rem;
-  text-align: center;
-  max-width: 600px;
-  margin: 2rem auto;
-}
-
-.iconeCoracao {
-  width: 56px;
-  height: 56px;
-  background-color: #f9e8e9;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin: 0 auto 1.2rem;
-}
-
-.subtitulo {
-  color: #6e6e78;
-  font-size: 0.95rem;
-  margin-bottom: 1.5rem;
-}
-
-.acoesCentradas {
-  display: flex;
-  gap: 1rem;
-  justify-content: center;
-}
-
-.botaoEntrar, .botaoExplorar {
-  background-color: #7a0f1a;
-  color: #ffffff;
-  padding: 0.75rem 1.8rem;
-  border-radius: 999px;
-  text-decoration: none;
-  font-weight: 600;
-  display: inline-block;
-}
-
-.botaoCriarConta {
-  border: 1px solid #d0d0d8;
-  color: #1c1c22;
-  padding: 0.75rem 1.8rem;
-  border-radius: 999px;
-  text-decoration: none;
-  font-weight: 600;
-}
-
-.gridUniversidades {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: 1.5rem;
-}
-
-.cardUni {
-  background: #ffffff;
-  border: 1px solid #eeeef0;
   border-radius: 12px;
-  padding: 1.5rem;
+  background: #fff;
+}
+
+.botaoVoltar {
+  display: inline-flex;
+  margin-top: 1rem;
+  padding: 0.7rem 1rem;
+  border-radius: 8px;
+  background: #7a0f1a;
+  color: #fff;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.erro {
+  color: #9e1f2e;
+}
+
+.listaFavoritos {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1rem;
+  margin-top: 2rem;
+}
+
+.favorito {
+  padding: 1.25rem;
+  border: 1px solid #eeeef0;
+  border-radius: 8px;
+  background: #fff;
+}
+
+.favorito h2 {
+  margin: 0;
+  font-size: 1.1rem;
+}
+
+.favorito p {
+  color: #5d5d6b;
+}
+
+.favorito a {
+  color: #7a0f1a;
+  font-weight: 600;
 }
 </style>

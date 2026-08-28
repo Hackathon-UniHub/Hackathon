@@ -1,6 +1,8 @@
 <script setup>
-import { computed } from 'vue'
-import { useRoute } from 'vue-router'
+import { computed, onMounted, ref } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
+import { useAuthStore } from '@/stores/auth'
+import { supabase } from '@/services/supabase'
 import {
   UniversidadePorId,
   getIniciais,
@@ -9,11 +11,46 @@ import {
 } from '@/utils/universidadesUtils.js'
 
 const route = useRoute()
+const router = useRouter()
+const authStore = useAuthStore()
 const universidade = computed(() => UniversidadePorId(route.params.id))
+const favorito = ref(false)
+const carregandoFavorito = ref(false)
 
 const iniciais = computed(() => getIniciais(universidade.value))
 const anoFundacao = computed(() => getAnoFundacao(universidade.value))
 const isPublica = computed(() => UniversidadePublica(universidade.value))
+
+async function carregarFavorito() {
+  if (!authStore.user || !universidade.value) return
+
+  const { data, error } = await supabase
+    .from('favoritos')
+    .select('id_uni')
+    .eq('id_user', authStore.user.id)
+    .eq('id_uni', universidade.value.id)
+    .maybeSingle()
+
+  if (!error) favorito.value = !!data
+}
+
+async function alternarFavorito() {
+  if (!authStore.isLoggedIn) {
+    router.push({ name: 'login', query: { redirect: route.fullPath } })
+    return
+  }
+
+  carregandoFavorito.value = true
+  const consulta = supabase.from('favoritos')
+  const resultado = favorito.value
+    ? await consulta.delete().eq('id_user', authStore.user.id).eq('id_uni', universidade.value.id)
+    : await consulta.insert({ id_user: authStore.user.id, id_uni: universidade.value.id })
+
+  if (!resultado.error) favorito.value = !favorito.value
+  carregandoFavorito.value = false
+}
+
+onMounted(carregarFavorito)
 </script>
 
 <template>
@@ -43,7 +80,14 @@ const isPublica = computed(() => UniversidadePublica(universidade.value))
             {{ universidade.igc }}
             <span class="notaLegenda">IGC/MEC</span>
           </div>
-          <button class="botaoFavoritar">Favoritar</button>
+          <button
+            class="botaoFavoritar"
+            type="button"
+            :disabled="carregandoFavorito"
+            @click="alternarFavorito"
+          >
+            {{ favorito ? 'Remover favorito' : 'Favoritar' }}
+          </button>
           <a class="botaoSite" :href="universidade.site" target="_blank">Site oficial</a>
         </div>
       </div>

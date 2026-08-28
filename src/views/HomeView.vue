@@ -1,5 +1,30 @@
 <script setup>
-import { onMounted } from 'vue'
+import { computed, onMounted } from 'vue'
+import { RouterLink } from 'vue-router'
+import notasUniversidades from '@/data/notasUniversidades.js'
+import universidades from '@/data/universidades.js'
+import { normalizarNome } from '@/utils/universidadesUtils.js'
+
+const universidadesMaisBemRanqueadas = computed(() => {
+  return [...notasUniversidades]
+    .sort((primeira, segunda) => primeira.Ranking - segunda.Ranking)
+    .slice(0, 6)
+    .map((nota) => {
+      const nomeNormalizado = normalizarNome(nota.Universidade)
+      const universidade = universidades.find(
+        (item) => {
+          const nomeItemNormalizado = normalizarNome(item.nome)
+          return (
+            nomeItemNormalizado === nomeNormalizado ||
+            nomeItemNormalizado.startsWith(nomeNormalizado)
+          )
+        },
+      )
+
+      return universidade ? { ...universidade, notaRuf: nota.Nota, rankingRuf: nota.Ranking } : null
+    })
+    .filter(Boolean)
+})
 
 onMounted(() => {
   const elementosAnimados = document.querySelectorAll('.pagina > section')
@@ -53,7 +78,7 @@ onMounted(() => {
             </article>
             <article class="cartaoEstatistica">
               <strong>4.9</strong>
-              <span>Ranking</span>
+              <span>Avaliação</span>
             </article>
           </div>
         </div>
@@ -85,12 +110,49 @@ onMounted(() => {
     <section class="secaoUniversidades">
       <div class="container">
         <div class="cabecalhoSecao">
-          <span class="destaque">Universidades</span>
-          <h2>Universidades mais buscadas</h2>
-          <RouterLink to="/universidades">Ver todas</RouterLink>
+          <div class="eyebrowLinha">
+            <span class="linhaEyebrow"></span>
+            <span class="destaque">Destaques · Ranking RUF</span>
+          </div>
+
+          <div class="tituloELink">
+            <h2>Universidades mais buscadas</h2>
+            <RouterLink to="/universidades" class="verTodasLink">
+              Ver todas <span class="setaLink">→</span>
+            </RouterLink>
+          </div>
         </div>
 
-        <div class="gradeUniversidades"></div>
+        <div class="gradeUniversidades">
+          <article
+            v-for="(universidade, indice) in universidadesMaisBemRanqueadas"
+            :key="universidade.id"
+            class="cartaoUniversidade"
+          >
+            <div class="topoCartao">
+              <span class="selo">{{ universidade.sigla }}</span>
+              <span class="numeroRanking">{{ String(indice + 1).padStart(2, '0') }}</span>
+            </div>
+
+            <h3>{{ universidade.nome }}</h3>
+            <p class="localCartao">{{ universidade.municipio }}, {{ universidade.uf }}</p>
+
+            <div class="metaCartao">
+              <span class="notaCartao"> {{ universidade.notaRuf.toFixed(2) }}</span>
+              <span class="separadorMeta">·</span>
+              <span>{{ universidade.categoria }}</span>
+              <span class="separadorMeta">·</span>
+              <span>Nº{{ universidade.rankingRuf }} no RUF</span>
+            </div>
+
+            <RouterLink
+              class="linkCartao"
+              :to="{ name: 'universidade', params: { id: universidade.id } }"
+            >
+              Ver detalhes <span class="setaLink">→</span>
+            </RouterLink>
+          </article>
+        </div>
       </div>
     </section>
 
@@ -134,7 +196,7 @@ onMounted(() => {
         </div>
 
         <div class="acoesChamada">
-          <RouterLink to="/explorar" class="botao botaoSecundario"
+          <RouterLink to="/universidades" class="botao botaoSecundario"
             >Explorar universidades</RouterLink
           >
           <RouterLink to="/mapa" class="botao botaoPrimario">Abrir mapa</RouterLink>
@@ -248,10 +310,10 @@ onMounted(() => {
 }
 
 .botaoSecundario {
-  background: rgba(255, 255, 255, 0.08);
-  color: var(--white);
-  border: 1px solid rgba(255, 255, 255, 0.22);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.15);
+  background: var(--white);
+  color: var(--brand-700);
+  border: 1px solid rgba(122, 15, 26, 0.24);
+  box-shadow: 0 8px 18px rgba(122, 15, 26, 0.08);
 }
 
 .gradeEstatisticas {
@@ -363,36 +425,27 @@ onMounted(() => {
   line-height: 1.35;
 }
 
+/* === UNIVERSIDADES MAIS BUSCADAS === */
+
 .secaoUniversidades {
-  padding: 36px 0 46px;
+  padding: 44px 0 56px;
 }
 
 .cabecalhoSecao {
+  margin-bottom: 34px;
+}
+
+.eyebrowLinha {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  gap: 16px;
-  margin-bottom: 24px;
+  margin-bottom: 10px;
 }
 
-.cabecalhoSecao h2 {
-  color: var(--ink-900);
-  font-size: clamp(1.8rem, 2vw, 2.4rem);
-  letter-spacing: -0.04em;
-}
-
-.cabecalhoSecao a {
-  color: var(--brand-700);
-  font-weight: 700;
-  text-decoration: none;
+.linhaEyebrow {
+  display: none;
 }
 
 .destaque {
-  display: inline-flex;
-  align-items: center;
-  padding: 6px 10px;
-  border-radius: 999px;
-  background: rgba(122, 15, 26, 0.08);
   color: var(--brand-700);
   font-size: 0.7rem;
   font-weight: 700;
@@ -401,91 +454,145 @@ onMounted(() => {
 }
 
 .destaqueClaro {
-  background: rgba(255, 255, 255, 0.08);
-  color: var(--white);
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.tituloELink {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 20px;
+}
+
+.cabecalhoSecao h2 {
+  color: var(--ink-900);
+  font-size: clamp(1.7rem, 2.2vw, 2.2rem);
+  letter-spacing: -0.03em;
+  line-height: 1.1;
+}
+
+.verTodasLink {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  color: var(--ink-600);
+  font-weight: 600;
+  font-size: 0.82rem;
+  text-decoration: none;
+  white-space: nowrap;
+  transition: color 0.15s ease;
+}
+
+.verTodasLink:hover {
+  color: var(--brand-700);
+}
+
+.setaLink {
+  display: inline-block;
+  transition: transform 0.15s ease;
+}
+
+.verTodasLink:hover .setaLink,
+.linkCartao:hover .setaLink {
+  transform: translateX(2px);
 }
 
 .gradeUniversidades {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 20px;
+  gap: 16px;
 }
 
 .cartaoUniversidade {
-  background: rgba(255, 255, 255, 0.7);
+  display: flex;
+  flex-direction: column;
+  background: var(--cream-50);
   border: 1px solid rgba(28, 28, 34, 0.08);
-  border-radius: 20px;
-  padding: 18px 18px 16px;
-  box-shadow: 0 10px 30px rgba(28, 28, 34, 0.04);
+  border-radius: 14px;
+  padding: 28px 24px;
+  box-shadow: 0 8px 20px rgba(28, 28, 34, 0.04);
+  transition: background 0.15s ease;
+}
+
+.cartaoUniversidade:hover {
+  background: var(--white);
 }
 
 .topoCartao {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 12px;
-  margin-bottom: 16px;
+  margin-bottom: 18px;
 }
 
-.marca {
+.selo {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  padding: 5px 8px;
-  border-radius: 8px;
-  font-size: 0.62rem;
-  font-weight: 800;
+  height: 30px;
+  padding: 0 10px;
+  border-radius: 4px;
+  background-color: #851420;
+  color: var(--white);
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+
+.numeroRanking {
+  color: var(--ink-600);
+  font-size: 0.72rem;
+  font-weight: 600;
   letter-spacing: 0.04em;
-}
-
-.marcaPrimaria {
-  background: rgba(122, 15, 26, 0.1);
-  color: var(--brand-700);
-}
-
-.marcaAzul {
-  background: rgba(59, 130, 246, 0.12);
-  color: #1d4ed8;
-}
-
-.marcaVerde {
-  background: rgba(34, 197, 94, 0.12);
-  color: #15803d;
-}
-
-.avaliacao {
-  color: var(--brand-700);
-  font-weight: 800;
-  font-size: 0.8rem;
 }
 
 .cartaoUniversidade h3 {
   color: var(--ink-900);
-  font-size: 1.06rem;
-  line-height: 1.4;
-  margin-bottom: 8px;
+  font-size: 1.02rem;
+  font-weight: 600;
+  line-height: 1.35;
+  letter-spacing: -0.01em;
+  margin-bottom: 6px;
+  min-height: 2.7em;
 }
 
-.cartaoUniversidade p {
+.localCartao {
   color: var(--ink-600);
-  font-size: 0.82rem;
-  margin-bottom: 14px;
+  font-size: 0.8rem;
+  margin-bottom: 20px;
 }
 
 .metaCartao {
   display: flex;
   flex-wrap: wrap;
-  gap: 8px;
+  align-items: center;
+  gap: 6px;
+  margin-top: auto;
+  margin-bottom: 16px;
+  color: var(--ink-600);
+  font-size: 0.76rem;
 }
 
-.metaCartao span {
+.notaCartao {
+  color: var(--ink-900);
+  font-weight: 700;
+}
+
+.separadorMeta {
+  color: rgba(28, 28, 34, 0.25);
+}
+
+.linkCartao {
   display: inline-flex;
   align-items: center;
-  padding: 5px 8px;
-  border-radius: 999px;
-  background: rgba(28, 28, 34, 0.04);
-  color: var(--ink-700);
-  font-size: 0.7rem;
+  gap: 4px;
+  color: var(--brand-700);
+  font-size: 0.8rem;
+  font-weight: 700;
+}
+
+.linkCartao:hover {
+  color: var(--brand-900);
 }
 
 .comoFunciona {
@@ -630,9 +737,10 @@ onMounted(() => {
     width: 100%;
   }
 
-  .cabecalhoSecao {
+  .tituloELink {
     align-items: flex-start;
     flex-direction: column;
+    gap: 10px;
   }
 
   .gradeEstatisticas {

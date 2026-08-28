@@ -44,7 +44,7 @@ async function handleSubmit() {
       password: password.value,
       rememberMe: rememberMe.value,
     })
-    router.push('/')
+    router.push(router.currentRoute.value.query.redirect || '/')
   } catch {
     errorMsg.value = 'Email ou senha incorretos.'
   } finally {

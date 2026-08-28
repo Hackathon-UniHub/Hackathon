@@ -1,7 +1,10 @@
 <script setup>
-import { ref } from 'vue'
+import { onMounted, ref } from 'vue'
+import { useRouter } from 'vue-router'
+import { useAuthStore } from '@/stores/auth'
+import { supabase } from '@/services/supabase'
 
-defineProps([
+const props = defineProps([
   'id',
   'nome',
   'sigla',
@@ -14,7 +17,48 @@ defineProps([
   'quantidade_alunos',
 ])
 
+const router = useRouter()
+const authStore = useAuthStore()
 const favorito = ref(false)
+const carregandoFavorito = ref(false)
+const erroFavorito = ref('')
+
+async function carregarFavorito() {
+  if (!authStore.user) return
+
+  const { data, error } = await supabase
+    .from('favoritos')
+    .select('id_uni')
+    .eq('id_user', authStore.user.id)
+    .eq('id_uni', props.id)
+    .maybeSingle()
+
+  if (!error) favorito.value = !!data
+}
+
+async function alternarFavorito() {
+  if (!authStore.isLoggedIn) {
+    router.push({ name: 'login', query: { redirect: router.currentRoute.value.fullPath } })
+    return
+  }
+
+  carregandoFavorito.value = true
+  erroFavorito.value = ''
+  const consulta = supabase.from('favoritos')
+  const resultado = favorito.value
+    ? await consulta.delete().eq('id_user', authStore.user.id).eq('id_uni', Number(props.id))
+    : await consulta.insert({ id_user: authStore.user.id, id_uni: Number(props.id) })
+
+  if (resultado.error) {
+    erroFavorito.value = 'Não foi possível atualizar este favorito.'
+    console.error('Erro ao atualizar favorito:', resultado.error.message)
+  } else {
+    favorito.value = !favorito.value
+  }
+  carregandoFavorito.value = false
+}
+
+onMounted(carregarFavorito)
 </script>
 
 <template>
@@ -40,7 +84,13 @@ const favorito = ref(false)
     <p v-if="quantidade_alunos" class="alunos">{{ quantidade_alunos }}</p>
 
     <div class="botoes">
-      <button class="botaoCor" type="button" @click="favorito = !favorito">
+      <button
+        class="botaoCor"
+        type="button"
+        :disabled="carregandoFavorito"
+        :aria-label="favorito ? 'Remover dos favoritos' : 'Adicionar aos favoritos'"
+        @click="alternarFavorito"
+      >
         <img
           v-if="!favorito"
           class="imgDois"
@@ -54,6 +104,7 @@ const favorito = ref(false)
           alt="Favoritado"
         />
       </button>
+      <span v-if="erroFavorito" class="erroFavorito" role="alert">{{ erroFavorito }}</span>
       <RouterLink class="botao" :to="{ name: 'universidade', params: { id } }">
         Página da universidade
       </RouterLink>
@@ -122,6 +173,11 @@ const favorito = ref(false)
 .botaoCor {
   color: #ffffff;
   border: none;
+}
+
+.erroFavorito {
+  color: #9e1f2e;
+  font-size: 0.75rem;
 }
 .botaoCor:hover {
   background-color: #f4e3e4;

@@ -11,7 +11,7 @@ import {
   estadoEstaAberto,
   filtrarUniversidades,
   selecionarUniversidade,
-} from '@/data/mapaUtils.js'
+} from '@/utils/mapaUtils.js'
 
 const router = useRouter()
 
