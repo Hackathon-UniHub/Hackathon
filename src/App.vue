@@ -19,7 +19,6 @@ import { RouterView } from 'vue-router'
   height: 76px;
 }
 
-/* === RESPONSIVO === */
 @media (max-width: 768px) {
   .cabecalhoReserva {
     height: 140px;

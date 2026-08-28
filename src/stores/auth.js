@@ -27,10 +27,10 @@ export const useAuthStore = defineStore('auth', {
       return data
     },
     async signUp({ email, password }) {
-       const { data, error } = await supabase.auth.signUp({
-         email,
-         password,
-       })
+      const { data, error } = await supabase.auth.signUp({
+        email,
+        password,
+      })
       if (error) throw error
       this.session = data.session
       this.user = data.user
@@ -49,6 +49,10 @@ export const useAuthStore = defineStore('auth', {
 
     async logout() {
       await supabase.auth.signOut()
+
+      const { useFavoritosStore } = await import('@/stores/favoritos')
+      useFavoritosStore().limparFavoritos()
+
       this.user = null
       this.session = null
       this.profile = null
@@ -60,27 +64,53 @@ export const useAuthStore = defineStore('auth', {
         .from('profiles')
         .select('*')
         .eq('id', this.user.id)
-        .single()
+        .maybeSingle()
 
       if (!error) this.profile = data
       return data
     },
 
-async createProfile({ full_name }) {
-  const { data, error } = await supabase
-    .from('profiles')
-    .insert({
-      id: this.user.id,
-      full_name,
-      avatar_url: this.user.user_metadata?.avatar_url,
-    })
-    .select()
-    .single()
+    async ensureProfile(user = this.user) {
+      if (!user) return null
 
-  if (error) throw error
-  this.profile = data
-  return data
-},
+      this.user = user
+      const profile = await this.fetchProfile()
+      if (profile) return profile
+
+      const { data, error } = await supabase
+        .from('profiles')
+        .insert({
+          id: user.id,
+          full_name:
+            user.user_metadata?.full_name ||
+            user.user_metadata?.name ||
+            user.email?.split('@')[0] ||
+            'Estudante',
+          avatar_url: user.user_metadata?.avatar_url || null,
+        })
+        .select()
+        .single()
+
+      if (error) throw error
+      this.profile = data
+      return data
+    },
+
+    async createProfile({ full_name }) {
+      const { data, error } = await supabase
+        .from('profiles')
+        .insert({
+          id: this.user.id,
+          full_name,
+          avatar_url: this.user.user_metadata?.avatar_url,
+        })
+        .select()
+        .single()
+
+      if (error) throw error
+      this.profile = data
+      return data
+    },
 
     async initAuthListener() {
       const {
