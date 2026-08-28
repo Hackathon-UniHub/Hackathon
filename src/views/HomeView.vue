@@ -1,10 +1,14 @@
 <script setup>
 import { computed, onMounted } from 'vue'
 import { RouterLink } from 'vue-router'
+import { useRouter } from 'vue-router'
+import { useAuthStore } from '@/stores/auth'
 import notasUniversidades from '@/data/notasUniversidades.js'
 import universidades from '@/data/universidades.js'
 import { normalizarNome } from '@/utils/universidadesUtils.js'
 
+const router = useRouter()
+const authStore = useAuthStore()
 const universidadesMaisBemRanqueadas = computed(() => {
   return [...notasUniversidades]
     .sort((primeira, segunda) => primeira.Ranking - segunda.Ranking)
@@ -25,6 +29,26 @@ const universidadesMaisBemRanqueadas = computed(() => {
     })
     .filter(Boolean)
 })
+
+async function comecarAgora() {
+  if (authStore.loading) {
+    await new Promise((resolve) => {
+      const unwatch = authStore.$subscribe((mutation, state) => {
+        if (!state.loading) {
+          unwatch()
+          resolve()
+        }
+      })
+    })
+  }
+
+  if (authStore.isLoggedIn) {
+    router.push('/universidades')
+    return
+  }
+
+  router.push({ name: 'login', query: { redirect: '/universidades' } })
+}
 
 onMounted(() => {
   const elementosAnimados = document.querySelectorAll('.pagina > section')
@@ -59,7 +83,9 @@ onMounted(() => {
           <p>Compare instituições, explore no mapa e tome decisões com confiança.</p>
 
           <div class="acoesPrincipal">
-            <RouterLink to="/explorar" class="botao botaoPrimario">Começar agora</RouterLink>
+            <button type="button" class="botao botaoPrimario" @click="comecarAgora">
+              Começar agora
+            </button>
             <RouterLink to="/mapa" class="botao botaoSecundario">Ver mapa interativo</RouterLink>
           </div>
 

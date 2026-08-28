@@ -197,10 +197,10 @@ function alternarFavorito() {
           </ul>
         </div>
 
-        <div class="caixaCadastro">
+        <div v-if="!authStore.loading && !authStore.isLoggedIn" class="caixaCadastro">
           <h3>Interessado em {{ universidade.sigla || universidade.nome }}?</h3>
           <p>Crie uma conta para salvar favoritos, ver mais instituições e localizalas no mapa.</p>
-          <button class="botaoPrimario">Criar conta grátis</button>
+          <RouterLink to="/criar-conta" class="botaoPrimario">Criar conta grátis</RouterLink>
           <RouterLink to="/universidades" class="botaoSecundario">Outras universidades</RouterLink>
         </div>
       </div>
