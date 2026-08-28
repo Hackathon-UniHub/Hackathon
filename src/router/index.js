@@ -1,7 +1,6 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import ErroView from '@/views/ErroView.vue'
-
-//import { useAuthStore } from '@/stores/auth'
+import { useAuthStore } from '@/stores/auth'
 
 const routes = [
   {
@@ -20,7 +19,6 @@ const routes = [
     path: '/create-account',
     name: 'create-account',
     component: () => import('@/views/CreateAccountView.vue'),
-    meta: { requiresAuth: true },
   },
   {
     path: '/universidades',
@@ -38,6 +36,12 @@ const routes = [
     component: () => import('@/components/paginaUniversidades/paginaUniversidade.vue'),
   },
   {
+    path: '/favoritos',
+    name: 'favoritos',
+    component: () => import('@/views/FavoritosView.vue'),
+    meta: { requiresAuth: true },
+  },
+  {
     path: '/:pathMatch(.*)*',
     name: 'not-found',
     component: ErroView,
@@ -53,25 +57,14 @@ const router = createRouter({
   },
 })
 
-/*router.beforeEach((to) => {
+
+router.beforeEach((to) => {
   const authStore = useAuthStore()
 
   if (to.meta.requiresAuth && !authStore.isLoggedIn) {
-    return { name: 'login' }
+    return { name: 'login', query: { redirect: to.fullPath } }
   }
-
-  if (authStore.isLoggedIn && !authStore.hasProfile && to.name !== 'complete-profile') {
-    return { name: 'complete-profile' }
-  }
-
-  if (
-    authStore.isLoggedIn &&
-    authStore.hasProfile &&
-    (to.name === 'login' || to.name === 'complete-profile')
-  ) {
-    return { name: 'home' }
-  }
-})*/
+})
 
 export default router
 
