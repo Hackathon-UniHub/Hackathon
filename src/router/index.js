@@ -12,12 +12,13 @@ const routes = [
   {
     path: '/login',
     name: 'login',
-    alias: ['/entrar', '/criar-conta'],
+    alias: ['/entrar'],
     component: () => import('@/views/auth/LoginView.vue'),
   },
   {
     path: '/create-account',
     name: 'create-account',
+    alias: ['/criar-conta'],
     component: () => import('@/views/CreateAccountView.vue'),
   },
   {
@@ -45,7 +46,7 @@ const routes = [
     path: '/:pathMatch(.*)*',
     name: 'not-found',
     component: ErroView,
-  },
+  }
 ]
 
 const router = createRouter({
@@ -67,4 +68,3 @@ router.beforeEach((to) => {
 })
 
 export default router
-
