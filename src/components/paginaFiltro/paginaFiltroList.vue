@@ -1,21 +1,28 @@
- <script setup>
+<script setup>
 import { ref, computed } from 'vue'
 import paginaFiltroCard from './paginaFiltroCard.vue'
 import notasUniversidades from '@/data/notasUniversidades.js'
 import {
   getEstados,
   getRatings,
+  getCursos,
+  getCursoDestaque,
   getUniversidadesFiltradas,
   alternarEstado,
   alternarRating,
+  alternarCurso,
+  normalizarNotaEnem,
 } from '@/utils/filtroUtils.js'
 
 const estadoAtivo = ref('')
 const ratingAtivo = ref('Todas')
 const pesquisa = ref('')
+const cursoAtivo = ref('')
+const notaEnem = ref('')
 
 const estados = getEstados()
 const ratings = getRatings()
+const cursos = getCursos()
 
 const rankingUniversidades = computed(() => {
   return [...notasUniversidades]
@@ -29,6 +36,8 @@ const universidades = computed(() =>
     estadoAtivo: estadoAtivo.value,
     pesquisa: pesquisa.value,
     ratingAtivo: ratingAtivo.value,
+    cursoAtivo: cursoAtivo.value,
+    notaEnem: notaEnem.value,
   }),
 )
 
@@ -42,6 +51,16 @@ function selecionarRating(r) {
   const proximoRating = alternarRating(ratingAtivo.value, r)
   ratingAtivo.value = proximoRating.ratingAtivo
   pesquisa.value = proximoRating.pesquisa
+}
+
+function selecionarCurso(curso) {
+  const proximoCurso = alternarCurso(cursoAtivo.value, curso)
+  cursoAtivo.value = proximoCurso.cursoAtivo
+  pesquisa.value = proximoCurso.pesquisa
+}
+
+function atualizarNotaEnem(evento) {
+  notaEnem.value = normalizarNotaEnem(evento.target.value)
 }
 </script>
 
@@ -73,7 +92,9 @@ function selecionarRating(r) {
       </div>
       <div class="containerTres">
         <h2>Rankings atualizados</h2>
-        <p>Ranking baseado nas notas do Ranking Universitário Folha (RUF), da Folha de S.Paulo/UOL.</p>
+        <p>
+          Ranking baseado nas notas do Ranking Universitário Folha (RUF), da Folha de S.Paulo/UOL.
+        </p>
 
         <div class="listaRanking">
           <div
@@ -100,6 +121,41 @@ function selecionarRating(r) {
         <div class="input">
           <input v-model="pesquisa" type="text" placeholder="Pesquise por universidades..." />
         </div>
+      </div>
+    </div>
+
+    <div class="filtroCurso">
+      <div class="cabecalhoFiltroCurso">
+        <span class="subtitulo subtituloEscuro">PESQUISAR POR CURSO</span>
+        <h2>Filtre por <span class="destaque">curso e nota do Enem</span></h2>
+      </div>
+
+      <div class="botoesCursos">
+        <button
+          class="botaoCurso"
+          v-for="curso in cursos"
+          :key="curso"
+          :class="{ ativo: cursoAtivo === curso }"
+          @click="selecionarCurso(curso)"
+        >
+          {{ curso }}
+        </button>
+      </div>
+
+      <div class="filtroNota">
+        <span class="subtitulo subtituloEscuro">MÉDIA NO ENEM (0 a 1000)</span>
+        <input
+          class="inputNota"
+          type="number"
+          min="0"
+          max="1000"
+          :value="notaEnem"
+          @input="atualizarNotaEnem"
+          placeholder="Ex: 650"
+        />
+        <p class="dicaNota" v-if="notaEnem !== ''">
+          Mostrando universidades com cursos disponíveis até {{ notaEnem }} pontos.
+        </p>
       </div>
     </div>
 
@@ -159,6 +215,7 @@ function selecionarRating(r) {
             :site="universidade.site"
             :rating="universidade.igc"
             :quantidade_alunos="universidade.quantidade_alunos"
+            :curso-destaque="getCursoDestaque(universidade.id, cursoAtivo)"
           />
         </div>
       </div>
@@ -226,7 +283,8 @@ h1 {
 
 .containerQuatro,
 .pesquisa,
-.divisao {
+.divisao,
+.filtroCurso {
   width: 95%;
   max-width: 1180px;
   margin: 0 auto;
@@ -371,6 +429,98 @@ h2 {
 .input input:focus {
   border-color: #fff;
   background: #ffffff2e;
+}
+
+/* --- Filtro por curso / nota do Enem --- */
+.filtroCurso {
+  background: #fff;
+  border: 1px solid #eeeef0;
+  border-radius: 16px;
+  padding: 1.8rem;
+  box-shadow: 0 4px 20px #1212160d;
+  margin-bottom: 2rem;
+}
+
+.cabecalhoFiltroCurso {
+  margin-bottom: 1.2rem;
+}
+
+.cabecalhoFiltroCurso .subtituloEscuro {
+  color: #b83d4a;
+}
+
+.cabecalhoFiltroCurso h2 {
+  color: #1c1c22;
+  font-size: 1.4rem;
+  margin-top: 0.2rem;
+}
+
+.cabecalhoFiltroCurso .destaque {
+  color: #7a0f1a;
+}
+
+.botoesCursos {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 1.5rem;
+}
+
+.botaoCurso {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #f7f7f8;
+  border: 1px solid #eeeef0;
+  color: #5d5d6b;
+  padding: 0.45rem 1rem;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.botaoCurso:hover {
+  background: #f9e8e9;
+  color: #7a0f1a;
+  border-color: #f0cdd0;
+}
+
+.botaoCurso.ativo {
+  background: #7a0f1a;
+  color: #fff;
+  border-color: #7a0f1a;
+  font-weight: 600;
+}
+
+.filtroNota {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  max-width: 320px;
+}
+
+.inputNota {
+  padding: 0.7rem 1rem;
+  border-radius: 10px;
+  border: 1px solid #eeeef0;
+  background: #faf6ef;
+  color: #1c1c22;
+  font-size: 0.95rem;
+  outline: 0;
+  transition: 0.2s;
+}
+
+.inputNota:focus {
+  border-color: #d06f78;
+  background: #fff;
+}
+
+.dicaNota {
+  font-size: 0.8rem;
+  color: #7a0f1a;
+  margin: 0;
 }
 
 .divisao {
