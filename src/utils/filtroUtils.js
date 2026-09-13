@@ -17,18 +17,27 @@ export function getCursos() {
   return [...new Set(nomesCursos)].sort()
 }
 
+export function getCursosFiltrados(cursos, busca = '') {
+  if (!busca) return cursos
+  const termo = busca.toLowerCase()
+  return cursos.filter((curso) => curso.toLowerCase().includes(termo))
+}
+
+export function getRankingUniversidades(notas, limite = 5) {
+  return [...notas]
+    .filter((universidade) => Number.isFinite(Number(universidade.Nota)))
+    .sort((primeira, segunda) => Number(segunda.Nota) - Number(primeira.Nota))
+    .slice(0, limite)
+}
+
 export function getCursosDaUniversidade(id) {
   return cursosPorUniversidadeId.get(Number(id)) || []
 }
 
-export function getCorteEnemCurso(id, nomeCurso) {
-  const curso = getCursosDaUniversidade(id).find((c) => c.nome_curso === nomeCurso)
-  return curso ? curso.media_corte_enem : null
-}
-
-export function getCursoDestaque(id, cursoAtivo) {
-  if (!cursoAtivo) return null
-  const curso = getCursosDaUniversidade(id).find((c) => c.nome_curso === cursoAtivo)
+export function getCursoDestaque(id, busca) {
+  if (!busca) return null
+  const termo = busca.toLowerCase()
+  const curso = getCursosDaUniversidade(id).find((c) => c.nome_curso.toLowerCase().includes(termo))
   return curso ? { nome: curso.nome_curso, nota: curso.media_corte_enem } : null
 }
 
@@ -46,22 +55,41 @@ export function filtrar(uf = '', pesquisa = '', rating = '') {
     .filter((e) => !rating || Math.round(Number(e.igc)) === Number(rating))
 }
 
-function atendeFiltroCurso(id, cursoAtivo, notaEnem) {
+function atendeFiltroCurso(id, busca, notaEnem) {
   const cursos = getCursosDaUniversidade(id)
   if (!cursos.length) return false
 
-  if (cursoAtivo) {
-    const curso = cursos.find((c) => c.nome_curso === cursoAtivo)
-    if (!curso) return false
-    if (notaEnem !== '' && Number(curso.media_corte_enem) > Number(notaEnem)) return false
-    return true
-  }
+  const termo = busca.toLowerCase()
+  const cursosCorrespondentes = busca
+    ? cursos.filter((c) => c.nome_curso.toLowerCase().includes(termo))
+    : cursos
+
+  if (busca && !cursosCorrespondentes.length) return false
 
   if (notaEnem !== '') {
-    return cursos.some((c) => Number(c.media_corte_enem) <= Number(notaEnem))
+    return cursosCorrespondentes.some((c) => Number(c.media_corte_enem) <= Number(notaEnem))
   }
 
   return true
+}
+
+export function getUniversidadesFiltradas({
+  estadoAtivo = '',
+  pesquisa = '',
+  ratingAtivo = 'Todas',
+  buscaCurso = '',
+  notaEnem = '',
+}) {
+  const rating = ratingAtivo === 'Todas' ? '' : ratingAtivo
+  const resultado = filtrar(estadoAtivo, pesquisa, rating)
+
+  if (!buscaCurso && notaEnem === '') {
+    return resultado
+  }
+
+  return resultado.filter((universidade) =>
+    atendeFiltroCurso(universidade.id, buscaCurso, notaEnem),
+  )
 }
 
 export function alternarEstado(estadoAtivo, uf) {
@@ -82,45 +110,53 @@ export function alternarRating(ratingAtivo, rating) {
   }
 }
 
-export function alternarCurso(cursoAtivo, curso) {
-  const proximoCurso = cursoAtivo === curso ? '' : curso
+export function alternarBuscaCurso(buscaAtual, curso) {
+  const proximaBusca = buscaAtual.toLowerCase() === curso.toLowerCase() ? '' : curso
 
   return {
-    cursoAtivo: proximoCurso,
+    buscaCurso: proximaBusca,
     pesquisa: '',
   }
 }
 
-export function getUniversidadesFiltradas({
-  estadoAtivo = '',
-  pesquisa = '',
-  ratingAtivo = 'Todas',
-  cursoAtivo = '',
-  notaEnem = '',
-}) {
-  const rating = ratingAtivo === 'Todas' ? '' : ratingAtivo
-  const resultado = filtrar(estadoAtivo, pesquisa, rating)
+export function selecionarEstado(estadoAtivoRef, pesquisaRef, uf) {
+  const proximo = alternarEstado(estadoAtivoRef.value, uf)
+  estadoAtivoRef.value = proximo.estadoAtivo
+  pesquisaRef.value = proximo.pesquisa
+}
 
-  if (!cursoAtivo && notaEnem === '') {
-    return resultado
-  }
+export function selecionarRating(ratingAtivoRef, pesquisaRef, rating) {
+  const proximo = alternarRating(ratingAtivoRef.value, rating)
+  ratingAtivoRef.value = proximo.ratingAtivo
+  pesquisaRef.value = proximo.pesquisa
+}
 
-  return resultado.filter((universidade) =>
-    atendeFiltroCurso(universidade.id, cursoAtivo, notaEnem),
-  )
+export function selecionarBuscaCurso(buscaCursoRef, pesquisaRef, curso) {
+  const proximo = alternarBuscaCurso(buscaCursoRef.value, curso)
+  buscaCursoRef.value = proximo.buscaCurso
+  pesquisaRef.value = proximo.pesquisa
+}
+
+export function atualizarNotaEnem(notaEnemRef, evento) {
+  notaEnemRef.value = normalizarNotaEnem(evento.target.value)
 }
 
 export default {
   getEstados,
   getRatings,
   getCursos,
+  getCursosFiltrados,
+  getRankingUniversidades,
   getCursosDaUniversidade,
-  getCorteEnemCurso,
   getCursoDestaque,
   normalizarNotaEnem,
   filtrar,
+  getUniversidadesFiltradas,
   alternarEstado,
   alternarRating,
-  alternarCurso,
-  getUniversidadesFiltradas,
+  alternarBuscaCurso,
+  selecionarEstado,
+  selecionarRating,
+  selecionarBuscaCurso,
+  atualizarNotaEnem,
 }

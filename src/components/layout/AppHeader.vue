@@ -16,10 +16,7 @@ async function sairDaConta() {
 }
 
 const userInitial = computed(() => {
-  const name =
-    authStore.user?.user_metadata?.full_name ||
-    authStore.user?.email ||
-    ''
+  const name = authStore.user?.user_metadata?.full_name || authStore.user?.email || ''
 
   return name.trim().charAt(0).toUpperCase() || '?'
 })
@@ -345,8 +342,8 @@ watch(() => authStore.loading, carregarFavoritos)
 
 /* === RESET === */
 /* http://meyerweb.com/eric/tools/css/reset/
-   v2.0 | 20110126
-   License: none (public domain)
+  v2.0 | 20110126
+  License: none (public domain)
 */
 
 html,
@@ -410,6 +407,7 @@ thead,
 tr,
 th,
 td,
+/* HTML5 display-role reset for older browsers */
 article,
 aside,
 canvas,
@@ -438,7 +436,6 @@ video {
   vertical-align: baseline;
   text-decoration: none;
 }
-/* HTML5 display-role reset for older browsers */
 article,
 aside,
 details,
@@ -474,13 +471,12 @@ table {
   border-collapse: collapse;
   border-spacing: 0;
 }
-/* === RESET === */
-
 header {
   background-color: white;
 }
 
 .container {
+  /* === RESET === */
   display: flex;
   align-items: center;
   justify-content: space-between;

@@ -8,10 +8,14 @@ import {
   getIniciais,
   getAnoFundacao,
   UniversidadePublica,
+  getSiteOficial,
   temCursosDisponiveis,
   getCursosDaUniversidade,
+  getRotuloCurso,
   filtrarCursosDaUniversidade,
-  getCorteEnemCurso,
+  getCorteEnemDoCursoSelecionado,
+  selecionarCursoDaUniversidade,
+  fecharCursoSelecionado,
 } from '@/utils/universidadesUtils.js'
 
 const route = useRoute()
@@ -21,16 +25,7 @@ const favoritosStore = useFavoritosStore()
 
 const universidade = computed(() => UniversidadePorId(route.params.id))
 
-const siteOficial = computed(() => {
-  const site = universidade.value?.site
-
-  if (!site) return '#'
-  if (/^https?:\/\//i.test(site)) return site
-  if (site.startsWith('//')) return `https:${site}`
-
-  return `https://${site}`
-})
-
+const siteOficial = computed(() => getSiteOficial(universidade.value))
 const iniciais = computed(() => getIniciais(universidade.value))
 const anoFundacao = computed(() => getAnoFundacao(universidade.value))
 const isPublica = computed(() => UniversidadePublica(universidade.value))
@@ -57,23 +52,19 @@ const pesquisaCurso = ref('')
 const cursoSelecionado = ref(null)
 
 const cursosDaUniversidade = computed(() => getCursosDaUniversidade(universidade.value))
-
 const cursosFiltrados = computed(() =>
   filtrarCursosDaUniversidade(cursosDaUniversidade.value, pesquisaCurso.value),
 )
+const corteEnemSelecionado = computed(() =>
+  getCorteEnemDoCursoSelecionado(universidade.value, cursoSelecionado.value),
+)
 
-const corteEnemSelecionado = computed(() => {
-  if (!cursoSelecionado.value || !universidade.value) return null
-  return getCorteEnemCurso(universidade.value.id, cursoSelecionado.value.nome_curso)
-})
-
-function selecionarCurso(curso) {
-  cursoSelecionado.value =
-    cursoSelecionado.value?.codigo_curso === curso.codigo_curso ? null : curso
+function onSelecionarCurso(curso) {
+  selecionarCursoDaUniversidade(cursoSelecionado, curso)
 }
 
-function fecharCurso() {
-  cursoSelecionado.value = null
+function onFecharCurso() {
+  fecharCursoSelecionado(cursoSelecionado)
 }
 </script>
 
@@ -180,26 +171,28 @@ function fecharCurso() {
 
           <div class="secao" v-if="temCursosDisponiveis(universidade)">
             <div class="cabecalhoCursos">
+              <div class="iconeCursos">🎓</div>
               <div>
                 <h2>Cursos oferecidos</h2>
                 <p class="subtituloCursos">
-                  {{ cursosDaUniversidade.length }} cursos no catálogo UniHub
+                  {{ cursosDaUniversidade.length }} cursos no catálogo UniHub — filtro em tempo real
                 </p>
               </div>
-              <div class="buscaCursos">
-                <input v-model="pesquisaCurso" type="text" placeholder="Filtrar cursos..." />
-              </div>
+            </div>
+
+            <div class="buscaCursos">
+              <input v-model="pesquisaCurso" type="text" placeholder="Filtrar cursos..." />
             </div>
 
             <div class="chipsCursos">
               <button
                 class="chipCurso"
-                v-for="curso in cursosFiltrados"
-                :key="curso.codigo_curso"
-                :class="{ ativo: cursoSelecionado?.codigo_curso === curso.codigo_curso }"
-                @click="selecionarCurso(curso)"
+                v-for="(curso, indice) in cursosFiltrados"
+                :key="`${curso.codigo_curso}-${indice}`"
+                :class="{ ativo: cursoSelecionado === curso }"
+                @click="onSelecionarCurso(curso)"
               >
-                {{ curso.nome_curso }}
+                {{ getRotuloCurso(curso) }}
               </button>
               <p class="semCursos" v-if="!cursosFiltrados.length">Nenhum curso encontrado.</p>
             </div>
@@ -212,7 +205,7 @@ function fecharCurso() {
                   <h3>{{ cursoSelecionado.nome_curso }}</h3>
                   <p>{{ universidade.nome }}</p>
                 </div>
-                <button class="fecharDetalheCurso" type="button" @click="fecharCurso">×</button>
+                <button class="fecharDetalheCurso" type="button" @click="onFecharCurso">×</button>
               </div>
 
               <div class="detalheCursoGrade">
@@ -697,14 +690,23 @@ function fecharCurso() {
   line-height: 1.7;
 }
 
-/* --- Cursos oferecidos (cursos_pda) --- */
 .cabecalhoCursos {
   display: flex;
-  flex-wrap: wrap;
-  justify-content: space-between;
   align-items: center;
-  gap: 1rem;
+  gap: 0.8rem;
   margin-bottom: 1.2rem;
+}
+
+.iconeCursos {
+  width: 44px;
+  height: 44px;
+  min-width: 44px;
+  border-radius: 12px;
+  background: #f9e8e9;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.3rem;
 }
 
 .subtituloCursos {
@@ -713,15 +715,20 @@ function fecharCurso() {
   color: #91919f;
 }
 
+.buscaCursos {
+  margin-bottom: 1rem;
+}
+
 .buscaCursos input {
-  padding: 0.6rem 1rem;
+  width: 100%;
+  padding: 0.7rem 1rem;
   border-radius: 10px;
   border: 1px solid #eeeef0;
   background: #fff;
   font-size: 0.9rem;
-  min-width: 220px;
   outline: 0;
   transition: 0.2s;
+  box-sizing: border-box;
 }
 
 .buscaCursos input:focus {
@@ -731,7 +738,11 @@ function fecharCurso() {
 .chipsCursos {
   display: flex;
   flex-wrap: wrap;
+  align-content: flex-start;
   gap: 0.5rem;
+  max-height: 260px;
+  overflow-y: auto;
+  padding: 4px 8px 4px 4px;
 }
 
 .chipCurso {

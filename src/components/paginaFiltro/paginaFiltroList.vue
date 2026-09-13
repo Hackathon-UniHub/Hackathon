@@ -6,61 +6,53 @@ import {
   getEstados,
   getRatings,
   getCursos,
+  getCursosFiltrados,
   getCursoDestaque,
+  getRankingUniversidades,
   getUniversidadesFiltradas,
-  alternarEstado,
-  alternarRating,
-  alternarCurso,
-  normalizarNotaEnem,
+  selecionarEstado,
+  selecionarRating,
+  selecionarBuscaCurso,
+  atualizarNotaEnem,
 } from '@/utils/filtroUtils.js'
 
 const estadoAtivo = ref('')
 const ratingAtivo = ref('Todas')
 const pesquisa = ref('')
-const cursoAtivo = ref('')
+const buscaCurso = ref('')
 const notaEnem = ref('')
 
 const estados = getEstados()
 const ratings = getRatings()
 const cursos = getCursos()
+const rankingUniversidades = getRankingUniversidades(notasUniversidades, 5)
 
-const rankingUniversidades = computed(() => {
-  return [...notasUniversidades]
-    .filter((universidade) => Number.isFinite(Number(universidade.Nota)))
-    .sort((primeira, segunda) => Number(segunda.Nota) - Number(primeira.Nota))
-    .slice(0, 5)
-})
+const cursosFiltrados = computed(() => getCursosFiltrados(cursos, buscaCurso.value))
 
 const universidades = computed(() =>
   getUniversidadesFiltradas({
     estadoAtivo: estadoAtivo.value,
     pesquisa: pesquisa.value,
     ratingAtivo: ratingAtivo.value,
-    cursoAtivo: cursoAtivo.value,
+    buscaCurso: buscaCurso.value,
     notaEnem: notaEnem.value,
   }),
 )
 
-function selecionarEstado(uf) {
-  const proximoEstado = alternarEstado(estadoAtivo.value, uf)
-  estadoAtivo.value = proximoEstado.estadoAtivo
-  pesquisa.value = proximoEstado.pesquisa
+function onSelecionarEstado(uf) {
+  selecionarEstado(estadoAtivo, pesquisa, uf)
 }
 
-function selecionarRating(r) {
-  const proximoRating = alternarRating(ratingAtivo.value, r)
-  ratingAtivo.value = proximoRating.ratingAtivo
-  pesquisa.value = proximoRating.pesquisa
+function onSelecionarRating(rating) {
+  selecionarRating(ratingAtivo, pesquisa, rating)
 }
 
-function selecionarCurso(curso) {
-  const proximoCurso = alternarCurso(cursoAtivo.value, curso)
-  cursoAtivo.value = proximoCurso.cursoAtivo
-  pesquisa.value = proximoCurso.pesquisa
+function onSelecionarBuscaCurso(curso) {
+  selecionarBuscaCurso(buscaCurso, pesquisa, curso)
 }
 
-function atualizarNotaEnem(evento) {
-  notaEnem.value = normalizarNotaEnem(evento.target.value)
+function onAtualizarNotaEnem(evento) {
+  atualizarNotaEnem(notaEnem, evento)
 }
 </script>
 
@@ -126,20 +118,33 @@ function atualizarNotaEnem(evento) {
 
     <div class="filtroCurso">
       <div class="cabecalhoFiltroCurso">
-        <span class="subtitulo subtituloEscuro">PESQUISAR POR CURSO</span>
-        <h2>Filtre por <span class="destaque">curso e nota do Enem</span></h2>
+        <div class="iconeFiltroCurso">🎓</div>
+        <div>
+          <span class="subtitulo subtituloEscuro">BUSCAR POR CURSO</span>
+          <h2>Filtro em tempo real</h2>
+          <p class="descricaoFiltroCurso">Digite o nome do curso ou escolha um atalho abaixo.</p>
+        </div>
+      </div>
+
+      <div class="inputBuscaCurso">
+        <input
+          v-model="buscaCurso"
+          type="text"
+          placeholder='Ex: "Medicina", "Engenharia Civil", "Direito"...'
+        />
       </div>
 
       <div class="botoesCursos">
         <button
           class="botaoCurso"
-          v-for="curso in cursos"
+          v-for="curso in cursosFiltrados"
           :key="curso"
-          :class="{ ativo: cursoAtivo === curso }"
-          @click="selecionarCurso(curso)"
+          :class="{ ativo: buscaCurso.toLowerCase() === curso.toLowerCase() }"
+          @click="onSelecionarBuscaCurso(curso)"
         >
           {{ curso }}
         </button>
+        <p class="semCursos" v-if="!cursosFiltrados.length">Nenhum curso encontrado.</p>
       </div>
 
       <div class="filtroNota">
@@ -150,7 +155,7 @@ function atualizarNotaEnem(evento) {
           min="0"
           max="1000"
           :value="notaEnem"
-          @input="atualizarNotaEnem"
+          @input="onAtualizarNotaEnem($event)"
           placeholder="Ex: 650"
         />
         <p class="dicaNota" v-if="notaEnem !== ''">
@@ -170,7 +175,7 @@ function atualizarNotaEnem(evento) {
                 v-for="uf in estados"
                 :key="uf"
                 :class="{ ativo: estadoAtivo === uf }"
-                @click="selecionarEstado(uf)"
+                @click="onSelecionarEstado(uf)"
               >
                 {{ uf }}
               </button>
@@ -183,7 +188,7 @@ function atualizarNotaEnem(evento) {
               <button
                 class="botao"
                 :class="{ ativo: ratingAtivo === 'Todas' }"
-                @click="selecionarRating('Todas')"
+                @click="onSelecionarRating('Todas')"
               >
                 Todas
               </button>
@@ -192,7 +197,7 @@ function atualizarNotaEnem(evento) {
                 v-for="r in ratings"
                 :key="r"
                 :class="{ ativo: ratingAtivo === r }"
-                @click="selecionarRating(r)"
+                @click="onSelecionarRating(r)"
               >
                 {{ r }}
               </button>
@@ -215,7 +220,7 @@ function atualizarNotaEnem(evento) {
             :site="universidade.site"
             :rating="universidade.igc"
             :quantidade_alunos="universidade.quantidade_alunos"
-            :curso-destaque="getCursoDestaque(universidade.id, cursoAtivo)"
+            :curso-destaque="getCursoDestaque(universidade.id, buscaCurso)"
           />
         </div>
       </div>
@@ -431,7 +436,6 @@ h2 {
   background: #ffffff2e;
 }
 
-/* --- Filtro por curso / nota do Enem --- */
 .filtroCurso {
   background: #fff;
   border: 1px solid #eeeef0;
@@ -442,7 +446,22 @@ h2 {
 }
 
 .cabecalhoFiltroCurso {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
   margin-bottom: 1.2rem;
+}
+
+.iconeFiltroCurso {
+  width: 44px;
+  height: 44px;
+  min-width: 44px;
+  border-radius: 12px;
+  background: #f9e8e9;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.3rem;
 }
 
 .cabecalhoFiltroCurso .subtituloEscuro {
@@ -451,18 +470,45 @@ h2 {
 
 .cabecalhoFiltroCurso h2 {
   color: #1c1c22;
-  font-size: 1.4rem;
-  margin-top: 0.2rem;
+  font-size: 1.3rem;
+  margin: 0.2rem 0 0;
 }
 
-.cabecalhoFiltroCurso .destaque {
-  color: #7a0f1a;
+.descricaoFiltroCurso {
+  margin: 0.2rem 0 0;
+  font-size: 0.85rem;
+  color: #91919f;
+}
+
+.inputBuscaCurso {
+  margin-bottom: 1rem;
+}
+
+.inputBuscaCurso input {
+  width: 100%;
+  padding: 0.9rem 1.2rem;
+  border-radius: 12px;
+  border: 1px solid #eeeef0;
+  background: #faf6ef;
+  font-size: 0.95rem;
+  outline: 0;
+  transition: 0.2s;
+  box-sizing: border-box;
+}
+
+.inputBuscaCurso input:focus {
+  border-color: #d06f78;
+  background: #fff;
 }
 
 .botoesCursos {
   display: flex;
   flex-wrap: wrap;
+  align-content: flex-start;
   gap: 8px;
+  max-height: 220px;
+  overflow-y: auto;
+  padding: 4px 8px 4px 4px;
   margin-bottom: 1.5rem;
 }
 
@@ -492,6 +538,12 @@ h2 {
   color: #fff;
   border-color: #7a0f1a;
   font-weight: 600;
+}
+
+.semCursos {
+  font-size: 0.85rem;
+  color: #91919f;
+  margin: 0;
 }
 
 .filtroNota {

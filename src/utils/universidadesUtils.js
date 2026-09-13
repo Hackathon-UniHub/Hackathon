@@ -3,18 +3,14 @@ import enem from '@/data/enem.js'
 
 const cursosEnemPorUniversidadeId = new Map(enem.map((item) => [Number(item.id), item.cursos]))
 
-export function normalizarNome(nome) {
-  return nome
-    .normalize('NFD')
-    .replace(/[\u0300-\u036f]/g, '')
-    .toLowerCase()
-    .replace(/[^a-z0-9]/g, '')
-}
-
 export function UniversidadePorId(id) {
   if (id == null) return null
   const num = Number(id)
   return universidades.find((u) => Number(u.id) === num) || null
+}
+
+export function getUniversidadePorRota(route) {
+  return UniversidadePorId(route?.params?.id)
 }
 
 export function getIniciais(universidade) {
@@ -31,8 +27,14 @@ export function UniversidadePublica(universidade) {
   return universidade?.categoria?.toLowerCase() === 'publica'
 }
 
-export function getUniversidadePorRota(route) {
-  return UniversidadePorId(route?.params?.id)
+export function getSiteOficial(universidade) {
+  const site = universidade?.site
+
+  if (!site) return '#'
+  if (/^https?:\/\//i.test(site)) return site
+  if (site.startsWith('//')) return `https:${site}`
+
+  return `https://${site}`
 }
 
 export function temCursosDisponiveis(universidade) {
@@ -41,6 +43,20 @@ export function temCursosDisponiveis(universidade) {
 
 export function getCursosDaUniversidade(universidade) {
   return universidade?.cursos_pda || []
+}
+
+export function getRotuloCurso(curso) {
+  if (!curso) return ''
+  const local = curso.municipio && curso.uf ? ` — ${curso.municipio}/${curso.uf}` : ''
+  return `${curso.nome_curso}${local}`
+}
+
+export function normalizarNome(nome) {
+  return nome
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase()
+    .replace(/[^a-z0-9]/g, '')
 }
 
 export function filtrarCursosDaUniversidade(cursos, pesquisa = '') {
@@ -55,15 +71,33 @@ export function getCorteEnemCurso(universidadeId, nomeCurso) {
   return curso ? curso.media_corte_enem : null
 }
 
+export function getCorteEnemDoCursoSelecionado(universidade, curso) {
+  if (!universidade || !curso) return null
+  return getCorteEnemCurso(universidade.id, curso.nome_curso)
+}
+
+export function selecionarCursoDaUniversidade(cursoSelecionadoRef, curso) {
+  cursoSelecionadoRef.value = cursoSelecionadoRef.value === curso ? null : curso
+}
+
+export function fecharCursoSelecionado(cursoSelecionadoRef) {
+  cursoSelecionadoRef.value = null
+}
+
 export default {
-  normalizarNome,
   UniversidadePorId,
+  getUniversidadePorRota,
   getIniciais,
   getAnoFundacao,
   UniversidadePublica,
-  getUniversidadePorRota,
+  getSiteOficial,
   temCursosDisponiveis,
   getCursosDaUniversidade,
+  getRotuloCurso,
+  normalizarNome,
   filtrarCursosDaUniversidade,
   getCorteEnemCurso,
+  getCorteEnemDoCursoSelecionado,
+  selecionarCursoDaUniversidade,
+  fecharCursoSelecionado,
 }
