@@ -1,5 +1,5 @@
 <script setup>
-import { computed } from 'vue'
+import { ref, computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import { useFavoritosStore } from '@/stores/favoritos'
@@ -8,6 +8,10 @@ import {
   getIniciais,
   getAnoFundacao,
   UniversidadePublica,
+  temCursosDisponiveis,
+  getCursosDaUniversidade,
+  filtrarCursosDaUniversidade,
+  getCorteEnemCurso,
 } from '@/utils/universidadesUtils.js'
 
 const route = useRoute()
@@ -47,6 +51,29 @@ function alternarFavorito() {
   } else {
     favoritosStore.adicionarFavorito(id)
   }
+}
+
+const pesquisaCurso = ref('')
+const cursoSelecionado = ref(null)
+
+const cursosDaUniversidade = computed(() => getCursosDaUniversidade(universidade.value))
+
+const cursosFiltrados = computed(() =>
+  filtrarCursosDaUniversidade(cursosDaUniversidade.value, pesquisaCurso.value),
+)
+
+const corteEnemSelecionado = computed(() => {
+  if (!cursoSelecionado.value || !universidade.value) return null
+  return getCorteEnemCurso(universidade.value.id, cursoSelecionado.value.nome_curso)
+})
+
+function selecionarCurso(curso) {
+  cursoSelecionado.value =
+    cursoSelecionado.value?.codigo_curso === curso.codigo_curso ? null : curso
+}
+
+function fecharCurso() {
+  cursoSelecionado.value = null
 }
 </script>
 
@@ -147,6 +174,92 @@ function alternarFavorito() {
                   {{ universidade.igc }}
                   <span v-if="universidade.ano_igc">({{ universidade.ano_igc }})</span>
                 </p>
+              </div>
+            </div>
+          </div>
+
+          <div class="secao" v-if="temCursosDisponiveis(universidade)">
+            <div class="cabecalhoCursos">
+              <div>
+                <h2>Cursos oferecidos</h2>
+                <p class="subtituloCursos">
+                  {{ cursosDaUniversidade.length }} cursos no catálogo UniHub
+                </p>
+              </div>
+              <div class="buscaCursos">
+                <input v-model="pesquisaCurso" type="text" placeholder="Filtrar cursos..." />
+              </div>
+            </div>
+
+            <div class="chipsCursos">
+              <button
+                class="chipCurso"
+                v-for="curso in cursosFiltrados"
+                :key="curso.codigo_curso"
+                :class="{ ativo: cursoSelecionado?.codigo_curso === curso.codigo_curso }"
+                @click="selecionarCurso(curso)"
+              >
+                {{ curso.nome_curso }}
+              </button>
+              <p class="semCursos" v-if="!cursosFiltrados.length">Nenhum curso encontrado.</p>
+            </div>
+
+            <div class="detalheCurso" v-if="cursoSelecionado">
+              <div class="detalheCursoCabecalho">
+                <div class="detalheCursoLogo">{{ cursoSelecionado.nome_curso.slice(0, 3) }}</div>
+                <div>
+                  <span class="subtitulo">DETALHES DO CURSO</span>
+                  <h3>{{ cursoSelecionado.nome_curso }}</h3>
+                  <p>{{ universidade.nome }}</p>
+                </div>
+                <button class="fecharDetalheCurso" type="button" @click="fecharCurso">×</button>
+              </div>
+
+              <div class="detalheCursoGrade">
+                <div class="detalheCursoItem">
+                  <span class="detalheCursoRotulo">GRAU</span>
+                  <span class="detalheCursoValor">{{ cursoSelecionado.grau || '-' }}</span>
+                </div>
+                <div class="detalheCursoItem">
+                  <span class="detalheCursoRotulo">ÁREA</span>
+                  <span class="detalheCursoValor">
+                    {{ cursoSelecionado.area_ocde_cine || cursoSelecionado.area_ocde || '-' }}
+                  </span>
+                </div>
+                <div class="detalheCursoItem">
+                  <span class="detalheCursoRotulo">MODALIDADE</span>
+                  <span class="detalheCursoValor">{{ cursoSelecionado.modalidade || '-' }}</span>
+                </div>
+                <div class="detalheCursoItem">
+                  <span class="detalheCursoRotulo">SITUAÇÃO</span>
+                  <span class="detalheCursoValor">
+                    {{ cursoSelecionado.situacao_curso || '-' }}
+                  </span>
+                </div>
+                <div class="detalheCursoItem">
+                  <span class="detalheCursoRotulo">VAGAS AUTORIZADAS</span>
+                  <span class="detalheCursoValor">
+                    {{ cursoSelecionado.vagas_autorizadas ?? '-' }}
+                  </span>
+                </div>
+                <div class="detalheCursoItem">
+                  <span class="detalheCursoRotulo">CARGA HORÁRIA</span>
+                  <span class="detalheCursoValor">
+                    {{
+                      cursoSelecionado.carga_horaria ? `${cursoSelecionado.carga_horaria}h` : '-'
+                    }}
+                  </span>
+                </div>
+                <div class="detalheCursoItem">
+                  <span class="detalheCursoRotulo">LOCAL</span>
+                  <span class="detalheCursoValor">
+                    {{ cursoSelecionado.municipio }} - {{ cursoSelecionado.uf }}
+                  </span>
+                </div>
+                <div class="detalheCursoItem" v-if="corteEnemSelecionado">
+                  <span class="detalheCursoRotulo">CORTE ENEM</span>
+                  <span class="detalheCursoValor destaqueCorte">{{ corteEnemSelecionado }}</span>
+                </div>
               </div>
             </div>
           </div>
@@ -582,6 +695,158 @@ function alternarFavorito() {
   color: #5d5d6b;
   font-size: 0.9rem;
   line-height: 1.7;
+}
+
+/* --- Cursos oferecidos (cursos_pda) --- */
+.cabecalhoCursos {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1.2rem;
+}
+
+.subtituloCursos {
+  margin: 0.2rem 0 0;
+  font-size: 0.85rem;
+  color: #91919f;
+}
+
+.buscaCursos input {
+  padding: 0.6rem 1rem;
+  border-radius: 10px;
+  border: 1px solid #eeeef0;
+  background: #fff;
+  font-size: 0.9rem;
+  min-width: 220px;
+  outline: 0;
+  transition: 0.2s;
+}
+
+.buscaCursos input:focus {
+  border-color: #d06f78;
+}
+
+.chipsCursos {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.chipCurso {
+  background: #fff;
+  border: 1px solid #eeeef0;
+  color: #5d5d6b;
+  padding: 0.4rem 0.9rem;
+  border-radius: 999px;
+  font-size: 0.8rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.chipCurso:hover {
+  background: #f9e8e9;
+  color: #7a0f1a;
+  border-color: #f0cdd0;
+}
+
+.chipCurso.ativo {
+  background: #7a0f1a;
+  color: #fff;
+  border-color: #7a0f1a;
+}
+
+.semCursos {
+  font-size: 0.85rem;
+  color: #91919f;
+  margin: 0;
+}
+
+.detalheCurso {
+  margin-top: 1.2rem;
+  background: #fff;
+  border: 1px solid #f0cdd0;
+  border-radius: 14px;
+  padding: 1.2rem;
+}
+
+.detalheCursoCabecalho {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.8rem;
+  margin-bottom: 1rem;
+}
+
+.detalheCursoLogo {
+  width: 44px;
+  height: 44px;
+  min-width: 44px;
+  border-radius: 10px;
+  background: #7a0f1a;
+  color: #fff;
+  font-weight: 800;
+  font-size: 0.75rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-transform: uppercase;
+}
+
+.detalheCursoCabecalho h3 {
+  margin: 0.1rem 0;
+  font-size: 1.05rem;
+  color: #1c1c22;
+}
+
+.detalheCursoCabecalho p {
+  margin: 0;
+  font-size: 0.82rem;
+  color: #5d5d6b;
+}
+
+.fecharDetalheCurso {
+  margin-left: auto;
+  background: transparent;
+  border: none;
+  font-size: 1.3rem;
+  line-height: 1;
+  color: #91919f;
+  cursor: pointer;
+}
+
+.detalheCursoGrade {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 0.8rem;
+}
+
+.detalheCursoItem {
+  background: #faf6ef;
+  border: 1px solid #eeeef0;
+  border-radius: 10px;
+  padding: 0.7rem 0.8rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.detalheCursoRotulo {
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  color: #91919f;
+}
+
+.detalheCursoValor {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #1c1c22;
+}
+
+.destaqueCorte {
+  color: #7a0f1a;
 }
 
 .caixaInstitucional,

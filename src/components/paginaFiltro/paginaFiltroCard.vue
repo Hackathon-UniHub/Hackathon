@@ -15,6 +15,7 @@ const props = defineProps([
   'site',
   'rating',
   'quantidade_alunos',
+  'cursoDestaque',
 ])
 
 const router = useRouter()
@@ -51,6 +52,14 @@ function alternarFavorito() {
     </div>
 
     <h2 class="nome">{{ nome }}</h2>
+
+    <div class="cursoDestaque" v-if="cursoDestaque">
+      <span class="cursoDestaqueNome">{{ cursoDestaque.nome }}</span>
+      <span class="cursoDestaqueNota" v-if="cursoDestaque.nota">
+        Nota de corte (ENEM): {{ cursoDestaque.nota }}
+      </span>
+    </div>
+
     <p>
       Nota: {{ rating }} <img class="img" src="/src/components/icons/estrela.svg" alt="rating" />
     </p>
@@ -138,6 +147,30 @@ function alternarFavorito() {
 .Categoria.privada {
   background-color: #f7e8d8;
   color: #a86a1f;
+}
+
+.cursoDestaque {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  background: #f9e8e9;
+  border: 1px solid #f0cdd0;
+  border-radius: 10px;
+  padding: 0.5rem 0.7rem;
+  margin-top: -0.4rem;
+}
+
+.cursoDestaqueNome {
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: #7a0f1a;
+  text-transform: capitalize;
+}
+
+.cursoDestaqueNota {
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: #9e1f2e;
 }
 
 .alunos {
