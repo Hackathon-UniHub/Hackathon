@@ -41,53 +41,35 @@ function alternarFavorito() {
 
 <template>
   <div class="card">
-    <div class="cardTopo">
-      <div class="logoCard">{{ sigla ? sigla.slice(0, 3) : nome.slice(0, 3) }}</div>
+    <div class="topo">
       <span
-        class="Categoria"
+        class="categoria"
         :class="categoria?.toLowerCase() === 'publica' ? 'publica' : 'privada'"
       >
         {{ categoria }}
       </span>
+      <span class="nota" v-if="rating">Nota {{ rating }}</span>
     </div>
 
     <h2 class="nome">{{ nome }}</h2>
+    <p class="local">{{ municipio }} - {{ uf }}</p>
 
-    <div class="cursoDestaque" v-if="cursoDestaque">
-      <span class="cursoDestaqueNome">{{ cursoDestaque.nome }}</span>
-      <span class="cursoDestaqueNota" v-if="cursoDestaque.nota">
-        Nota de corte (ENEM): {{ cursoDestaque.nota }}
-      </span>
-    </div>
-
-    <p>
-      Nota: {{ rating }} <img class="img" src="/src/components/icons/estrela.svg" alt="rating" />
+    <p class="destaque" v-if="cursoDestaque">
+      <strong>{{ cursoDestaque.nome }}</strong>
+      <span v-if="cursoDestaque.nota"> · Corte ENEM: {{ cursoDestaque.nota }}</span>
     </p>
-    <p>
-      {{ municipio }} - {{ uf }}
-      <img class="imgUm" src="/src/components/icons/pingo.svg" alt="localização" />
-    </p>
-    <p v-if="quantidade_alunos" class="alunos">{{ quantidade_alunos }}</p>
 
-    <div class="botoes">
+    <p class="alunos" v-if="quantidade_alunos">{{ quantidade_alunos }}</p>
+
+    <div class="rodape">
       <button
-        class="botaoCor"
+        class="favoritar"
         type="button"
         :aria-label="favorito ? 'Remover dos favoritos' : 'Adicionar aos favoritos'"
         @click="alternarFavorito"
       >
-        <img
-          v-if="!favorito"
-          class="imgDois"
-          src="/src/components/icons/favoritoVazio.svg"
-          alt="Favoritar"
-        />
-        <img
-          v-else
-          class="imgTres"
-          src="/src/components/icons/favoritoCheio.svg"
-          alt="Favoritado"
-        />
+        <img v-if="!favorito" src="/src/components/icons/favoritoVazio.svg" alt="Favoritar" />
+        <img v-else src="/src/components/icons/favoritoCheio.svg" alt="Favoritado" />
       </button>
       <RouterLink class="botao" :to="{ name: 'universidade', params: { id } }">
         Página da universidade
@@ -97,169 +79,110 @@ function alternarFavorito() {
 </template>
 
 <style scoped>
-.imgTres {
-  border-radius: 35px;
-  width: 38px;
-  height: 38px;
-}
-.imgDois {
-  border-radius: 40px;
-  width: 40px;
-  height: 40px;
-}
-.imgUm {
-  width: 16px;
-  height: 16px;
-}
-.img {
-  width: 20px;
-  height: 20px;
-}
-.cardTopo {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.logoCard {
-  width: 40px;
-  height: 40px;
-  border-radius: 8px;
-  background-color: #7a0f1a;
-  color: #fff;
-  font-size: 0.7rem;
-  font-weight: 800;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.Categoria {
-  font-size: 0.7rem;
-  font-weight: 600;
-  padding: 0.2rem 0.55rem;
-  border-radius: 999px;
-}
-.Categoria.publica {
-  background-color: #e2f2e8;
-  color: #1f8a4c;
-}
-.Categoria.privada {
-  background-color: #f7e8d8;
-  color: #a86a1f;
-}
-
-.cursoDestaque {
-  display: flex;
-  flex-direction: column;
-  gap: 0.15rem;
-  background: #f9e8e9;
-  border: 1px solid #f0cdd0;
-  border-radius: 10px;
-  padding: 0.5rem 0.7rem;
-  margin-top: -0.4rem;
-}
-
-.cursoDestaqueNome {
-  font-size: 0.78rem;
-  font-weight: 700;
-  color: #7a0f1a;
-  text-transform: capitalize;
-}
-
-.cursoDestaqueNota {
-  font-size: 0.72rem;
-  font-weight: 600;
-  color: #9e1f2e;
-}
-
-.alunos {
-  font-size: 0.85rem;
-  color: #7a7a86;
-}
-
-.botaoCor {
-  color: #ffffff;
-  border: none;
-  background: transparent;
-  cursor: pointer;
-}
-
-.botaoCor:hover {
-  background-color: #f4e3e4;
-}
-.botoes {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-}
-
 .card {
-  background-color: #ffffff;
-  border-radius: 16px;
-  padding: 1.5rem;
-  box-shadow: 0 4px 16px rgba(18, 18, 22, 0.05);
-  border: 1px solid #eeeef0;
+  --vermelho: #7a0f1a;
+  --vermelho-escuro: #9e1f2e;
+  --borda: #eeeef0;
+  --texto: #5d5d6b;
+
+  background: #fff;
+  border: 1px solid var(--borda);
+  border-radius: 14px;
+  padding: 1.1rem 1.2rem;
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
-  gap: 1rem;
-  margin: 0;
-  transition:
-    transform 0.2s ease,
-    box-shadow 0.2s ease,
-    border-color 0.2s ease;
+  gap: 0.5rem;
+  transition: 0.15s;
 }
 
 .card:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 8px 24px rgba(122, 15, 26, 0.08);
   border-color: #f0cdd0;
+  box-shadow: 0 6px 18px rgba(122, 15, 26, 0.08);
+}
+
+.topo {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.categoria {
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+.categoria.publica {
+  color: #4c4c57;
+}
+.categoria.privada {
+  color: var(--vermelho);
+}
+
+.nota {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--vermelho);
 }
 
 .nome {
-  font-size: 1.1rem;
+  font-size: 1.05rem;
   font-weight: 700;
   color: #1c1c22;
   margin: 0;
-  line-height: 1.4;
+  line-height: 1.35;
 }
 
-.card p {
-  font-size: 0.9rem;
-  color: #5d5d6b;
+.local {
+  font-size: 0.85rem;
+  color: var(--texto);
   margin: 0;
+}
+
+.destaque {
+  margin: 0;
+  font-size: 0.85rem;
+  color: var(--vermelho);
+}
+.destaque span {
+  color: var(--texto);
+  font-weight: 400;
+}
+
+.alunos {
+  font-size: 0.82rem;
+  color: var(--texto);
+  margin: 0;
+}
+
+.rodape {
   display: flex;
   align-items: center;
-  gap: 0.3rem;
+  gap: 0.6rem;
+  margin-top: 0.3rem;
 }
 
-.card .botao {
-  background-color: #7a0f1a;
-  color: #ffffff;
+.favoritar {
   border: none;
-  padding: 0.55rem 1.1rem;
+  background: transparent;
+  cursor: pointer;
+  padding: 0;
+  display: flex;
+}
+.favoritar img {
+  width: 34px;
+  height: 34px;
+}
+
+.botao {
+  background: var(--vermelho);
+  color: #fff;
+  padding: 0.5rem 1rem;
   border-radius: 8px;
   font-weight: 600;
-  font-size: 0.85rem;
-  font-family: inherit;
-  cursor: pointer;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  box-sizing: border-box;
+  font-size: 0.82rem;
   text-decoration: none;
-  line-height: 1;
-  transition:
-    background-color 0.2s ease,
-    transform 0.1s ease;
+  transition: 0.15s;
 }
-
-.card .botao:hover {
-  background-color: #9e1f2e;
-}
-
-.card .botao:active {
-  transform: scale(0.98);
+.botao:hover {
+  background: var(--vermelho-escuro);
 }
 </style>

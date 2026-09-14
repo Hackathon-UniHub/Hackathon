@@ -39,7 +39,7 @@ watch(() => authStore.loading, carregarFavoritos)
       <nav aria-label="Navegação principal">
         <ul class="menuNavegacao">
           <li>
-            <RouterLink class="linkNavegacao" :to="{ name: 'home' }" exact-active-class="ativo">
+            <RouterLink class="linkNavegacao" to="/" exact-active-class="ativo">
               Início
             </RouterLink>
           </li>

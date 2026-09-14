@@ -117,26 +117,19 @@ function onAtualizarNotaEnem(evento) {
     </div>
 
     <div class="filtroCurso">
-      <div class="cabecalhoFiltroCurso">
-        <div class="iconeFiltroCurso">🎓</div>
-        <div>
-          <span class="subtitulo subtituloEscuro">BUSCAR POR CURSO</span>
-          <h2>Filtro em tempo real</h2>
-          <p class="descricaoFiltroCurso">Digite o nome do curso ou escolha um atalho abaixo.</p>
-        </div>
-      </div>
+      <span class="rotulo">BUSCAR POR CURSO</span>
+      <p class="dica">Digite ou clique num curso abaixo.</p>
 
-      <div class="inputBuscaCurso">
-        <input
-          v-model="buscaCurso"
-          type="text"
-          placeholder='Ex: "Medicina", "Engenharia Civil", "Direito"...'
-        />
-      </div>
+      <input
+        v-model="buscaCurso"
+        type="text"
+        class="buscaInput"
+        placeholder='Ex: "Medicina", "Engenharia Civil", "Direito"...'
+      />
 
-      <div class="botoesCursos">
+      <div class="chips">
         <button
-          class="botaoCurso"
+          class="chip"
           v-for="curso in cursosFiltrados"
           :key="curso"
           :class="{ ativo: buscaCurso.toLowerCase() === curso.toLowerCase() }"
@@ -144,23 +137,21 @@ function onAtualizarNotaEnem(evento) {
         >
           {{ curso }}
         </button>
-        <p class="semCursos" v-if="!cursosFiltrados.length">Nenhum curso encontrado.</p>
+        <p class="semResultado" v-if="!cursosFiltrados.length">Nenhum curso encontrado.</p>
       </div>
 
-      <div class="filtroNota">
-        <span class="subtitulo subtituloEscuro">MÉDIA NO ENEM (0 a 1000)</span>
+      <div class="notaEnem">
+        <span class="rotulo">MÉDIA NO ENEM (0 a 1000)</span>
         <input
-          class="inputNota"
           type="number"
           min="0"
           max="1000"
+          class="notaInput"
           :value="notaEnem"
           @input="onAtualizarNotaEnem($event)"
           placeholder="Ex: 650"
         />
-        <p class="dicaNota" v-if="notaEnem !== ''">
-          Mostrando universidades com cursos disponíveis até {{ notaEnem }} pontos.
-        </p>
+        <p class="dica" v-if="notaEnem !== ''">Cursos com corte até {{ notaEnem }} pontos.</p>
       </div>
     </div>
 
@@ -229,47 +220,17 @@ function onAtualizarNotaEnem(evento) {
 </template>
 
 <style scoped>
-.listaRanking {
-  display: grid;
-  width: 100%;
-  gap: 0.55rem;
-  margin-top: 1.2rem;
-}
-
-.itemRanking {
-  display: grid;
-  grid-template-columns: 2rem 1fr auto;
-  align-items: center;
-  gap: 0.5rem;
-  width: 100%;
-  padding: 0.45rem 0.6rem;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
-  text-align: left;
-}
-
-.posicaoRanking {
-  color: #f0cdd0;
-  font-weight: 700;
-}
-
-.siglaRanking {
-  overflow: hidden;
-  color: #fff;
-  font-size: 0.85rem;
-  font-weight: 700;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.notaRanking {
-  color: #fff;
-  font-size: 0.85rem;
-  font-weight: 700;
-}
-
 .paginaFiltro {
+  --vermelho: #7a0f1a;
+  --vermelho-escuro: #9e1f2e;
+  --creme: #fffcf7;
+  --creme-forte: #faf6ef;
+  --borda: #eeeef0;
+  --texto: #5d5d6b;
+  --texto-fraco: #91919f;
+
   min-height: 100vh;
-  background: #fffcf7;
+  background: var(--creme);
   padding: 3rem 1.5rem;
   color: #1c1c22;
 }
@@ -279,7 +240,7 @@ h1 {
   font-weight: 800;
   text-align: center;
   margin-bottom: 2.5rem;
-  color: #7a0f1a;
+  color: var(--vermelho);
 }
 
 .colorUm {
@@ -334,7 +295,7 @@ h1 {
 .divDois {
   background: #fff;
   box-shadow: 0 4px 20px #1212160d;
-  border: 1px solid #eeeef0;
+  border: 1px solid var(--borda);
 }
 
 .containerDois {
@@ -348,7 +309,7 @@ h1 {
 
 .containerDois p,
 .divDois p {
-  color: #5d5d6b;
+  color: var(--texto);
   margin: 0;
 }
 
@@ -363,7 +324,7 @@ h1 {
 }
 
 .containerTres {
-  background: linear-gradient(135deg, #9e1f2e, #7a0f1a);
+  background: linear-gradient(135deg, var(--vermelho-escuro), var(--vermelho));
   color: #fff;
   padding: 2.8rem 2rem;
   justify-content: space-between;
@@ -388,8 +349,46 @@ h2 {
   margin-bottom: 0.8rem;
 }
 
+.listaRanking {
+  display: grid;
+  width: 100%;
+  gap: 0.55rem;
+  margin-top: 1.2rem;
+}
+
+.itemRanking {
+  display: grid;
+  grid-template-columns: 2rem 1fr auto;
+  align-items: center;
+  gap: 0.5rem;
+  width: 100%;
+  padding: 0.45rem 0.6rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+  text-align: left;
+}
+
+.posicaoRanking {
+  color: #f0cdd0;
+  font-weight: 700;
+}
+
+.siglaRanking {
+  overflow: hidden;
+  color: #fff;
+  font-size: 0.85rem;
+  font-weight: 700;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.notaRanking {
+  color: #fff;
+  font-size: 0.85rem;
+  font-weight: 700;
+}
+
 .pesquisa {
-  background: linear-gradient(135deg, #9e1f2e, #7a0f1a);
+  background: linear-gradient(135deg, var(--vermelho-escuro), var(--vermelho));
   color: #fff;
   padding: 2.5rem 2rem;
   border-radius: 16px;
@@ -424,7 +423,6 @@ h2 {
   color: #fff;
   font-size: 1rem;
   outline: 0;
-  transition: 0.2s;
 }
 
 .input input::placeholder {
@@ -438,141 +436,109 @@ h2 {
 
 .filtroCurso {
   background: #fff;
-  border: 1px solid #eeeef0;
+  border: 1px solid var(--borda);
   border-radius: 16px;
-  padding: 1.8rem;
+  padding: 1.5rem 1.6rem;
   box-shadow: 0 4px 20px #1212160d;
   margin-bottom: 2rem;
 }
 
-.cabecalhoFiltroCurso {
-  display: flex;
-  align-items: center;
-  gap: 0.8rem;
-  margin-bottom: 1.2rem;
+.filtroCurso .rotulo {
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 1.2px;
+  color: var(--vermelho-escuro);
 }
 
-.iconeFiltroCurso {
-  width: 44px;
-  height: 44px;
-  min-width: 44px;
-  border-radius: 12px;
-  background: #f9e8e9;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 1.3rem;
+.filtroCurso .dica {
+  font-size: 0.82rem;
+  color: var(--texto-fraco);
+  margin: 0.2rem 0 1rem;
 }
 
-.cabecalhoFiltroCurso .subtituloEscuro {
-  color: #b83d4a;
-}
-
-.cabecalhoFiltroCurso h2 {
-  color: #1c1c22;
-  font-size: 1.3rem;
-  margin: 0.2rem 0 0;
-}
-
-.descricaoFiltroCurso {
-  margin: 0.2rem 0 0;
-  font-size: 0.85rem;
-  color: #91919f;
-}
-
-.inputBuscaCurso {
+.buscaInput {
+  width: 100%;
+  padding: 0.8rem 1.1rem;
+  border-radius: 10px;
+  border: 1px solid var(--borda);
+  background: var(--creme-forte);
+  font-size: 0.9rem;
+  outline: 0;
+  box-sizing: border-box;
   margin-bottom: 1rem;
 }
 
-.inputBuscaCurso input {
-  width: 100%;
-  padding: 0.9rem 1.2rem;
-  border-radius: 12px;
-  border: 1px solid #eeeef0;
-  background: #faf6ef;
-  font-size: 0.95rem;
-  outline: 0;
-  transition: 0.2s;
-  box-sizing: border-box;
-}
-
-.inputBuscaCurso input:focus {
+.buscaInput:focus {
   border-color: #d06f78;
   background: #fff;
 }
 
-.botoesCursos {
+.chips {
   display: flex;
   flex-wrap: wrap;
-  align-content: flex-start;
   gap: 8px;
-  max-height: 220px;
+  max-height: 200px;
   overflow-y: auto;
-  padding: 4px 8px 4px 4px;
-  margin-bottom: 1.5rem;
+  padding: 4px;
+  margin-bottom: 1.2rem;
 }
 
-.botaoCurso {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: #f7f7f8;
-  border: 1px solid #eeeef0;
-  color: #5d5d6b;
-  padding: 0.45rem 1rem;
+.chip {
+  background: var(--creme-forte);
+  border: 1px solid var(--borda);
+  color: var(--texto);
+  padding: 0.4rem 0.9rem;
   border-radius: 20px;
-  font-size: 0.85rem;
-  font-weight: 500;
+  font-size: 0.82rem;
   cursor: pointer;
-  transition: 0.2s;
 }
 
-.botaoCurso:hover {
-  background: #f9e8e9;
-  color: #7a0f1a;
+.chip:hover {
   border-color: #f0cdd0;
+  color: var(--vermelho);
 }
 
-.botaoCurso.ativo {
-  background: #7a0f1a;
+.chip.ativo {
+  background: var(--vermelho);
   color: #fff;
-  border-color: #7a0f1a;
-  font-weight: 600;
+  border-color: var(--vermelho);
 }
 
-.semCursos {
+.semResultado {
   font-size: 0.85rem;
-  color: #91919f;
+  color: var(--texto-fraco);
   margin: 0;
 }
 
-.filtroNota {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-  max-width: 320px;
+.notaEnem .rotulo {
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 1.2px;
+  color: var(--vermelho-escuro);
+  display: block;
+  margin-bottom: 0.5rem;
 }
 
-.inputNota {
+.notaInput {
+  max-width: 320px;
+  width: 100%;
   padding: 0.7rem 1rem;
   border-radius: 10px;
-  border: 1px solid #eeeef0;
-  background: #faf6ef;
-  color: #1c1c22;
-  font-size: 0.95rem;
+  border: 1px solid var(--borda);
+  background: var(--creme-forte);
+  font-size: 0.9rem;
   outline: 0;
-  transition: 0.2s;
 }
 
-.inputNota:focus {
+.notaInput:focus {
   border-color: #d06f78;
   background: #fff;
 }
 
-.dicaNota {
+.notaEnem .dica {
   font-size: 0.8rem;
-  color: #7a0f1a;
-  margin: 0;
+  color: var(--vermelho);
+  margin: 0.5rem 0 0;
 }
 
 .divisao {
@@ -588,7 +554,7 @@ h2 {
   border-radius: 16px;
   padding: 1.5rem;
   box-shadow: 0 4px 20px #1212160d;
-  border: 1px solid #eeeef0;
+  border: 1px solid var(--borda);
 }
 
 .lateralEstados .pesquisa {
@@ -600,7 +566,7 @@ h2 {
 }
 
 .lateralEstados .subtitulo {
-  color: #91919f;
+  color: var(--texto-fraco);
   margin-bottom: 0.8rem;
 }
 
@@ -622,27 +588,24 @@ h2 {
   justify-content: center;
   width: 100%;
   min-height: 36px;
-  background: #f7f7f8;
-  border: 1px solid #eeeef0;
-  color: #5d5d6b;
+  background: var(--creme-forte);
+  border: 1px solid var(--borda);
+  color: var(--texto);
   padding: 0.4rem 0.85rem;
   border-radius: 20px;
   font-size: 0.85rem;
-  font-weight: 500;
   cursor: pointer;
-  transition: 0.2s;
 }
 
 .botoesEstados .botao:hover {
-  background: #f9e8e9;
-  color: #7a0f1a;
   border-color: #f0cdd0;
+  color: var(--vermelho);
 }
 
 .botoesEstados .botao.ativo {
-  background: #7a0f1a;
+  background: var(--vermelho);
   color: #fff;
-  border-color: #7a0f1a;
+  border-color: var(--vermelho);
   font-weight: 600;
 }
 

@@ -129,7 +129,6 @@ function onFecharCurso() {
               >
                 {{ curso }}
               </span>
-              <img class="graduacao" src="/src/components/icons/graduacao.svg" alt="Graduação" />
             </div>
           </div>
 
@@ -168,101 +167,10 @@ function onFecharCurso() {
               </div>
             </div>
           </div>
-
-          <div class="secao" v-if="temCursosDisponiveis(universidade)">
-            <div class="cabecalhoCursos">
-              <div class="iconeCursos">🎓</div>
-              <div>
-                <h2>Cursos oferecidos</h2>
-                <p class="subtituloCursos">
-                  {{ cursosDaUniversidade.length }} cursos no catálogo UniHub — filtro em tempo real
-                </p>
-              </div>
-            </div>
-
-            <div class="buscaCursos">
-              <input v-model="pesquisaCurso" type="text" placeholder="Filtrar cursos..." />
-            </div>
-
-            <div class="chipsCursos">
-              <button
-                class="chipCurso"
-                v-for="(curso, indice) in cursosFiltrados"
-                :key="`${curso.codigo_curso}-${indice}`"
-                :class="{ ativo: cursoSelecionado === curso }"
-                @click="onSelecionarCurso(curso)"
-              >
-                {{ getRotuloCurso(curso) }}
-              </button>
-              <p class="semCursos" v-if="!cursosFiltrados.length">Nenhum curso encontrado.</p>
-            </div>
-
-            <div class="detalheCurso" v-if="cursoSelecionado">
-              <div class="detalheCursoCabecalho">
-                <div class="detalheCursoLogo">{{ cursoSelecionado.nome_curso.slice(0, 3) }}</div>
-                <div>
-                  <span class="subtitulo">DETALHES DO CURSO</span>
-                  <h3>{{ cursoSelecionado.nome_curso }}</h3>
-                  <p>{{ universidade.nome }}</p>
-                </div>
-                <button class="fecharDetalheCurso" type="button" @click="onFecharCurso">×</button>
-              </div>
-
-              <div class="detalheCursoGrade">
-                <div class="detalheCursoItem">
-                  <span class="detalheCursoRotulo">GRAU</span>
-                  <span class="detalheCursoValor">{{ cursoSelecionado.grau || '-' }}</span>
-                </div>
-                <div class="detalheCursoItem">
-                  <span class="detalheCursoRotulo">ÁREA</span>
-                  <span class="detalheCursoValor">
-                    {{ cursoSelecionado.area_ocde_cine || cursoSelecionado.area_ocde || '-' }}
-                  </span>
-                </div>
-                <div class="detalheCursoItem">
-                  <span class="detalheCursoRotulo">MODALIDADE</span>
-                  <span class="detalheCursoValor">{{ cursoSelecionado.modalidade || '-' }}</span>
-                </div>
-                <div class="detalheCursoItem">
-                  <span class="detalheCursoRotulo">SITUAÇÃO</span>
-                  <span class="detalheCursoValor">
-                    {{ cursoSelecionado.situacao_curso || '-' }}
-                  </span>
-                </div>
-                <div class="detalheCursoItem">
-                  <span class="detalheCursoRotulo">VAGAS AUTORIZADAS</span>
-                  <span class="detalheCursoValor">
-                    {{ cursoSelecionado.vagas_autorizadas ?? '-' }}
-                  </span>
-                </div>
-                <div class="detalheCursoItem">
-                  <span class="detalheCursoRotulo">CARGA HORÁRIA</span>
-                  <span class="detalheCursoValor">
-                    {{
-                      cursoSelecionado.carga_horaria ? `${cursoSelecionado.carga_horaria}h` : '-'
-                    }}
-                  </span>
-                </div>
-                <div class="detalheCursoItem">
-                  <span class="detalheCursoRotulo">LOCAL</span>
-                  <span class="detalheCursoValor">
-                    {{ cursoSelecionado.municipio }} - {{ cursoSelecionado.uf }}
-                  </span>
-                </div>
-                <div class="detalheCursoItem" v-if="corteEnemSelecionado">
-                  <span class="detalheCursoRotulo">CORTE ENEM</span>
-                  <span class="detalheCursoValor destaqueCorte">{{ corteEnemSelecionado }}</span>
-                </div>
-              </div>
-            </div>
-          </div>
         </div>
 
         <div class="caixaInstitucional">
-          <div class="tituloInstitucional">
-            <h3>Informações institucionais</h3>
-            <img class="medalha" src="/src/components/icons/medalha.svg" alt="medalha" />
-          </div>
+          <h3>Informações institucionais</h3>
           <div class="linhaDado" v-if="universidade.razao_social">
             <span class="dadoRotulo">Razão social</span>
             <span class="dadoValor">{{ universidade.razao_social }}</span>
@@ -323,6 +231,83 @@ function onFecharCurso() {
           <RouterLink to="/universidades" class="botaoSecundario">Outras universidades</RouterLink>
         </div>
       </div>
+
+      <div class="secaoCursos" v-if="temCursosDisponiveis(universidade)">
+        <h2>Cursos oferecidos</h2>
+        <p class="subtituloCursos">{{ cursosDaUniversidade.length }} cursos disponíveis</p>
+
+        <input
+          v-model="pesquisaCurso"
+          type="text"
+          class="buscaCursoInput"
+          placeholder="Filtrar cursos..."
+        />
+
+        <div class="chipsCursos">
+          <button
+            class="chipCurso"
+            v-for="(curso, indice) in cursosFiltrados"
+            :key="`${curso.codigo_curso}-${indice}`"
+            :class="{ ativo: cursoSelecionado === curso }"
+            @click="onSelecionarCurso(curso)"
+          >
+            {{ getRotuloCurso(curso) }}
+          </button>
+          <p class="semResultado" v-if="!cursosFiltrados.length">Nenhum curso encontrado.</p>
+        </div>
+
+        <div class="detalheCurso" v-if="cursoSelecionado">
+          <div class="detalheCursoCabecalho">
+            <div>
+              <span class="subtitulo">DETALHES DO CURSO</span>
+              <h3>{{ cursoSelecionado.nome_curso }}</h3>
+              <p>{{ universidade.nome }}</p>
+            </div>
+            <button class="fecharDetalheCurso" type="button" @click="onFecharCurso">×</button>
+          </div>
+
+          <div class="detalheCursoGrade">
+            <div class="detalheCursoItem">
+              <span class="detalheCursoRotulo">GRAU</span>
+              <span class="detalheCursoValor">{{ cursoSelecionado.grau || '-' }}</span>
+            </div>
+            <div class="detalheCursoItem">
+              <span class="detalheCursoRotulo">ÁREA</span>
+              <span class="detalheCursoValor">
+                {{ cursoSelecionado.area_ocde_cine || cursoSelecionado.area_ocde || '-' }}
+              </span>
+            </div>
+            <div class="detalheCursoItem">
+              <span class="detalheCursoRotulo">MODALIDADE</span>
+              <span class="detalheCursoValor">{{ cursoSelecionado.modalidade || '-' }}</span>
+            </div>
+            <div class="detalheCursoItem">
+              <span class="detalheCursoRotulo">SITUAÇÃO</span>
+              <span class="detalheCursoValor">{{ cursoSelecionado.situacao_curso || '-' }}</span>
+            </div>
+            <div class="detalheCursoItem">
+              <span class="detalheCursoRotulo">VAGAS AUTORIZADAS</span>
+              <span class="detalheCursoValor">{{ cursoSelecionado.vagas_autorizadas ?? '-' }}</span>
+            </div>
+            <div class="detalheCursoItem">
+              <span class="detalheCursoRotulo">CARGA HORÁRIA</span>
+              <span class="detalheCursoValor">
+                {{ cursoSelecionado.carga_horaria ? `${cursoSelecionado.carga_horaria}h` : '-' }}
+              </span>
+            </div>
+            <div class="detalheCursoItem">
+              <span class="detalheCursoRotulo">LOCAL</span>
+              <span class="detalheCursoValor">
+                {{ cursoSelecionado.municipio }} - {{ cursoSelecionado.uf }}
+              </span>
+            </div>
+            <div class="detalheCursoItem" v-if="corteEnemSelecionado">
+              <span class="detalheCursoRotulo">CORTE ENEM</span>
+              <span class="detalheCursoValor destaqueCorte">{{ corteEnemSelecionado }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 
@@ -350,50 +335,36 @@ function onFecharCurso() {
 </template>
 
 <style scoped>
-.graduacao {
-  width: 40px;
-  height: 40px;
-  margin-left: 0.3rem;
-}
-.tituloInstitucional {
-  display: flex;
-  gap: 0.5rem;
-}
-.tituloInstitucional h3 {
-  margin: 20px 0 0 0;
-}
-.medalha {
-  width: 40px;
-  height: 40px;
-  margin: 0rem 0 0px 0;
-}
-.estrela {
-  width: 16px;
-  height: 16px;
-  margin-left: 0.3rem;
-}
 .paginaFundo {
+  --vermelho: #7a0f1a;
+  --vermelho-escuro: #9e1f2e;
+  --vermelho-claro: #f9e8e9;
+  --creme: #fffcf7;
+  --creme-forte: #faf6ef;
+  --borda: #eeeef0;
+  --texto: #5d5d6b;
+  --texto-fraco: #91919f;
+
   min-height: 100vh;
-  background-color: #fffcf7;
+  background-color: var(--creme);
 }
 
 .paginaUniversidade {
   max-width: 1100px;
   margin: 0 auto;
   padding: 2rem 1.5rem 4rem;
-  font-family: inherit;
   color: #1c1c22;
 }
 
 .voltar {
-  color: #5d5d6b;
+  color: var(--texto);
   text-decoration: none;
   font-size: 0.9rem;
   display: inline-block;
   margin-bottom: 1.5rem;
 }
 .voltar:hover {
-  color: #7a0f1a;
+  color: var(--vermelho);
 }
 
 .cabecalho {
@@ -412,7 +383,7 @@ function onFecharCurso() {
   height: 80px;
   min-width: 80px;
   border-radius: 14px;
-  background-color: #7a0f1a;
+  background-color: var(--vermelho);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -480,7 +451,7 @@ function onFecharCurso() {
   display: block;
   font-size: 0.65rem;
   font-weight: 400;
-  color: #91919f;
+  color: var(--texto-fraco);
 }
 
 .botaoFavoritar,
@@ -513,13 +484,13 @@ function onFecharCurso() {
 }
 
 .caixaEstatistica {
-  background-color: #faf6ef;
-  border: 1px solid #eeeef0;
+  background-color: var(--creme-forte);
+  border: 1px solid var(--borda);
   border-radius: 14px;
   padding: 1.2rem;
 }
 .caixaEstatistica:nth-child(odd) {
-  background: linear-gradient(135deg, #9e1f2e, #7a0f1a);
+  background: linear-gradient(135deg, var(--vermelho-escuro), var(--vermelho));
   border: none;
   color: #ffffff;
 }
@@ -536,7 +507,7 @@ function onFecharCurso() {
 .rotuloEstatistica {
   margin: 0;
   font-size: 0.8rem;
-  color: #91919f;
+  color: var(--texto-fraco);
 }
 
 .conteudo {
@@ -594,9 +565,10 @@ function onFecharCurso() {
   }
 }
 
-.secao {
-  background-color: #faf6ef;
-  border: 1px solid #eeeef0;
+.secao,
+.secaoCursos {
+  background-color: var(--creme-forte);
+  border: 1px solid var(--borda);
   border-radius: 16px;
   padding: 1.5rem;
 }
@@ -618,8 +590,8 @@ function onFecharCurso() {
   gap: 0.5rem;
 }
 .etiqueta {
-  background-color: #f9e8e9;
-  color: #7a0f1a;
+  background-color: var(--vermelho-claro);
+  color: var(--vermelho);
   font-size: 0.8rem;
   font-weight: 600;
   padding: 0.35rem 0.75rem;
@@ -633,12 +605,12 @@ function onFecharCurso() {
 }
 
 .itemDiferencial {
-  border: 1px solid #eeeef0;
+  border: 1px solid var(--borda);
   border-radius: 10px;
   padding: 0.8rem;
 }
 .itemDiferencial:nth-child(odd) {
-  background: linear-gradient(135deg, #7a0f1a, #68121b);
+  background: linear-gradient(135deg, var(--vermelho), #68121b);
   border: none;
 }
 .itemDiferencial:nth-child(odd) p {
@@ -657,7 +629,7 @@ function onFecharCurso() {
   gap: 0.8rem;
 }
 .avaliacaoItem {
-  border: 1px solid #eeeef0;
+  border: 1px solid var(--borda);
   border-radius: 10px;
   padding: 0.9rem;
 }
@@ -674,7 +646,7 @@ function onFecharCurso() {
 .notaRotulo {
   margin: 0 0 0.3rem;
   font-size: 0.78rem;
-  color: #91919f;
+  color: var(--texto-fraco);
 }
 .notaValor {
   margin: 0;
@@ -685,93 +657,77 @@ function onFecharCurso() {
 .listaFontes {
   margin: 0;
   padding-left: 1.2rem;
-  color: #5d5d6b;
+  color: var(--texto);
   font-size: 0.9rem;
   line-height: 1.7;
 }
 
-.cabecalhoCursos {
-  display: flex;
-  align-items: center;
-  gap: 0.8rem;
-  margin-bottom: 1.2rem;
+.secaoCursos {
+  margin-top: 1.5rem;
 }
 
-.iconeCursos {
-  width: 44px;
-  height: 44px;
-  min-width: 44px;
-  border-radius: 12px;
-  background: #f9e8e9;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 1.3rem;
+.secaoCursos h2 {
+  margin: 0 0 0.2rem;
+  font-size: 1.1rem;
 }
 
 .subtituloCursos {
-  margin: 0.2rem 0 0;
+  margin: 0 0 1rem;
   font-size: 0.85rem;
-  color: #91919f;
+  color: var(--texto-fraco);
 }
 
-.buscaCursos {
-  margin-bottom: 1rem;
-}
-
-.buscaCursos input {
+.buscaCursoInput {
   width: 100%;
+  max-width: 420px;
   padding: 0.7rem 1rem;
   border-radius: 10px;
-  border: 1px solid #eeeef0;
+  border: 1px solid var(--borda);
   background: #fff;
   font-size: 0.9rem;
   outline: 0;
-  transition: 0.2s;
   box-sizing: border-box;
+  margin-bottom: 1rem;
+  display: block;
 }
 
-.buscaCursos input:focus {
+.buscaCursoInput:focus {
   border-color: #d06f78;
 }
 
 .chipsCursos {
   display: flex;
   flex-wrap: wrap;
-  align-content: flex-start;
   gap: 0.5rem;
-  max-height: 260px;
+  max-height: 220px;
   overflow-y: auto;
-  padding: 4px 8px 4px 4px;
+  padding: 4px;
 }
 
 .chipCurso {
   background: #fff;
-  border: 1px solid #eeeef0;
-  color: #5d5d6b;
+  border: 1px solid var(--borda);
+  color: var(--texto);
   padding: 0.4rem 0.9rem;
   border-radius: 999px;
   font-size: 0.8rem;
-  font-weight: 500;
   cursor: pointer;
-  transition: 0.2s;
 }
 
 .chipCurso:hover {
-  background: #f9e8e9;
-  color: #7a0f1a;
   border-color: #f0cdd0;
+  color: var(--vermelho);
 }
 
 .chipCurso.ativo {
-  background: #7a0f1a;
+  background: var(--vermelho);
   color: #fff;
-  border-color: #7a0f1a;
+  border-color: var(--vermelho);
 }
 
-.semCursos {
+.semResultado {
   font-size: 0.85rem;
-  color: #91919f;
+  color: var(--texto-fraco);
   margin: 0;
 }
 
@@ -790,21 +746,6 @@ function onFecharCurso() {
   margin-bottom: 1rem;
 }
 
-.detalheCursoLogo {
-  width: 44px;
-  height: 44px;
-  min-width: 44px;
-  border-radius: 10px;
-  background: #7a0f1a;
-  color: #fff;
-  font-weight: 800;
-  font-size: 0.75rem;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  text-transform: uppercase;
-}
-
 .detalheCursoCabecalho h3 {
   margin: 0.1rem 0;
   font-size: 1.05rem;
@@ -814,7 +755,7 @@ function onFecharCurso() {
 .detalheCursoCabecalho p {
   margin: 0;
   font-size: 0.82rem;
-  color: #5d5d6b;
+  color: var(--texto);
 }
 
 .fecharDetalheCurso {
@@ -823,7 +764,7 @@ function onFecharCurso() {
   border: none;
   font-size: 1.3rem;
   line-height: 1;
-  color: #91919f;
+  color: var(--texto-fraco);
   cursor: pointer;
 }
 
@@ -834,8 +775,8 @@ function onFecharCurso() {
 }
 
 .detalheCursoItem {
-  background: #faf6ef;
-  border: 1px solid #eeeef0;
+  background: var(--creme-forte);
+  border: 1px solid var(--borda);
   border-radius: 10px;
   padding: 0.7rem 0.8rem;
   display: flex;
@@ -847,7 +788,7 @@ function onFecharCurso() {
   font-size: 0.7rem;
   font-weight: 700;
   letter-spacing: 0.5px;
-  color: #91919f;
+  color: var(--texto-fraco);
 }
 
 .detalheCursoValor {
@@ -857,13 +798,13 @@ function onFecharCurso() {
 }
 
 .destaqueCorte {
-  color: #7a0f1a;
+  color: var(--vermelho);
 }
 
 .caixaInstitucional,
 .caixaCadastro {
-  background-color: #faf6ef;
-  border: 1px solid #eeeef0;
+  background-color: var(--creme-forte);
+  border: 1px solid var(--borda);
   border-radius: 16px;
   padding: 1.5rem;
 }
@@ -885,14 +826,14 @@ function onFecharCurso() {
 }
 .dadoRotulo {
   font-size: 0.75rem;
-  color: #91919f;
+  color: var(--texto-fraco);
 }
 .dadoValor {
   font-size: 0.88rem;
   color: #1c1c22;
 }
 .dadoValor.alerta {
-  color: #9e1f2e;
+  color: var(--vermelho-escuro);
   font-weight: 600;
 }
 
@@ -938,10 +879,9 @@ function onFecharCurso() {
   display: flex;
   justify-content: center;
   align-items: center;
-  background: linear-gradient(135deg, var(--cream-50) 0%, var(--cream-100) 100%);
+  background: linear-gradient(135deg, #fffcf7 0%, #faf6ef 100%);
   padding: 20px;
   box-sizing: border-box;
-  font-family: 'Inter', sans-serif;
 }
 
 .conteudoErro {
@@ -956,7 +896,7 @@ function onFecharCurso() {
 .codigoStatus {
   font-size: 120px;
   font-weight: 800;
-  color: var(--brand-700);
+  color: #7a0f1a;
   line-height: 1;
   margin-bottom: 16px;
   letter-spacing: -2px;
@@ -965,21 +905,21 @@ function onFecharCurso() {
 .tituloPrincipal {
   font-size: 32px;
   font-weight: 700;
-  color: var(--ink-900);
+  color: #1c1c22;
   margin-bottom: 20px;
   line-height: 1.2;
 }
 
 .textoDescritivo {
   font-size: 16px;
-  color: var(--ink-600);
+  color: #5d5d6b;
   line-height: 1.6;
   margin-bottom: 32px;
 }
 
 .textoDestacado {
   font-weight: 700;
-  color: var(--brand-700);
+  color: #7a0f1a;
 }
 
 .grupoBotoes {
@@ -1000,32 +940,29 @@ function onFecharCurso() {
   font-weight: 700;
   text-decoration: none;
   border-radius: 999px;
-  transition: all 0.3s ease;
   cursor: pointer;
   border: none;
   min-width: 160px;
 }
 
 .erroBotaoPrimario {
-  background: linear-gradient(135deg, var(--brand-700) 0%, var(--brand-500) 100%);
+  background: linear-gradient(135deg, #7a0f1a 0%, #b83d4a 100%);
   color: #ffffff;
   box-shadow: 0 10px 24px rgba(122, 15, 26, 0.2);
 }
 
 .erroBotaoPrimario:hover {
   transform: translateY(-2px);
-  box-shadow: 0 14px 32px rgba(122, 15, 26, 0.3);
 }
 
 .erroBotaoSecundario {
   background: #ffffff;
-  color: var(--brand-700);
-  border: 2px solid var(--brand-700);
-  box-shadow: 0 4px 12px rgba(122, 15, 26, 0.08);
+  color: #7a0f1a;
+  border: 2px solid #7a0f1a;
 }
 
 .erroBotaoSecundario:hover {
-  background: var(--cream-100);
+  background: #faf6ef;
   transform: translateY(-2px);
 }
 </style>
