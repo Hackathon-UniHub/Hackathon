@@ -45,6 +45,12 @@ const routes = [
     meta: { requiresAuth: true },
   },
   {
+    path: '/professor/dashboard',
+    name: 'professor-dashboard',
+    component: () => import('@/views/ProfessorDashboard.vue'),
+    meta: { requiresAuth: true, requiresProfessor: true },
+  },
+  {
     path: '/:pathMatch(.*)*',
     name: 'not-found',
     component: ErroView,
@@ -77,6 +83,10 @@ router.beforeEach(async (to) => {
 
   if (to.meta.requiresAuth && !authStore.isLoggedIn) {
     return { name: 'login', query: { redirect: to.fullPath } }
+  }
+
+  if (to.meta.requiresProfessor && !authStore.isProfessor) {
+    return { name: 'home' }
   }
 })
 
