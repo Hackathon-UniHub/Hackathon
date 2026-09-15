@@ -86,7 +86,7 @@ function remover(idUni) {
           <div class="card-rodape">
             <span v-if="uni.categoria" class="tag">{{ uni.categoria }}</span>
             <RouterLink :to="{ name: 'universidade', params: { id: uni.id } }" class="detalhes"
-              >Ver detalhes <span aria-hidden="true">↗</span></RouterLink
+              >Ver detalhes <span aria-hidden="true"></span></RouterLink
             >
           </div>
         </article>
