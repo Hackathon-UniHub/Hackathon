@@ -99,9 +99,15 @@ function onFecharCurso() {
           >
             <HugeiconsIcon
               :icon="HeartIcon"
+<<<<<<< Updated upstream
               :size="20"
               :color="favorito ? '#f0cdd0' : 'currentColor'"
               :stroke-width="1.5"
+=======
+              :size="36"
+              :color="favorito ? '#f0cdd0' : 'currentColor'"
+              :stroke-width="1.4"
+>>>>>>> Stashed changes
               aria-hidden="true"
             />
             {{ favorito ? 'Remover favorito' : 'Favoritar' }}

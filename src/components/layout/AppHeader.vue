@@ -65,7 +65,11 @@ watch(() => authStore.loading, carregarFavoritos)
           :to="{ name: 'favoritos' }"
           aria-label="Favoritos"
         >
+<<<<<<< Updated upstream
           <HugeiconsIcon :icon="HeartAddIcon" :size="22" color="currentColor" :stroke-width="1.8" />
+=======
+          <HugeiconsIcon :icon="HeartAddIcon" :size="36" color="currentColor" :stroke-width="1.6" />
+>>>>>>> Stashed changes
           <span v-if="quantidadeFavoritos" class="contadorFavoritos">
             {{ quantidadeFavoritos > 99 ? '99+' : quantidadeFavoritos }}
           </span>
