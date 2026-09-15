@@ -63,9 +63,15 @@ function alternarFavorito() {
         <HugeiconsIcon
           :icon="HeartIcon"
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
           :size="24"
           :color="favorito ? 'var(--vermelho)' : 'currentColor'"
           :stroke-width="1.5"
+=======
+          :size="36"
+          :color="favorito ? 'var(--vermelho)' : 'currentColor'"
+          :stroke-width="1.4"
+>>>>>>> Stashed changes
 =======
           :size="36"
           :color="favorito ? 'var(--vermelho)' : 'currentColor'"

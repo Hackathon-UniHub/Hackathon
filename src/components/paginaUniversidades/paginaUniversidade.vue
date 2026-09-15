@@ -100,9 +100,15 @@ function onFecharCurso() {
             <HugeiconsIcon
               :icon="HeartIcon"
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
               :size="20"
               :color="favorito ? '#f0cdd0' : 'currentColor'"
               :stroke-width="1.5"
+=======
+              :size="36"
+              :color="favorito ? '#f0cdd0' : 'currentColor'"
+              :stroke-width="1.4"
+>>>>>>> Stashed changes
 =======
               :size="36"
               :color="favorito ? '#f0cdd0' : 'currentColor'"
