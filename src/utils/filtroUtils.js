@@ -6,7 +6,7 @@ for (const item of enem) {
   cursosPorUniversidadeId.set(item.id, item.cursos)
 }
 
-function getCursosDaUniversidade(id) {
+export function getCursosDaUniversidade(id) {
   const cursos = cursosPorUniversidadeId.get(id)
   if (!cursos) return []
   return cursos
