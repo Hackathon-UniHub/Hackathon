@@ -62,11 +62,11 @@ watch(() => authStore.loading, carregarFavoritos)
         </RouterLink> -->
         <RouterLink
           class="botaoPesquisa"
-          :to="authStore.isLoggedIn ? { name: 'favoritos' } : { name: 'login' }"
-          :aria-label="authStore.isLoggedIn ? 'Favoritos' : 'Entrar para ver favoritos'"
+          :to="{ name: 'favoritos' }"
+          aria-label="Favoritos"
         >
           <HugeiconsIcon :icon="HeartAddIcon" :size="22" color="currentColor" :stroke-width="1.8" />
-          <span v-if="authStore.isLoggedIn && quantidadeFavoritos" class="contadorFavoritos">
+          <span v-if="quantidadeFavoritos" class="contadorFavoritos">
             {{ quantidadeFavoritos > 99 ? '99+' : quantidadeFavoritos }}
           </span>
         </RouterLink>

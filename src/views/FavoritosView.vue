@@ -1,5 +1,7 @@
 <script setup>
 import { computed, onMounted, ref, watch } from 'vue'
+import { HugeiconsIcon } from '@hugeicons/vue'
+import { Cancel01Icon } from '@hugeicons/core-free-icons'
 import { RouterLink } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import { useFavoritosStore } from '@/stores/favoritos'
@@ -70,7 +72,13 @@ function remover(idUni) {
               :aria-label="`Remover ${uni.nome} dos favoritos`"
               @click="remover(uni.id)"
             >
-              <span aria-hidden="true">♥</span>
+              <HugeiconsIcon
+                :icon="Cancel01Icon"
+                :size="18"
+                color="currentColor"
+                :stroke-width="1.8"
+                aria-hidden="true"
+              />
             </button>
           </div>
           <h2>{{ uni.nome }}</h2>
@@ -225,7 +233,9 @@ h1 {
 .remover {
   width: 34px;
   height: 34px;
-
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   border: 1px solid var(--brand-100);
   border-radius: 50%;
   background: var(--brand-50);

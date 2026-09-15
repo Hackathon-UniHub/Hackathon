@@ -1,7 +1,7 @@
 <script setup>
 import { computed } from 'vue'
-import { useRouter, useRoute } from 'vue-router'
-import { useAuthStore } from '@/stores/auth'
+import { HugeiconsIcon } from '@hugeicons/vue'
+import { HeartIcon } from '@hugeicons/core-free-icons'
 import { useFavoritosStore } from '@/stores/favoritos'
 
 const props = defineProps([
@@ -18,19 +18,11 @@ const props = defineProps([
   'cursoDestaque',
 ])
 
-const router = useRouter()
-const route = useRoute()
-const authStore = useAuthStore()
 const favoritosStore = useFavoritosStore()
 
 const favorito = computed(() => favoritosStore.isFavorito(Number(props.id)))
 
 function alternarFavorito() {
-  if (!authStore.isLoggedIn) {
-    router.push({ name: 'login', query: { redirect: route.fullPath } })
-    return
-  }
-
   if (favorito.value) {
     favoritosStore.removerFavorito(Number(props.id))
   } else {
@@ -68,8 +60,14 @@ function alternarFavorito() {
         :aria-label="favorito ? 'Remover dos favoritos' : 'Adicionar aos favoritos'"
         @click="alternarFavorito"
       >
-        <img v-if="!favorito" src="/src/components/icons/favoritoVazio.svg" alt="Favoritar" />
-        <img v-else src="/src/components/icons/favoritoCheio.svg" alt="Favoritado" />
+        <HugeiconsIcon
+          :icon="HeartIcon"
+          :size="24"
+          :color="favorito ? 'var(--vermelho)' : 'currentColor'"
+          :stroke-width="1.5"
+          :class="{ favoritoAtivo: favorito }"
+          aria-hidden="true"
+        />
       </button>
       <RouterLink class="botao" :to="{ name: 'universidade', params: { id } }">
         Página da universidade
@@ -166,10 +164,17 @@ function alternarFavorito() {
   cursor: pointer;
   padding: 0;
   display: flex;
+  color: var(--texto);
+  transition: color 0.15s ease, transform 0.15s ease;
 }
-.favoritar img {
-  width: 34px;
-  height: 34px;
+
+.favoritar:hover {
+  color: var(--vermelho);
+  transform: scale(1.06);
+}
+
+.favoritoAtivo {
+  color: var(--vermelho);
 }
 
 .botao {

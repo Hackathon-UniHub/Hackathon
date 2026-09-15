@@ -1,6 +1,8 @@
 <script setup>
 import { ref, computed } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
+import { HugeiconsIcon } from '@hugeicons/vue'
+import { HeartIcon } from '@hugeicons/core-free-icons'
+import { useRoute } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import { useFavoritosStore } from '@/stores/favoritos'
 import {
@@ -19,7 +21,6 @@ import {
 } from '@/utils/universidadesUtils.js'
 
 const route = useRoute()
-const router = useRouter()
 const authStore = useAuthStore()
 const favoritosStore = useFavoritosStore()
 
@@ -35,11 +36,6 @@ const favorito = computed(() =>
 )
 
 function alternarFavorito() {
-  if (!authStore.isLoggedIn) {
-    router.push({ name: 'login', query: { redirect: route.fullPath } })
-    return
-  }
-
   const id = Number(universidade.value.id)
   if (favorito.value) {
     favoritosStore.removerFavorito(id)
@@ -95,7 +91,19 @@ function onFecharCurso() {
             {{ universidade.igc }}
             <span class="notaLegenda">IGC/MEC</span>
           </div>
-          <button class="botaoFavoritar" type="button" @click="alternarFavorito">
+          <button
+            class="botaoFavoritar"
+            type="button"
+            :aria-label="favorito ? 'Remover dos favoritos' : 'Adicionar aos favoritos'"
+            @click="alternarFavorito"
+          >
+            <HugeiconsIcon
+              :icon="HeartIcon"
+              :size="20"
+              :color="favorito ? '#f0cdd0' : 'currentColor'"
+              :stroke-width="1.5"
+              aria-hidden="true"
+            />
             {{ favorito ? 'Remover favorito' : 'Favoritar' }}
           </button>
           <a class="botaoSite" :href="siteOficial" target="_blank" rel="noopener noreferrer">
@@ -465,6 +473,7 @@ function onFecharCurso() {
   text-decoration: none;
   display: inline-flex;
   align-items: center;
+  gap: 0.45rem;
 }
 .botaoFavoritar {
   background-color: transparent;
