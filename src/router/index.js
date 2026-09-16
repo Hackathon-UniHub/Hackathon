@@ -42,7 +42,6 @@ const routes = [
     path: '/favoritos',
     name: 'favoritos',
     component: () => import('@/views/FavoritosView.vue'),
-    meta: { requiresAuth: true },
   },
   {
     path: '/professor/dashboard',

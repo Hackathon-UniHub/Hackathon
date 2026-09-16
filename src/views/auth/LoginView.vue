@@ -29,8 +29,8 @@ async function handleGoogleLogin() {
   }
 }
 
-const canSubmit = computed(() =>
-  email.value.trim().length > 0 && password.value.length > 0 && !loading.value
+const canSubmit = computed(
+  () => email.value.trim().length > 0 && password.value.length > 0 && !loading.value,
 )
 
 async function handleSubmit() {
@@ -74,74 +74,94 @@ const userInitial = computed(() => {
 
 <template>
   <div class="page">
-
     <main class="auth-card">
       <div class="avatar">{{ userInitial }}</div>
       <h1>Bem vindo de volta!</h1>
 
       <form @submit.prevent="handleSubmit">
-      <div class="input-wrap">
+        <div class="input-wrap">
+          <HugeiconsIcon
+            class="icon"
+            :icon="MailIcon"
+            :size="32"
+            color="currentColor"
+            :stroke-width="1.5"
+          />
+          <input
+            v-model="email"
+            type="email"
+            placeholder="Endereço de email"
+            autocomplete="email"
+            required
+          />
+        </div>
 
-        <HugeiconsIcon class="icon" :icon="MailIcon" :size="32" color="currentColor" :stroke-width="1.5"/>
-        <input
-          v-model="email"
-          type="email"
-          placeholder="Endereço de email"
-          autocomplete="email"
-          required
-        />
-      </div>
+        <div class="input-wrap">
+          <HugeiconsIcon
+            class="icon"
+            :icon="CircleLockIcon"
+            :size="32"
+            color="currentColor"
+            :stroke-width="1.5"
+          />
+          <input
+            v-model="password"
+            :type="showPassword ? 'text' : 'password'"
+            placeholder="Senha"
+            autocomplete="current-password"
+            required
+          />
+          <button
+            type="button"
+            class="toggle-visibility"
+            @click="showPassword = !showPassword"
+            :aria-label="showPassword ? 'Ocultar senha' : 'Mostrar senha'"
+          >
+            <HugeiconsIcon
+              v-if="!showPassword"
+              :icon="ViewOffIcon"
+              :size="24"
+              color="currentColor"
+              :stroke-width="1.5"
+            />
+            <HugeiconsIcon
+              v-else
+              :icon="EyeIcon"
+              :size="24"
+              color="currentColor"
+              :stroke-width="1.5"
+            />
+          </button>
+        </div>
 
-      <div class="input-wrap">
-        <HugeiconsIcon class="icon" :icon="CircleLockIcon" :size="32" color="currentColor" :stroke-width="1.5"/>
-        <input
-          v-model="password"
-          :type="showPassword ? 'text' : 'password'"
-          placeholder="Senha"
-          autocomplete="current-password"
-          required
-        />
-        <button
-          type="button"
-          class="toggle-visibility"
-          @click="showPassword = !showPassword"
-          :aria-label="showPassword ? 'Ocultar senha' : 'Mostrar senha'"
-        >
-            <HugeiconsIcon v-if="!showPassword" :icon="ViewOffIcon" :size="24" color="currentColor" :stroke-width="1.5"/>
-            <HugeiconsIcon v-else :icon="EyeIcon" :size="24" color="currentColor" :stroke-width="1.5"/>
+        <div class="row">
+          <label class="checkbox">
+            <input type="checkbox" v-model="rememberMe" />
+            <span>Lembre-me</span>
+          </label>
+          <a href="" class="link">Esqueceu a senha?</a>
+        </div>
+
+        <button type="submit" class="primary-btn" :disabled="!canSubmit">
+          {{ loading ? 'Entrando...' : 'Entrar' }}
         </button>
-      </div>
+      </form>
 
-      <div class="row">
-        <label class="checkbox">
-          <input type="checkbox" v-model="rememberMe" />
-          <span>Lembre-me</span>
-        </label>
-        <a href="" class="link">Esqueceu a senha?</a>
-      </div>
+      <div class="divider"><span>ou</span></div>
 
-      <button type="submit" class="primary-btn" :disabled="!canSubmit">
-        {{ loading ? 'Entrando...' : 'Entrar' }}
+      <button type="button" class="google-btn" @click="handleGoogleLogin">
+        <HugeiconsIcon class="continue-with" :icon="GoogleIcon" :size="24" :stroke-width="1.5" />
+        <p>Entrar com o Google</p>
       </button>
-    </form>
 
-    <div class="divider"><span>ou</span></div>
+      <p v-if="errorMsg" class="error" role="alert">{{ errorMsg }}</p>
 
-    <button type="button" class="google-btn" @click="handleGoogleLogin">
-      <HugeiconsIcon class="continue-with" :icon="GoogleIcon" :size="24"  :stroke-width="1.5"/>
-      <p>
-        Entrar com o Google
+      <p class="footer-link">
+        Não tem uma conta?
+        <router-link to="/create-account">Criar conta</router-link>
       </p>
-    </button>
-
-    <p v-if="errorMsg" class="error" role="alert">{{ errorMsg }}</p>
-
-    <p class="footer-link">
-      Não tem uma conta?
-      <router-link to="/create-account">Criar conta</router-link>
-    </p>
-  </main>
-</div>
+    </main>
+  </div>
 </template>
 
 <style scoped>

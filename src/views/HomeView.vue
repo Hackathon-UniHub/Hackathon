@@ -15,15 +15,12 @@ const universidadesMaisBemRanqueadas = computed(() => {
     .slice(0, 6)
     .map((nota) => {
       const nomeNormalizado = normalizarNome(nota.Universidade)
-      const universidade = universidades.find(
-        (item) => {
-          const nomeItemNormalizado = normalizarNome(item.nome)
-          return (
-            nomeItemNormalizado === nomeNormalizado ||
-            nomeItemNormalizado.startsWith(nomeNormalizado)
-          )
-        },
-      )
+      const universidade = universidades.find((item) => {
+        const nomeItemNormalizado = normalizarNome(item.nome)
+        return (
+          nomeItemNormalizado === nomeNormalizado || nomeItemNormalizado.startsWith(nomeNormalizado)
+        )
+      })
 
       return universidade ? { ...universidade, notaRuf: nota.Nota, rankingRuf: nota.Ranking } : null
     })
@@ -452,7 +449,6 @@ onMounted(() => {
 }
 
 /* === UNIVERSIDADES MAIS BUSCADAS === */
-
 .secaoUniversidades {
   padding: 44px 0 56px;
 }

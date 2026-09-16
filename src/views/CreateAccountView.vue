@@ -27,100 +27,13 @@ const showPassword = ref(false)
 const errorMsg = ref('')
 const loading = ref(false)
 
-const universidadeSelecionada = ref('')
-const searchQuery = ref('')
-const mostrarDropdown = ref(false)
-const dropdownRef = ref(null)
-const inputWrapRef = ref(null)
-const dropdownStyle = ref({})
-
-
-function toggleDropdown() {
-  if (!isProfessor.value) return
-  mostrarDropdown.value = !mostrarDropdown.value
-  if (mostrarDropdown.value) {
-    atualizarPosicaoDropdown()
-  }
-}
-
-function atualizarPosicaoDropdown() {
-  if (!inputWrapRef.value) return
-  const rect = inputWrapRef.value.getBoundingClientRect()
-  dropdownStyle.value = {
-    position: 'fixed',
-    top: `${rect.bottom + 4}px`,
-    left: `${rect.left}px`,
-    width: `${rect.width}px`,
-  }
-}
-
-function selecionarUniversidade(id) {
-  universidadeSelecionada.value = String(id)
-  searchQuery.value = ''
-  mostrarDropdown.value = false
-}
-
-function limparUniversidade() {
-  universidadeSelecionada.value = ''
-  searchQuery.value = ''
-}
-
-function clickFora(e) {
-  if (
-    dropdownRef.value &&
-    !dropdownRef.value.contains(e.target) &&
-    inputWrapRef.value &&
-    !inputWrapRef.value.contains(e.target)
-  ) {
-    mostrarDropdown.value = false
-  }
-}
-
-function handleScrollOuReiszie() {
-  if (mostrarDropdown.value) {
-    atualizarPosicaoDropdown()
-  }
-}
-
-onMounted(() => {
-  document.body.style.background = 'linear-gradient(to bottom, #920205, #2C0102)'
-  document.addEventListener('click', clickFora)
-  window.addEventListener('resize', handleScrollOuReiszie)
-  window.addEventListener('scroll', handleScrollOuReiszie, true) // true = captura scroll de qualquer elemento, incluindo .auth-card
-})
-
-onUnmounted(() => {
-  document.body.style.background = ''
-  document.removeEventListener('click', clickFora)
-  window.removeEventListener('resize', handleScrollOuReiszie)
-  window.removeEventListener('scroll', handleScrollOuReiszie, true)
-})
-
-const universidadesFiltradas = computed(() => {
-  if (!searchQuery.value.trim()) return universidades.slice(0, 10)
-  const busca = searchQuery.value.toLowerCase()
-  return universidades.filter(u =>
-    u.nome.toLowerCase().includes(busca) ||
-    u.sigla.toLowerCase().includes(busca) ||
-    u.municipio.toLowerCase().includes(busca) ||
-    u.uf.toLowerCase().includes(busca)
-  ).slice(0, 15)
-})
-
-const selectedUni = computed(() => universidades.find(u => u.id === Number(universidadeSelecionada.value)))
-
-const isProfessor = computed(() => tipoUsuario.value === 'professor')
-
-const canSubmit = computed(() => {
-  const base = fullName.value.trim().length > 0 &&
+const canSubmit = computed(
+  () =>
+    fullName.value.trim().length > 0 &&
     email.value.trim().length > 0 &&
     password.value.length >= 6 &&
-    !loading.value
-  if (isProfessor.value) {
-    return base && universidadeSelecionada.value !== ''
-  }
-  return base
-})
+    !loading.value,
+)
 
 async function handleSubmit() {
   if (!canSubmit.value) return
@@ -222,7 +135,13 @@ onUnmounted(() => {
         <div class="field">
           <label for="fullName">Nome completo</label>
           <div class="input-wrap">
-            <HugeiconsIcon class="icon" :icon="User02Icon" :size="32" color="currentColor" :stroke-width="1.5"/>
+            <HugeiconsIcon
+              class="icon"
+              :icon="User02Icon"
+              :size="32"
+              color="currentColor"
+              :stroke-width="1.5"
+            />
             <input
               id="fullName"
               v-model="fullName"
@@ -237,7 +156,13 @@ onUnmounted(() => {
         <div class="field">
           <label for="email">Endereço de email</label>
           <div class="input-wrap">
-            <HugeiconsIcon class="icon" :icon="MailIcon" :size="32" color="currentColor" :stroke-width="1.5"/>
+            <HugeiconsIcon
+              class="icon"
+              :icon="MailIcon"
+              :size="32"
+              color="currentColor"
+              :stroke-width="1.5"
+            />
             <input
               id="email"
               v-model="email"
@@ -252,7 +177,13 @@ onUnmounted(() => {
         <div class="field">
           <label for="password">Senha</label>
           <div class="input-wrap">
-            <HugeiconsIcon class="icon" :icon="CircleLockIcon" :size="32" color="currentColor" :stroke-width="1.5"/>
+            <HugeiconsIcon
+              class="icon"
+              :icon="CircleLockIcon"
+              :size="32"
+              color="currentColor"
+              :stroke-width="1.5"
+            />
             <input
               id="password"
               v-model="password"
@@ -267,8 +198,20 @@ onUnmounted(() => {
               @click="showPassword = !showPassword"
               :aria-label="showPassword ? 'Ocultar senha' : 'Mostrar senha'"
             >
-              <HugeiconsIcon v-if="!showPassword" :icon="ViewOffIcon" :size="24" color="currentColor" :stroke-width="1.5"/>
-              <HugeiconsIcon v-else :icon="EyeIcon" :size="24" color="currentColor" :stroke-width="1.5"/>
+              <HugeiconsIcon
+                v-if="!showPassword"
+                :icon="ViewOffIcon"
+                :size="24"
+                color="currentColor"
+                :stroke-width="1.5"
+              />
+              <HugeiconsIcon
+                v-else
+                :icon="EyeIcon"
+                :size="24"
+                color="currentColor"
+                :stroke-width="1.5"
+              />
             </button>
           </div>
         </div>
@@ -357,11 +300,16 @@ onUnmounted(() => {
 
       <div class="social-row">
         <button type="button" class="social-btn" @click="handleGoogleSignUp">
-          <HugeiconsIcon class="continue-with" :icon="ChromeIcon" :size="24" :stroke-width="1.5"/>
+          <HugeiconsIcon class="continue-with" :icon="ChromeIcon" :size="24" :stroke-width="1.5" />
           <p>Google</p>
         </button>
         <button type="button" class="social-btn" @click="handleMicrosoftSignUp">
-          <HugeiconsIcon class="continue-with" :icon="MicrosoftIcon" :size="24" :stroke-width="1.5"/>
+          <HugeiconsIcon
+            class="continue-with"
+            :icon="MicrosoftIcon"
+            :size="24"
+            :stroke-width="1.5"
+          />
           <p>Microsoft</p>
         </button>
       </div>
