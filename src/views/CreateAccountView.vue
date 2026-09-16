@@ -22,11 +22,12 @@ const showPassword = ref(false)
 const errorMsg = ref('')
 const loading = ref(false)
 
-const canSubmit = computed(() =>
-  fullName.value.trim().length > 0 &&
-  email.value.trim().length > 0 &&
-  password.value.length >= 6 &&
-  !loading.value
+const canSubmit = computed(
+  () =>
+    fullName.value.trim().length > 0 &&
+    email.value.trim().length > 0 &&
+    password.value.length >= 6 &&
+    !loading.value,
 )
 
 async function handleSubmit() {
@@ -89,7 +90,13 @@ onUnmounted(() => {
         <div class="field">
           <label for="fullName">Nome completo</label>
           <div class="input-wrap">
-            <HugeiconsIcon class="icon" :icon="User02Icon" :size="32" color="currentColor" :stroke-width="1.5"/>
+            <HugeiconsIcon
+              class="icon"
+              :icon="User02Icon"
+              :size="32"
+              color="currentColor"
+              :stroke-width="1.5"
+            />
             <input
               id="fullName"
               v-model="fullName"
@@ -104,7 +111,13 @@ onUnmounted(() => {
         <div class="field">
           <label for="email">Endereço de email</label>
           <div class="input-wrap">
-            <HugeiconsIcon class="icon" :icon="MailIcon" :size="32" color="currentColor" :stroke-width="1.5"/>
+            <HugeiconsIcon
+              class="icon"
+              :icon="MailIcon"
+              :size="32"
+              color="currentColor"
+              :stroke-width="1.5"
+            />
             <input
               id="email"
               v-model="email"
@@ -119,7 +132,13 @@ onUnmounted(() => {
         <div class="field">
           <label for="password">Senha</label>
           <div class="input-wrap">
-            <HugeiconsIcon class="icon" :icon="CircleLockIcon" :size="32" color="currentColor" :stroke-width="1.5"/>
+            <HugeiconsIcon
+              class="icon"
+              :icon="CircleLockIcon"
+              :size="32"
+              color="currentColor"
+              :stroke-width="1.5"
+            />
             <input
               id="password"
               v-model="password"
@@ -134,8 +153,20 @@ onUnmounted(() => {
               @click="showPassword = !showPassword"
               :aria-label="showPassword ? 'Ocultar senha' : 'Mostrar senha'"
             >
-              <HugeiconsIcon v-if="!showPassword" :icon="ViewOffIcon" :size="24" color="currentColor" :stroke-width="1.5"/>
-              <HugeiconsIcon v-else :icon="EyeIcon" :size="24" color="currentColor" :stroke-width="1.5"/>
+              <HugeiconsIcon
+                v-if="!showPassword"
+                :icon="ViewOffIcon"
+                :size="24"
+                color="currentColor"
+                :stroke-width="1.5"
+              />
+              <HugeiconsIcon
+                v-else
+                :icon="EyeIcon"
+                :size="24"
+                color="currentColor"
+                :stroke-width="1.5"
+              />
             </button>
           </div>
         </div>
@@ -149,11 +180,16 @@ onUnmounted(() => {
 
       <div class="social-row">
         <button type="button" class="social-btn" @click="handleGoogleSignUp">
-          <HugeiconsIcon class="continue-with" :icon="ChromeIcon" :size="24" :stroke-width="1.5"/>
+          <HugeiconsIcon class="continue-with" :icon="ChromeIcon" :size="24" :stroke-width="1.5" />
           <p>Google</p>
         </button>
         <button type="button" class="social-btn" @click="handleMicrosoftSignUp">
-          <HugeiconsIcon class="continue-with" :icon="MicrosoftIcon" :size="24" :stroke-width="1.5"/>
+          <HugeiconsIcon
+            class="continue-with"
+            :icon="MicrosoftIcon"
+            :size="24"
+            :stroke-width="1.5"
+          />
           <p>Microsoft</p>
         </button>
       </div>

@@ -34,17 +34,17 @@ const props = defineProps({
   },
 })
 
-const limitesBrasil = L.latLngBounds(
-  [-33.8, -73.99],
-  [5.3, -34.7],
-)
+const limitesBrasil = L.latLngBounds([-33.8, -73.99], [5.3, -34.7])
 
 const containerMapa = ref(null)
 let mapa = null
 const marcadores = {}
 
 function iniciaisDaSigla(sigla) {
-  return sigla.replace(/[^A-Z]/gi, '').slice(0, 2).toUpperCase()
+  return sigla
+    .replace(/[^A-Z]/gi, '')
+    .slice(0, 2)
+    .toUpperCase()
 }
 
 function descricaoResumida(universidade) {

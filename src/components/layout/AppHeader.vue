@@ -16,10 +16,7 @@ async function sairDaConta() {
 }
 
 const userInitial = computed(() => {
-  const name =
-    authStore.user?.user_metadata?.full_name ||
-    authStore.user?.email ||
-    ''
+  const name = authStore.user?.user_metadata?.full_name || authStore.user?.email || ''
 
   return name.trim().charAt(0).toUpperCase() || '?'
 })
@@ -42,7 +39,7 @@ watch(() => authStore.loading, carregarFavoritos)
       <nav aria-label="Navegação principal">
         <ul class="menuNavegacao">
           <li>
-            <RouterLink class="linkNavegacao" :to="{ name: 'home' }" exact-active-class="ativo">
+            <RouterLink class="linkNavegacao" to="/" exact-active-class="ativo">
               Início
             </RouterLink>
           </li>
@@ -65,11 +62,11 @@ watch(() => authStore.loading, carregarFavoritos)
         </RouterLink> -->
         <RouterLink
           class="botaoPesquisa"
-          :to="authStore.isLoggedIn ? { name: 'favoritos' } : { name: 'login' }"
-          :aria-label="authStore.isLoggedIn ? 'Favoritos' : 'Entrar para ver favoritos'"
+          :to="{ name: 'favoritos' }"
+          aria-label="Favoritos"
         >
           <HugeiconsIcon :icon="HeartAddIcon" :size="22" color="currentColor" :stroke-width="1.8" />
-          <span v-if="authStore.isLoggedIn && quantidadeFavoritos" class="contadorFavoritos">
+          <span v-if="quantidadeFavoritos" class="contadorFavoritos">
             {{ quantidadeFavoritos > 99 ? '99+' : quantidadeFavoritos }}
           </span>
         </RouterLink>
@@ -345,8 +342,8 @@ watch(() => authStore.loading, carregarFavoritos)
 
 /* === RESET === */
 /* http://meyerweb.com/eric/tools/css/reset/
-   v2.0 | 20110126
-   License: none (public domain)
+  v2.0 | 20110126
+  License: none (public domain)
 */
 
 html,
@@ -410,6 +407,7 @@ thead,
 tr,
 th,
 td,
+/* HTML5 display-role reset for older browsers */
 article,
 aside,
 canvas,
@@ -438,7 +436,6 @@ video {
   vertical-align: baseline;
   text-decoration: none;
 }
-/* HTML5 display-role reset for older browsers */
 article,
 aside,
 details,
@@ -474,13 +471,12 @@ table {
   border-collapse: collapse;
   border-spacing: 0;
 }
-/* === RESET === */
-
 header {
   background-color: white;
 }
 
 .container {
+  /* === RESET === */
   display: flex;
   align-items: center;
   justify-content: space-between;

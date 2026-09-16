@@ -1,47 +1,58 @@
- <script setup>
+<script setup>
 import { ref, computed } from 'vue'
 import paginaFiltroCard from './paginaFiltroCard.vue'
 import notasUniversidades from '@/data/notasUniversidades.js'
 import {
   getEstados,
   getRatings,
+  getCursos,
+  getCursosFiltrados,
+  getCursoDestaque,
+  getRankingUniversidades,
   getUniversidadesFiltradas,
-  alternarEstado,
-  alternarRating,
+  selecionarEstado,
+  selecionarRating,
+  selecionarBuscaCurso,
+  atualizarNotaEnem,
 } from '@/utils/filtroUtils.js'
 
 const estadoAtivo = ref('')
 const ratingAtivo = ref('Todas')
 const pesquisa = ref('')
+const buscaCurso = ref('')
+const notaEnem = ref('')
 
 const estados = getEstados()
 const ratings = getRatings()
+const cursos = getCursos()
+const rankingUniversidades = getRankingUniversidades(notasUniversidades, 5)
 
-const rankingUniversidades = computed(() => {
-  return [...notasUniversidades]
-    .filter((universidade) => Number.isFinite(Number(universidade.Nota)))
-    .sort((primeira, segunda) => Number(segunda.Nota) - Number(primeira.Nota))
-    .slice(0, 5)
-})
+const cursosFiltrados = computed(() => getCursosFiltrados(cursos, buscaCurso.value))
 
 const universidades = computed(() =>
   getUniversidadesFiltradas({
     estadoAtivo: estadoAtivo.value,
     pesquisa: pesquisa.value,
     ratingAtivo: ratingAtivo.value,
+    buscaCurso: buscaCurso.value,
+    notaEnem: notaEnem.value,
   }),
 )
 
-function selecionarEstado(uf) {
-  const proximoEstado = alternarEstado(estadoAtivo.value, uf)
-  estadoAtivo.value = proximoEstado.estadoAtivo
-  pesquisa.value = proximoEstado.pesquisa
+function onSelecionarEstado(uf) {
+  selecionarEstado(estadoAtivo, pesquisa, uf)
 }
 
-function selecionarRating(r) {
-  const proximoRating = alternarRating(ratingAtivo.value, r)
-  ratingAtivo.value = proximoRating.ratingAtivo
-  pesquisa.value = proximoRating.pesquisa
+function onSelecionarRating(rating) {
+  selecionarRating(ratingAtivo, pesquisa, rating)
+}
+
+function onSelecionarBuscaCurso(curso) {
+  selecionarBuscaCurso(buscaCurso, pesquisa, curso)
+}
+
+function onAtualizarNotaEnem(evento) {
+  atualizarNotaEnem(notaEnem, evento)
 }
 </script>
 
@@ -73,7 +84,9 @@ function selecionarRating(r) {
       </div>
       <div class="containerTres">
         <h2>Rankings atualizados</h2>
-        <p>Ranking baseado nas notas do Ranking Universitário Folha (RUF), da Folha de S.Paulo/UOL.</p>
+        <p>
+          Ranking baseado nas notas do Ranking Universitário Folha (RUF), da Folha de S.Paulo/UOL.
+        </p>
 
         <div class="listaRanking">
           <div
@@ -103,6 +116,45 @@ function selecionarRating(r) {
       </div>
     </div>
 
+    <div class="filtroCurso">
+      <span class="rotulo">BUSCAR POR CURSO</span>
+      <p class="dica">Digite ou clique num curso abaixo.</p>
+
+      <input
+        v-model="buscaCurso"
+        type="text"
+        class="buscaInput"
+        placeholder='Ex: "Medicina", "Engenharia Civil", "Direito"...'
+      />
+
+      <div class="chips">
+        <button
+          class="chip"
+          v-for="curso in cursosFiltrados"
+          :key="curso"
+          :class="{ ativo: buscaCurso.toLowerCase() === curso.toLowerCase() }"
+          @click="onSelecionarBuscaCurso(curso)"
+        >
+          {{ curso }}
+        </button>
+        <p class="semResultado" v-if="!cursosFiltrados.length">Nenhum curso encontrado.</p>
+      </div>
+
+      <div class="notaEnem">
+        <span class="rotulo">MÉDIA NO ENEM (0 a 1000)</span>
+        <input
+          type="number"
+          min="0"
+          max="1000"
+          class="notaInput"
+          :value="notaEnem"
+          @input="onAtualizarNotaEnem($event)"
+          placeholder="Ex: 650"
+        />
+        <p class="dica" v-if="notaEnem !== ''">Cursos com corte até {{ notaEnem }} pontos.</p>
+      </div>
+    </div>
+
     <div class="divisao">
       <div class="lateralEstados">
         <div class="pesquisa">
@@ -114,7 +166,7 @@ function selecionarRating(r) {
                 v-for="uf in estados"
                 :key="uf"
                 :class="{ ativo: estadoAtivo === uf }"
-                @click="selecionarEstado(uf)"
+                @click="onSelecionarEstado(uf)"
               >
                 {{ uf }}
               </button>
@@ -127,7 +179,7 @@ function selecionarRating(r) {
               <button
                 class="botao"
                 :class="{ ativo: ratingAtivo === 'Todas' }"
-                @click="selecionarRating('Todas')"
+                @click="onSelecionarRating('Todas')"
               >
                 Todas
               </button>
@@ -136,7 +188,7 @@ function selecionarRating(r) {
                 v-for="r in ratings"
                 :key="r"
                 :class="{ ativo: ratingAtivo === r }"
-                @click="selecionarRating(r)"
+                @click="onSelecionarRating(r)"
               >
                 {{ r }}
               </button>
@@ -159,6 +211,7 @@ function selecionarRating(r) {
             :site="universidade.site"
             :rating="universidade.igc"
             :quantidade_alunos="universidade.quantidade_alunos"
+            :curso-destaque="getCursoDestaque(universidade.id, buscaCurso)"
           />
         </div>
       </div>
@@ -167,47 +220,17 @@ function selecionarRating(r) {
 </template>
 
 <style scoped>
-.listaRanking {
-  display: grid;
-  width: 100%;
-  gap: 0.55rem;
-  margin-top: 1.2rem;
-}
-
-.itemRanking {
-  display: grid;
-  grid-template-columns: 2rem 1fr auto;
-  align-items: center;
-  gap: 0.5rem;
-  width: 100%;
-  padding: 0.45rem 0.6rem;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
-  text-align: left;
-}
-
-.posicaoRanking {
-  color: #f0cdd0;
-  font-weight: 700;
-}
-
-.siglaRanking {
-  overflow: hidden;
-  color: #fff;
-  font-size: 0.85rem;
-  font-weight: 700;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.notaRanking {
-  color: #fff;
-  font-size: 0.85rem;
-  font-weight: 700;
-}
-
 .paginaFiltro {
+  --vermelho: #7a0f1a;
+  --vermelho-escuro: #9e1f2e;
+  --creme: #fffcf7;
+  --creme-forte: #faf6ef;
+  --borda: #eeeef0;
+  --texto: #5d5d6b;
+  --texto-fraco: #91919f;
+
   min-height: 100vh;
-  background: #fffcf7;
+  background: var(--creme);
   padding: 3rem 1.5rem;
   color: #1c1c22;
 }
@@ -217,7 +240,7 @@ h1 {
   font-weight: 800;
   text-align: center;
   margin-bottom: 2.5rem;
-  color: #7a0f1a;
+  color: var(--vermelho);
 }
 
 .colorUm {
@@ -226,7 +249,8 @@ h1 {
 
 .containerQuatro,
 .pesquisa,
-.divisao {
+.divisao,
+.filtroCurso {
   width: 95%;
   max-width: 1180px;
   margin: 0 auto;
@@ -271,7 +295,7 @@ h1 {
 .divDois {
   background: #fff;
   box-shadow: 0 4px 20px #1212160d;
-  border: 1px solid #eeeef0;
+  border: 1px solid var(--borda);
 }
 
 .containerDois {
@@ -285,7 +309,7 @@ h1 {
 
 .containerDois p,
 .divDois p {
-  color: #5d5d6b;
+  color: var(--texto);
   margin: 0;
 }
 
@@ -300,7 +324,7 @@ h1 {
 }
 
 .containerTres {
-  background: linear-gradient(135deg, #9e1f2e, #7a0f1a);
+  background: linear-gradient(135deg, var(--vermelho-escuro), var(--vermelho));
   color: #fff;
   padding: 2.8rem 2rem;
   justify-content: space-between;
@@ -325,8 +349,46 @@ h2 {
   margin-bottom: 0.8rem;
 }
 
+.listaRanking {
+  display: grid;
+  width: 100%;
+  gap: 0.55rem;
+  margin-top: 1.2rem;
+}
+
+.itemRanking {
+  display: grid;
+  grid-template-columns: 2rem 1fr auto;
+  align-items: center;
+  gap: 0.5rem;
+  width: 100%;
+  padding: 0.45rem 0.6rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+  text-align: left;
+}
+
+.posicaoRanking {
+  color: #f0cdd0;
+  font-weight: 700;
+}
+
+.siglaRanking {
+  overflow: hidden;
+  color: #fff;
+  font-size: 0.85rem;
+  font-weight: 700;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.notaRanking {
+  color: #fff;
+  font-size: 0.85rem;
+  font-weight: 700;
+}
+
 .pesquisa {
-  background: linear-gradient(135deg, #9e1f2e, #7a0f1a);
+  background: linear-gradient(135deg, var(--vermelho-escuro), var(--vermelho));
   color: #fff;
   padding: 2.5rem 2rem;
   border-radius: 16px;
@@ -361,7 +423,6 @@ h2 {
   color: #fff;
   font-size: 1rem;
   outline: 0;
-  transition: 0.2s;
 }
 
 .input input::placeholder {
@@ -371,6 +432,113 @@ h2 {
 .input input:focus {
   border-color: #fff;
   background: #ffffff2e;
+}
+
+.filtroCurso {
+  background: #fff;
+  border: 1px solid var(--borda);
+  border-radius: 16px;
+  padding: 1.5rem 1.6rem;
+  box-shadow: 0 4px 20px #1212160d;
+  margin-bottom: 2rem;
+}
+
+.filtroCurso .rotulo {
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 1.2px;
+  color: var(--vermelho-escuro);
+}
+
+.filtroCurso .dica {
+  font-size: 0.82rem;
+  color: var(--texto-fraco);
+  margin: 0.2rem 0 1rem;
+}
+
+.buscaInput {
+  width: 100%;
+  padding: 0.8rem 1.1rem;
+  border-radius: 10px;
+  border: 1px solid var(--borda);
+  background: var(--creme-forte);
+  font-size: 0.9rem;
+  outline: 0;
+  box-sizing: border-box;
+  margin-bottom: 1rem;
+}
+
+.buscaInput:focus {
+  border-color: #d06f78;
+  background: #fff;
+}
+
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  max-height: 200px;
+  overflow-y: auto;
+  padding: 4px;
+  margin-bottom: 1.2rem;
+}
+
+.chip {
+  background: var(--creme-forte);
+  border: 1px solid var(--borda);
+  color: var(--texto);
+  padding: 0.4rem 0.9rem;
+  border-radius: 20px;
+  font-size: 0.82rem;
+  cursor: pointer;
+}
+
+.chip:hover {
+  border-color: #f0cdd0;
+  color: var(--vermelho);
+}
+
+.chip.ativo {
+  background: var(--vermelho);
+  color: #fff;
+  border-color: var(--vermelho);
+}
+
+.semResultado {
+  font-size: 0.85rem;
+  color: var(--texto-fraco);
+  margin: 0;
+}
+
+.notaEnem .rotulo {
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 1.2px;
+  color: var(--vermelho-escuro);
+  display: block;
+  margin-bottom: 0.5rem;
+}
+
+.notaInput {
+  max-width: 320px;
+  width: 100%;
+  padding: 0.7rem 1rem;
+  border-radius: 10px;
+  border: 1px solid var(--borda);
+  background: var(--creme-forte);
+  font-size: 0.9rem;
+  outline: 0;
+}
+
+.notaInput:focus {
+  border-color: #d06f78;
+  background: #fff;
+}
+
+.notaEnem .dica {
+  font-size: 0.8rem;
+  color: var(--vermelho);
+  margin: 0.5rem 0 0;
 }
 
 .divisao {
@@ -386,7 +554,7 @@ h2 {
   border-radius: 16px;
   padding: 1.5rem;
   box-shadow: 0 4px 20px #1212160d;
-  border: 1px solid #eeeef0;
+  border: 1px solid var(--borda);
 }
 
 .lateralEstados .pesquisa {
@@ -398,7 +566,7 @@ h2 {
 }
 
 .lateralEstados .subtitulo {
-  color: #91919f;
+  color: var(--texto-fraco);
   margin-bottom: 0.8rem;
 }
 
@@ -420,27 +588,24 @@ h2 {
   justify-content: center;
   width: 100%;
   min-height: 36px;
-  background: #f7f7f8;
-  border: 1px solid #eeeef0;
-  color: #5d5d6b;
+  background: var(--creme-forte);
+  border: 1px solid var(--borda);
+  color: var(--texto);
   padding: 0.4rem 0.85rem;
   border-radius: 20px;
   font-size: 0.85rem;
-  font-weight: 500;
   cursor: pointer;
-  transition: 0.2s;
 }
 
 .botoesEstados .botao:hover {
-  background: #f9e8e9;
-  color: #7a0f1a;
   border-color: #f0cdd0;
+  color: var(--vermelho);
 }
 
 .botoesEstados .botao.ativo {
-  background: #7a0f1a;
+  background: var(--vermelho);
   color: #fff;
-  border-color: #7a0f1a;
+  border-color: var(--vermelho);
   font-weight: 600;
 }
 

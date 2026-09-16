@@ -26,7 +26,9 @@ const componenteMapaRef = ref(null)
 const estadosExpandidos = reactive({})
 const busca = ref('')
 
-const universidadesFiltradas = computed(() => filtrarUniversidades(universidadesNoMapa, busca.value))
+const universidadesFiltradas = computed(() =>
+  filtrarUniversidades(universidadesNoMapa, busca.value),
+)
 
 const universidadesPorEstado = computed(() =>
   agruparUniversidadesPorEstado(universidadesFiltradas.value),
