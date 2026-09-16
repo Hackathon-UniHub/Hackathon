@@ -243,8 +243,8 @@ import { InstagramIcon, Facebook01Icon, NewTwitterIcon } from '@hugeicons/core-f
 
 /* === RESET === */
 /* http://meyerweb.com/eric/tools/css/reset/
-   v2.0 | 20110126
-   License: none (public domain)
+  v2.0 | 20110126
+  License: none (public domain)
 */
 
 html,
@@ -308,6 +308,7 @@ thead,
 tr,
 th,
 td,
+/* HTML5 display-role reset for older browsers */
 article,
 aside,
 canvas,
@@ -336,7 +337,6 @@ video {
   vertical-align: baseline;
   text-decoration: none;
 }
-/* HTML5 display-role reset for older browsers */
 article,
 aside,
 details,
@@ -372,14 +372,13 @@ table {
   border-collapse: collapse;
   border-spacing: 0;
 }
-/* === RESET === */
-
 footer {
   background-color: black;
   padding: 6vw 2vw;
 }
 
 .container {
+  /* === RESET === */
   display: flex;
   flex-direction: column;
   align-items: center;

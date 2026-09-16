@@ -5,11 +5,17 @@ import ComponenteMapa from '@/components/ComponenteMapa.vue'
 import universidades from '@/data/universidades.js'
 import { coordenadasMapa } from '@/data/coordenadasMapa.js'
 import {
+  getCursos,
+  getCursosDaUniversidade,
+  getCursosFiltrados,
+} from '@/utils/filtroUtils.js'
+import {
   agruparUniversidadesPorEstado,
   alternarEstado,
   criarManipuladorAberturaUniversidade,
   estadoEstaAberto,
   filtrarUniversidades,
+  filtrarUniversidadesPorCurso,
   selecionarUniversidade,
 } from '@/utils/mapaUtils.js'
 
@@ -25,8 +31,37 @@ const universidadesNoMapa = universidades
 const componenteMapaRef = ref(null)
 const estadosExpandidos = reactive({})
 const busca = ref('')
+const buscaCurso = ref('')
+const cursos = getCursos()
 
-const universidadesFiltradas = computed(() => filtrarUniversidades(universidadesNoMapa, busca.value))
+const cursosFiltrados = computed(() => getCursosFiltrados(cursos, buscaCurso.value))
+
+const universidadesFiltradas = computed(() => {
+  const resultadoBusca = filtrarUniversidades(universidadesNoMapa, busca.value)
+  return filtrarUniversidadesPorCurso(resultadoBusca, buscaCurso.value, getCursosDaUniversidade)
+})
+
+const universidadesDestacadas = computed(() => {
+  const destacadas = new Set()
+  const universidadesComCurso = buscaCurso.value
+    ? filtrarUniversidadesPorCurso(universidadesNoMapa, buscaCurso.value, getCursosDaUniversidade)
+    : []
+
+  universidadesComCurso.forEach((universidade) => destacadas.add(universidade.sigla))
+
+  universidadesNoMapa.forEach((universidade) => {
+    if (estadosExpandidos[universidade.uf]) {
+      destacadas.add(universidade.sigla)
+    }
+  })
+
+  return [...destacadas]
+})
+
+function selecionarCurso(curso) {
+  buscaCurso.value = buscaCurso.value.toLowerCase() === curso.toLowerCase() ? '' : curso
+  busca.value = ''
+}
 
 const universidadesPorEstado = computed(() =>
   agruparUniversidadesPorEstado(universidadesFiltradas.value),
@@ -45,7 +80,11 @@ onUnmounted(() => {
 <template>
   <div class="mapaPagina">
     <section class="mapaArea" aria-label="Mapa interativo de universidades">
-      <ComponenteMapa ref="componenteMapaRef" :universidades="universidadesNoMapa" />
+      <ComponenteMapa
+        ref="componenteMapaRef"
+        :universidades="universidadesNoMapa"
+        :universidades-destacadas="universidadesDestacadas"
+      />
     </section>
 
     <aside class="mapaInformacoes">
@@ -74,6 +113,32 @@ onUnmounted(() => {
           >
             ×
           </button>
+        </div>
+
+        <div class="filtroCurso">
+          <span class="rotuloCurso">BUSCAR POR CURSO</span>
+          <input
+            v-model="buscaCurso"
+            type="text"
+            class="buscaInput"
+            placeholder="Ex: Medicina, Engenharia, Direito..."
+          />
+
+          <div class="chipsCursos">
+            <button
+              v-for="curso in cursosFiltrados"
+              :key="curso"
+              class="chipCurso"
+              type="button"
+              :class="{ ativo: buscaCurso.toLowerCase() === curso.toLowerCase() }"
+              @click="selecionarCurso(curso)"
+            >
+              {{ curso }}
+            </button>
+            <p v-if="!cursosFiltrados.length" class="semResultadoCurso">
+              Nenhum curso encontrado.
+            </p>
+          </div>
         </div>
       </div>
 
@@ -125,7 +190,7 @@ onUnmounted(() => {
         </ul>
 
         <p v-if="universidadesPorEstado.length === 0" class="semResultados">
-          Nenhuma universidade encontrada para "{{ busca }}".
+          Nenhuma universidade encontrada para os filtros selecionados.
         </p>
       </div>
     </aside>
@@ -150,11 +215,12 @@ onUnmounted(() => {
   position: absolute;
   top: 20px;
   left: 20px;
+  bottom: 20px;
   z-index: 1000;
   display: flex;
   flex-direction: column;
-  width: 310px;
-  max-height: 600px;
+  width: 350px;
+  height: calc(100% - 40px);
   overflow: hidden;
   border: 1px solid rgba(28, 28, 34, 0.1);
   border-radius: 16px;
@@ -252,6 +318,53 @@ onUnmounted(() => {
 
 .buscaLimpar:hover {
   color: #7a0f1a;
+}
+
+.filtroCurso {
+  margin-top: 14px;
+}
+
+.rotuloCurso {
+  color: #737384;
+  font-size: 0.65rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+}
+
+.chipsCursos {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 5px;
+  max-height: 112px;
+  margin-top: 8px;
+  overflow-y: auto;
+}
+
+.chipCurso {
+  min-width: 0;
+  overflow: hidden;
+  padding: 5px 8px;
+  border: 1px solid rgba(122, 15, 26, 0.14);
+  border-radius: 999px;
+  background: #fdfaf4;
+  color: #737384;
+  font-size: 0.65rem;
+  cursor: pointer;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.chipCurso:hover,
+.chipCurso.ativo {
+  border-color: #9e1f2e;
+  background: #9e1f2e;
+  color: #ffffff;
+}
+
+.semResultadoCurso {
+  margin: 4px 0;
+  color: #91919f;
+  font-size: 0.7rem;
 }
 
 .estadosLista {
@@ -374,7 +487,7 @@ onUnmounted(() => {
     left: 16px;
     right: 16px;
     width: auto;
-    max-height: 50%;
+    height: calc(100% - 32px);
   }
 }
 </style>

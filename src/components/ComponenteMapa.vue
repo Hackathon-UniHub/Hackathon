@@ -3,27 +3,29 @@
 </template>
 
 <script setup>
-import { ref, onMounted, onUnmounted } from 'vue'
+import { ref, onMounted, onUnmounted, watch } from 'vue'
 import L from 'leaflet'
 import 'leaflet/dist/leaflet.css'
 import logoSemNome from '@/assets/logo-semNome.svg'
+import logoVerde from '@/assets/logo-verde.svg'
 
 const iconesUniversidade = new Map()
 
-function obterIconeUniversidade(zoom) {
+function obterIconeUniversidade(zoom, destacado = false) {
   const tamanho = Math.round(Math.min(55, Math.max(32, 32 + (zoom - 4) * 2.875)))
-  const iconeExistente = iconesUniversidade.get(tamanho)
+  const chave = `${destacado ? 'verde' : 'normal'}-${tamanho}`
+  const iconeExistente = iconesUniversidade.get(chave)
   if (iconeExistente) return iconeExistente
 
   const largura = Math.round(tamanho * (1064 / 1494))
   const icone = L.icon({
-    iconUrl: logoSemNome,
+    iconUrl: destacado ? logoVerde : logoSemNome,
     iconSize: [largura, tamanho],
     iconAnchor: [largura / 2, tamanho],
     popupAnchor: [0, -tamanho],
   })
 
-  iconesUniversidade.set(tamanho, icone)
+  iconesUniversidade.set(chave, icone)
   return icone
 }
 
@@ -32,19 +34,23 @@ const props = defineProps({
     type: Array,
     default: () => [],
   },
+  universidadesDestacadas: {
+    type: Array,
+    default: () => [],
+  },
 })
 
-const limitesBrasil = L.latLngBounds(
-  [-33.8, -73.99],
-  [5.3, -34.7],
-)
+const limitesBrasil = L.latLngBounds([-33.8, -73.99], [5.3, -34.7])
 
 const containerMapa = ref(null)
 let mapa = null
 const marcadores = {}
 
 function iniciaisDaSigla(sigla) {
-  return sigla.replace(/[^A-Z]/gi, '').slice(0, 2).toUpperCase()
+  return sigla
+    .replace(/[^A-Z]/gi, '')
+    .slice(0, 2)
+    .toUpperCase()
 }
 
 function descricaoResumida(universidade) {
@@ -86,6 +92,32 @@ function montarPopup(universidade) {
   `
 }
 
+function adicionarMarcadores() {
+  props.universidades.forEach((universidade) => {
+    if (universidade.latitude && universidade.longitude) {
+      const marcador = L.marker([universidade.latitude, universidade.longitude])
+        .setIcon(
+          obterIconeUniversidade(
+            mapa.getZoom(),
+            props.universidadesDestacadas.includes(universidade.sigla),
+          ),
+        )
+        .addTo(mapa)
+        .bindPopup(montarPopup(universidade), { maxWidth: 260 })
+
+      marcadores[universidade.sigla] = marcador
+    }
+  })
+}
+
+function atualizarMarcadores() {
+  if (!mapa) return
+
+  Object.values(marcadores).forEach((marcador) => marcador.remove())
+  Object.keys(marcadores).forEach((sigla) => delete marcadores[sigla])
+  adicionarMarcadores()
+}
+
 onMounted(() => {
   mapa = L.map(containerMapa.value, {
     maxBounds: limitesBrasil,
@@ -97,22 +129,18 @@ onMounted(() => {
     attribution: '&copy; OpenStreetMap contributors',
   }).addTo(mapa)
 
-  props.universidades.forEach((universidade) => {
-    if (universidade.latitude && universidade.longitude) {
-      const marcador = L.marker([universidade.latitude, universidade.longitude])
-        .setIcon(obterIconeUniversidade(mapa.getZoom()))
-        .addTo(mapa)
-        .bindPopup(montarPopup(universidade), { maxWidth: 260 })
-
-      marcadores[universidade.sigla] = marcador
-    }
-  })
+  adicionarMarcadores()
 
   mapa.on('zoom', () => {
-    const icone = obterIconeUniversidade(mapa.getZoom())
-    Object.values(marcadores).forEach((marcador) => marcador.setIcon(icone))
+    Object.entries(marcadores).forEach(([sigla, marcador]) => {
+      marcador.setIcon(
+        obterIconeUniversidade(mapa.getZoom(), props.universidadesDestacadas.includes(sigla)),
+      )
+    })
   })
 })
+
+watch([() => props.universidades, () => props.universidadesDestacadas], atualizarMarcadores)
 
 function focarUniversidade(sigla) {
   const universidade = props.universidades.find((item) => item.sigla === sigla)

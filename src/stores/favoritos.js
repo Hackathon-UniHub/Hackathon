@@ -10,25 +10,18 @@ export const useFavoritosStore = defineStore('favoritos', () => {
     return `favoritos_${userId}`
   }
 
-  function carregarFavoritos() {
+  function chaveAtual() {
     const authStore = useAuthStore()
-    if (!authStore.isLoggedIn) {
-      idsFavoritos.value = []
-      return
-    }
+    return authStore.isLoggedIn ? chaveStorage(authStore.user.id) : 'favoritos_guest'
+  }
 
-    const salvos = sessionStorage.getItem(chaveStorage(authStore.user.id))
+  function carregarFavoritos() {
+    const salvos = sessionStorage.getItem(chaveAtual())
     idsFavoritos.value = salvos ? JSON.parse(salvos) : []
   }
 
   function salvarNoStorage() {
-    const authStore = useAuthStore()
-    if (!authStore.isLoggedIn) return
-
-    sessionStorage.setItem(
-      chaveStorage(authStore.user.id),
-      JSON.stringify(idsFavoritos.value)
-    )
+    sessionStorage.setItem(chaveAtual(), JSON.stringify(idsFavoritos.value))
   }
 
   function limparFavoritos() {
@@ -36,15 +29,11 @@ export const useFavoritosStore = defineStore('favoritos', () => {
     if (authStore.user) {
       sessionStorage.removeItem(chaveStorage(authStore.user.id))
     }
+    sessionStorage.removeItem('favoritos_guest')
     idsFavoritos.value = []
   }
 
   function adicionarFavorito(idUni) {
-    const authStore = useAuthStore()
-    if (!authStore.isLoggedIn) {
-      throw new Error('USUARIO_NAO_LOGADO')
-    }
-
     if (!idsFavoritos.value.includes(idUni)) {
       idsFavoritos.value.push(idUni)
       salvarNoStorage()
@@ -52,11 +41,6 @@ export const useFavoritosStore = defineStore('favoritos', () => {
   }
 
   function removerFavorito(idUni) {
-    const authStore = useAuthStore()
-    if (!authStore.isLoggedIn) {
-      throw new Error('USUARIO_NAO_LOGADO')
-    }
-
     idsFavoritos.value = idsFavoritos.value.filter((id) => id !== idUni)
     salvarNoStorage()
   }
@@ -66,9 +50,7 @@ export const useFavoritosStore = defineStore('favoritos', () => {
   }
 
   const favoritos = computed(() =>
-    idsFavoritos.value
-      .map((id) => universidades.find((u) => u.id === id))
-      .filter(Boolean)
+    idsFavoritos.value.map((id) => universidades.find((u) => u.id === id)).filter(Boolean),
   )
 
   return {

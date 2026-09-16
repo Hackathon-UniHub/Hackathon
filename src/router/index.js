@@ -42,7 +42,12 @@ const routes = [
     path: '/favoritos',
     name: 'favoritos',
     component: () => import('@/views/FavoritosView.vue'),
-    meta: { requiresAuth: true },
+  },
+  {
+    path: '/professor/dashboard',
+    name: 'professor-dashboard',
+    component: () => import('@/views/ProfessorDashboard.vue'),
+    meta: { requiresAuth: true, requiresProfessor: true },
   },
   {
     path: '/:pathMatch(.*)*',
@@ -63,7 +68,7 @@ const router = createRouter({
 router.beforeEach(async (to) => {
   const authStore = useAuthStore()
 
-  // espera a sessão inicial terminar de carregar antes de decidir qualquer coisa
+
   if (authStore.loading) {
     await new Promise((resolve) => {
       const unwatch = authStore.$subscribe((mutation, state) => {
@@ -77,6 +82,16 @@ router.beforeEach(async (to) => {
 
   if (to.meta.requiresAuth && !authStore.isLoggedIn) {
     return { name: 'login', query: { redirect: to.fullPath } }
+  }
+
+  const isProfessorUser =
+    authStore.isProfessor ||
+    authStore.profile?.tipo_usuario === 'professor' ||
+    authStore.user?.user_metadata?.tipo_usuario === 'professor' ||
+    authStore.session?.user?.user_metadata?.tipo_usuario === 'professor'
+
+  if (to.meta.requiresProfessor && !isProfessorUser) {
+    return { name: 'home' }
   }
 })
 
