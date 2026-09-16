@@ -6,6 +6,17 @@ for (const item of enem) {
   cursosPorUniversidadeId.set(item.id, item.cursos)
 }
 
+export function normalizarNome(nome) {
+  if (!nome) return ''
+
+  return nome
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/[^a-zA-Z0-9\s]/g, '')
+    .trim()
+    .toLowerCase()
+}
+
 export function UniversidadePorId(id) {
   const numero = Number(id)
 
@@ -101,6 +112,7 @@ export function fecharCursoSelecionado(cursoRef) {
 }
 
 export default {
+  normalizarNome,
   UniversidadePorId,
   getIniciais,
   getAnoFundacao,

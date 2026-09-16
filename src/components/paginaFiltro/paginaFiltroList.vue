@@ -324,7 +324,7 @@ h1 {
 }
 
 .containerTres {
-  background: linear-gradient(135deg, var(--vermelho-escuro), var(--vermelho));
+  background: var(--vermelho-escuro);
   color: #fff;
   padding: 2.8rem 2rem;
   justify-content: space-between;
@@ -388,7 +388,7 @@ h2 {
 }
 
 .pesquisa {
-  background: linear-gradient(135deg, var(--vermelho-escuro), var(--vermelho));
+  background: var(--vermelho);
   color: #fff;
   padding: 2.5rem 2rem;
   border-radius: 16px;
