@@ -1,15 +1,18 @@
 <script setup>
 import { HugeiconsIcon } from '@hugeicons/vue'
-import { /*Search01Icon,*/ HeartAddIcon } from '@hugeicons/core-free-icons'
-import { RouterLink } from 'vue-router'
+import { /*Search01Icon,*/ HeartAddIcon, BriefcaseIcon } from '@hugeicons/core-free-icons'
+import { RouterLink, useRouter } from 'vue-router'
 import { computed, onMounted, watch } from 'vue'
 import { useAuthStore } from '@/stores/auth'
 import { useFavoritosStore } from '@/stores/favoritos'
 
 const authStore = useAuthStore()
 const favoritosStore = useFavoritosStore()
+const router = useRouter()
 
 const quantidadeFavoritos = computed(() => favoritosStore.idsFavoritos.length)
+
+const isProfessor = computed(() => authStore.isProfessor)
 
 async function sairDaConta() {
   await authStore.logout()
@@ -57,6 +60,16 @@ watch(() => authStore.loading, carregarFavoritos)
       </nav>
 
       <div class="areaAcoes">
+        <template v-if="authStore.isLoggedIn && isProfessor">
+          <RouterLink
+            class="botaoPesquisa"
+            to="/professor/dashboard"
+            aria-label="Painel do Professor"
+            title="Painel do Professor"
+          >
+            <HugeiconsIcon :icon="BriefcaseIcon" :size="22" color="currentColor" :stroke-width="1.8" />
+          </RouterLink>
+        </template>
         <!--<RouterLink class="botaoPesquisa" to="/explorar" aria-label="Explorar">
           <HugeiconsIcon :icon="Search01Icon" :size="22" color="currentColor" :stroke-width="1.8" />
         </RouterLink> -->

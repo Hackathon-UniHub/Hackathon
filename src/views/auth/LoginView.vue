@@ -44,7 +44,12 @@ async function handleSubmit() {
       password: password.value,
       rememberMe: rememberMe.value,
     })
-    router.push(router.currentRoute.value.query.redirect || '/')
+    const redirect = router.currentRoute.value.query.redirect
+    if (authStore.isProfessor) {
+      router.push('/professor/dashboard')
+    } else {
+      router.push(redirect || '/')
+    }
   } catch {
     errorMsg.value = 'Email ou senha incorretos.'
   } finally {

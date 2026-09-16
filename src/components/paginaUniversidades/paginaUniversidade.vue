@@ -3,6 +3,9 @@ import { ref, computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import { useFavoritosStore } from '@/stores/favoritos'
+import { useVestibularesStore } from '@/stores/vestibulares'
+import VestibularesList from './VestibularesList.vue'
+import VestibularForm from './VestibularForm.vue'
 import {
   UniversidadePorId,
   getIniciais,
@@ -21,6 +24,7 @@ const route = useRoute()
 const router = useRouter()
 const authStore = useAuthStore()
 const favoritosStore = useFavoritosStore()
+const vestibularesStore = useVestibularesStore()
 
 const universidade = computed(() => UniversidadePorId(route.params.id))
 
@@ -31,6 +35,19 @@ const anoFundacao = computed(() => getAnoFundacao(universidade.value))
 const favorito = computed(() =>
   universidade.value ? favoritosStore.isFavorito(Number(universidade.value.id)) : false,
 )
+
+const modalVestibularAberto = ref(false)
+const vestibularEditando = ref(null)
+
+function abrirEdicaoVestibular(vestibular) {
+  vestibularEditando.value = vestibular
+  modalVestibularAberto.value = true
+}
+
+function fecharModalVestibular() {
+  modalVestibularAberto.value = false
+  vestibularEditando.value = null
+}
 
 function alternarFavorito() {
   if (!authStore.isLoggedIn) {
@@ -209,6 +226,7 @@ function onFecharCurso() {
             <span class="dadoRotulo">Sinalizações vigentes</span>
             <span class="dadoValor alerta">{{ universidade.sinalizacoes_vigentes }}</span>
           </div>
+          </div>
         </div>
 
         <div class="secao" v-if="universidade.fontes_pesquisa?.length">
@@ -298,6 +316,12 @@ function onFecharCurso() {
         </div>
       </div>
     </div>
+
+    <VestibularForm
+      v-model="modalVestibularAberto"
+      :vestibular="vestibularEditando"
+      @salvo="fecharModalVestibular"
+    />
   </div>
 
   <div class="paginaFundo" v-else>
@@ -506,8 +530,13 @@ function onFecharCurso() {
 }
 
 .caixaInstitucional {
+  margin-top: 0;
+}
+
+.colunaLateral {
   grid-column: 2;
-  grid-row: 1;
+  grid-row: 1 / span 2;
+  min-width: 0;
 }
 
 .conteudo > .secao {
@@ -532,9 +561,13 @@ function onFecharCurso() {
     grid-column: 1;
     grid-row: 2;
   }
-  .caixaInstitucional {
+  .colunaLateral {
     grid-column: 1;
     grid-row: 3;
+  }
+  .caixaInstitucional {
+    grid-column: 1;
+    grid-row: auto;
   }
   .caixaCadastro {
     grid-column: 1;
