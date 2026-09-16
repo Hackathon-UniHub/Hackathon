@@ -42,9 +42,17 @@ export function countByVestibular(vid) {
   return total
 }
 
-export function addComentario({ vestibular_id, user_id, user_nome, user_tipo, user_universidade_id, conteudo }) {
+export function getByUniversidade(uid) {
+  return getAll().filter(c => c.universidade_id === Number(uid)).sort((a, b) => new Date(b.criado_em) - new Date(a.criado_em))
+}
+
+export function countByUniversidade(uid) {
+  return getByUniversidade(uid).length
+}
+
+export function addComentario({ vestibular_id, universidade_id, user_id, user_nome, user_tipo, user_universidade_id, conteudo }) {
   const list = getAll()
-  const novo = { id: nextComentarioId++, vestibular_id, user_id, user_nome, user_tipo, user_universidade_id, conteudo, criado_em: new Date().toISOString(), atualizado_em: null, respostas: [] }
+  const novo = { id: nextComentarioId++, vestibular_id, universidade_id, user_id, user_nome, user_tipo, user_universidade_id, conteudo, criado_em: new Date().toISOString(), atualizado_em: null, respostas: [] }
   list.push(novo)
   save(list)
   return novo

@@ -31,7 +31,6 @@ function formatDate(date) {
   <section class="lista" v-if="vestibulares.length">
     <div class="cabecalho">
       <h2>Vestibulares</h2>
-      <span>{{ vestibulares.length }}</span>
     </div>
 
     <div class="cards">

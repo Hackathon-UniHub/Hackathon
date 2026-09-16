@@ -1,14 +1,13 @@
 <script setup>
 import { HugeiconsIcon } from '@hugeicons/vue'
 import { /*Search01Icon,*/ HeartAddIcon, BriefcaseIcon } from '@hugeicons/core-free-icons'
-import { RouterLink, useRouter } from 'vue-router'
+import { RouterLink } from 'vue-router'
 import { computed, onMounted, watch } from 'vue'
 import { useAuthStore } from '@/stores/auth'
 import { useFavoritosStore } from '@/stores/favoritos'
 
 const authStore = useAuthStore()
 const favoritosStore = useFavoritosStore()
-const router = useRouter()
 
 const quantidadeFavoritos = computed(() => favoritosStore.idsFavoritos.length)
 

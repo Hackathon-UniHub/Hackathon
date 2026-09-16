@@ -3,20 +3,28 @@ import { computed, onMounted, ref } from 'vue'
 import { useAuthStore } from '@/stores/auth'
 import { useComentariosStore } from '@/stores/comentarios'
 
-const props = defineProps({ vestibularId: Number })
+const props = defineProps({ vestibularId: Number, universidadeId: Number })
 const store = useComentariosStore()
 const auth = useAuthStore()
 const aberto = ref(false)
 const texto = ref('')
-const comentarios = computed(() => store.getByVest(props.vestibularId))
-const quantidade = computed(() => store.count(props.vestibularId))
+const comentarios = computed(() => props.universidadeId
+  ? store.getByUniversidade(props.universidadeId)
+  : store.getByVest(props.vestibularId))
+const quantidade = computed(() => props.universidadeId
+  ? store.countUniversidade(props.universidadeId)
+  : store.count(props.vestibularId))
 
 onMounted(() => store.init())
 
 async function publicar() {
   if (!texto.value.trim()) return
 
-  await store.criarComentario(props.vestibularId, texto.value.trim())
+  if (props.universidadeId) {
+    await store.criarComentarioUniversidade(props.universidadeId, texto.value.trim())
+  } else {
+    await store.criarComentario(props.vestibularId, texto.value.trim())
+  }
   texto.value = ''
 }
 

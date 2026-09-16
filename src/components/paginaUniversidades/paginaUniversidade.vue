@@ -3,9 +3,9 @@ import { ref, computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import { useFavoritosStore } from '@/stores/favoritos'
-import { useVestibularesStore } from '@/stores/vestibulares'
 import VestibularesList from './VestibularesList.vue'
 import VestibularForm from './VestibularForm.vue'
+import ComentariosSection from './ComentariosSection.vue'
 import {
   UniversidadePorId,
   getIniciais,
@@ -24,7 +24,6 @@ const route = useRoute()
 const router = useRouter()
 const authStore = useAuthStore()
 const favoritosStore = useFavoritosStore()
-const vestibularesStore = useVestibularesStore()
 
 const universidade = computed(() => UniversidadePorId(route.params.id))
 
@@ -226,7 +225,6 @@ function onFecharCurso() {
             <span class="dadoRotulo">Sinalizações vigentes</span>
             <span class="dadoValor alerta">{{ universidade.sinalizacoes_vigentes }}</span>
           </div>
-          </div>
         </div>
 
         <div class="secao" v-if="universidade.fontes_pesquisa?.length">
@@ -243,6 +241,16 @@ function onFecharCurso() {
           <RouterLink to="/universidades" class="botaoSecundario">Outras universidades</RouterLink>
         </div>
       </div>
+
+      <VestibularesList
+        :universidade-id="universidade.id"
+        @editar="abrirEdicaoVestibular"
+      />
+
+      <ComentariosSection
+        v-if="temCursosDisponiveis(universidade)"
+        :universidade-id="universidade.id"
+      />
 
       <div class="secaoCursos" v-if="temCursosDisponiveis(universidade)">
         <h2>Cursos oferecidos</h2>
@@ -267,6 +275,7 @@ function onFecharCurso() {
           <div class="detalheCursoCabecalho">
             <div>
               <span class="subtitulo">DETALHES DO CURSO</span>
+
               <h3>{{ cursoSelecionado.nome_curso }}</h3>
               <p>{{ universidade.nome }}</p>
             </div>

@@ -26,13 +26,81 @@ const password = ref('')
 const showPassword = ref(false)
 const errorMsg = ref('')
 const loading = ref(false)
+const universidadeSelecionada = ref('')
+const searchQuery = ref('')
+const mostrarDropdown = ref(false)
+const dropdownRef = ref(null)
+const inputWrapRef = ref(null)
+const dropdownStyle = ref({})
+
+const isProfessor = computed(() => tipoUsuario.value === 'professor')
+const selectedUni = computed(() =>
+  universidades.find((universidade) => universidade.id === Number(universidadeSelecionada.value)),
+)
+const universidadesFiltradas = computed(() => {
+  const busca = searchQuery.value.trim().toLowerCase()
+  if (!busca) return universidades.slice(0, 10)
+
+  return universidades
+    .filter((universidade) =>
+      [universidade.nome, universidade.sigla, universidade.municipio, universidade.uf]
+        .join(' ')
+        .toLowerCase()
+        .includes(busca),
+    )
+    .slice(0, 15)
+})
+
+function atualizarPosicaoDropdown() {
+  if (!inputWrapRef.value) return
+  const rect = inputWrapRef.value.getBoundingClientRect()
+  dropdownStyle.value = {
+    position: 'fixed',
+    top: `${rect.bottom + 4}px`,
+    left: `${rect.left}px`,
+    width: `${rect.width}px`,
+  }
+}
+
+function toggleDropdown() {
+  if (!isProfessor.value) return
+  mostrarDropdown.value = !mostrarDropdown.value
+  if (mostrarDropdown.value) atualizarPosicaoDropdown()
+}
+
+function selecionarUniversidade(id) {
+  universidadeSelecionada.value = String(id)
+  searchQuery.value = ''
+  mostrarDropdown.value = false
+}
+
+function limparUniversidade() {
+  universidadeSelecionada.value = ''
+  searchQuery.value = ''
+}
+
+function clickFora(event) {
+  if (
+    dropdownRef.value &&
+    !dropdownRef.value.contains(event.target) &&
+    inputWrapRef.value &&
+    !inputWrapRef.value.contains(event.target)
+  ) {
+    mostrarDropdown.value = false
+  }
+}
+
+function atualizarDropdownAoRedimensionar() {
+  if (mostrarDropdown.value) atualizarPosicaoDropdown()
+}
 
 const canSubmit = computed(
   () =>
     fullName.value.trim().length > 0 &&
     email.value.trim().length > 0 &&
     password.value.length >= 6 &&
-    !loading.value,
+    !loading.value &&
+    (!isProfessor.value || universidadeSelecionada.value !== ''),
 )
 
 async function handleSubmit() {
@@ -90,11 +158,15 @@ function definirTipoUsuario(valor) {
 onMounted(() => {
   document.body.style.background = 'linear-gradient(to bottom, #920205, #2C0102)'
   document.addEventListener('click', clickFora)
+  window.addEventListener('resize', atualizarDropdownAoRedimensionar)
+  window.addEventListener('scroll', atualizarDropdownAoRedimensionar, true)
 })
 
 onUnmounted(() => {
   document.body.style.background = ''
   document.removeEventListener('click', clickFora)
+  window.removeEventListener('resize', atualizarDropdownAoRedimensionar)
+  window.removeEventListener('scroll', atualizarDropdownAoRedimensionar, true)
 })
 
 
@@ -688,7 +760,7 @@ form {
 }
 
 .universidade-dropdown {
-  position: fixed; 
+  position: fixed;
   background: #fff;
   border: 1px solid #eeeef0;
   border-radius: 12px;

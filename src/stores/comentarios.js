@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
-import { getAll, countByVestibular, addComentario, addResposta, editComentario, deleteComentario, deleteResposta, canModerate, canEdit } from '@/data/comentarios.js'
+import { getAll, countByVestibular, countByUniversidade, addComentario, addResposta, editComentario, deleteComentario, deleteResposta, canModerate, canEdit, getByUniversidade as getComentariosDaUniversidade } from '@/data/comentarios.js'
 import { useAuthStore } from '@/stores/auth'
 
 export const useComentariosStore = defineStore('comentarios', () => {
@@ -19,12 +19,23 @@ export const useComentariosStore = defineStore('comentarios', () => {
 
   function getByVest(vid) { return (byVestibular.value[vid] || []).sort((a, b) => new Date(b.criado_em) - new Date(a.criado_em)) }
   function count(vid) { return countByVestibular(vid) }
+  function getByUniversidade(uid) { return getComentariosDaUniversidade(uid) }
+  function countUniversidade(uid) { return countByUniversidade(uid) }
 
   async function criarComentario(vid, texto) {
     const auth = useAuthStore()
     if (!auth.isLoggedIn) throw new Error('USUARIO_NAO_LOGADO')
     if (!auth.isEstudante && !auth.isProfessor) throw new Error('TIPO_USUARIO_NAO_PERMITIDO')
     const c = addComentario({ vestibular_id: vid, user_id: auth.user.id, user_nome: auth.profile?.full_name || auth.user.email?.split('@')[0] || 'Estudante', user_tipo: auth.profile?.tipo_usuario || 'estudante', user_universidade_id: auth.profile?.universidade_id || null, conteudo: texto })
+    reload()
+    return c
+  }
+
+  async function criarComentarioUniversidade(uid, texto) {
+    const auth = useAuthStore()
+    if (!auth.isLoggedIn) throw new Error('USUARIO_NAO_LOGADO')
+    if (!auth.isEstudante && !auth.isProfessor) throw new Error('TIPO_USUARIO_NAO_PERMITIDO')
+    const c = addComentario({ universidade_id: Number(uid), user_id: auth.user.id, user_nome: auth.profile?.full_name || auth.user.email?.split('@')[0] || 'Estudante', user_tipo: auth.profile?.tipo_usuario || 'estudante', user_universidade_id: auth.profile?.universidade_id || null, conteudo: texto })
     reload()
     return c
   }
@@ -73,5 +84,5 @@ export const useComentariosStore = defineStore('comentarios', () => {
   function podeEditar(c) { return canEdit(c, { id: useAuthStore().user?.id }) }
   function isProfDaCasa(c) { const auth = useAuthStore(); return auth.profile?.tipo_usuario === 'professor' && auth.profile?.universidade_id === c.user_universidade_id }
 
-  return { list, loading, error, init, reload, getByVest, count, criarComentario, criarResposta, editar, remover, removerResposta, podeModerar, podeEditar, isProfDaCasa }
+  return { list, loading, error, init, reload, getByVest, count, getByUniversidade, countUniversidade, criarComentario, criarComentarioUniversidade, criarResposta, editar, remover, removerResposta, podeModerar, podeEditar, isProfDaCasa }
 })
