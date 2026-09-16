@@ -29,11 +29,6 @@ export function getAnoFundacao(universidade) {
   return universidade.data_criacao_ies.split('-')[0]
 }
 
-export function UniversidadePublica(universidade) {
-  if (!universidade || !universidade.categoria) return false
-  return universidade.categoria.toLowerCase() === 'publica'
-}
-
 export function getSiteOficial(universidade) {
   if (!universidade || !universidade.site) return '#'
 
@@ -64,14 +59,6 @@ export function getRotuloCurso(curso) {
     return curso.nome_curso + ' — ' + curso.municipio + '/' + curso.uf
   }
   return curso.nome_curso
-}
-
-export function normalizarNome(nome) {
-  return nome
-    .normalize('NFD')
-    .replace(/[\u0300-\u036f]/g, '')
-    .toLowerCase()
-    .replace(/[^a-z0-9]/g, '')
 }
 
 export function filtrarCursosDaUniversidade(cursos, pesquisa) {
@@ -117,12 +104,10 @@ export default {
   UniversidadePorId,
   getIniciais,
   getAnoFundacao,
-  UniversidadePublica,
   getSiteOficial,
   temCursosDisponiveis,
   getCursosDaUniversidade,
   getRotuloCurso,
-  normalizarNome,
   filtrarCursosDaUniversidade,
   getCorteEnemDoCursoSelecionado,
   selecionarCursoDaUniversidade,

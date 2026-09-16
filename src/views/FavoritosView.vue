@@ -45,13 +45,13 @@ function remover(idUni) {
           </p>
         </div>
         <RouterLink to="/universidades" class="explorar-link"
-          >Explorar mais <span aria-hidden="true">→</span></RouterLink
-        >
+          >Explorar mais <span aria-hidden="true"></span
+        ></RouterLink>
       </div>
 
       <div v-if="quantidadeFavoritos" class="barra-controles">
         <label class="campo-busca">
-          <span class="icone-busca" aria-hidden="true">⌕</span>
+          <span class="icone-busca" aria-hidden="true"></span>
           <span class="sr-only">Buscar nos favoritos</span>
           <input v-model="busca" type="search" placeholder="Buscar nos favoritos..." />
         </label>
@@ -82,18 +82,18 @@ function remover(idUni) {
             </button>
           </div>
           <h2>{{ uni.nome }}</h2>
-          <p class="localizacao">⌖ {{ uni.municipio }}, {{ uni.uf }}</p>
+          <p class="localizacao">{{ uni.municipio }}, {{ uni.uf }}</p>
           <div class="card-rodape">
             <span v-if="uni.categoria" class="tag">{{ uni.categoria }}</span>
             <RouterLink :to="{ name: 'universidade', params: { id: uni.id } }" class="detalhes"
-              >Ver detalhes <span aria-hidden="true"></span></RouterLink
-            >
+              >Ver detalhes <span aria-hidden="true"></span
+            ></RouterLink>
           </div>
         </article>
       </div>
 
       <div v-else class="estado-vazio">
-        <div class="icone-vazio" aria-hidden="true">♡</div>
+        <div class="icone-vazio" aria-hidden="true"></div>
         <h2>{{ busca ? 'Nenhuma universidade encontrada' : 'Nenhum favorito ainda' }}</h2>
         <p>
           {{

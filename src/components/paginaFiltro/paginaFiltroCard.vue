@@ -94,7 +94,7 @@ function alternarFavorito() {
 }
 
 .card:hover {
-  border-color: #f0cdd0;
+  border-color: rgba(175, 175, 175, 0.552);
   box-shadow: 0 6px 18px rgba(122, 15, 26, 0.08);
 }
 
@@ -165,7 +165,9 @@ function alternarFavorito() {
   padding: 0;
   display: flex;
   color: var(--texto);
-  transition: color 0.15s ease, transform 0.15s ease;
+  transition:
+    color 0.15s ease,
+    transform 0.15s ease;
 }
 
 .favoritar:hover {
@@ -191,3 +193,10 @@ function alternarFavorito() {
   background: var(--vermelho-escuro);
 }
 </style>
+
+
+
+
+
+
+

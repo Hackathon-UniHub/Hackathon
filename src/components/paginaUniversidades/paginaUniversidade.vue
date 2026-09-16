@@ -1,15 +1,12 @@
 <script setup>
 import { ref, computed } from 'vue'
-import { HugeiconsIcon } from '@hugeicons/vue'
-import { HeartIcon } from '@hugeicons/core-free-icons'
-import { useRoute } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import { useFavoritosStore } from '@/stores/favoritos'
 import {
   UniversidadePorId,
   getIniciais,
   getAnoFundacao,
-  UniversidadePublica,
   getSiteOficial,
   temCursosDisponiveis,
   getCursosDaUniversidade,
@@ -21,6 +18,7 @@ import {
 } from '@/utils/universidadesUtils.js'
 
 const route = useRoute()
+const router = useRouter()
 const authStore = useAuthStore()
 const favoritosStore = useFavoritosStore()
 
@@ -29,13 +27,17 @@ const universidade = computed(() => UniversidadePorId(route.params.id))
 const siteOficial = computed(() => getSiteOficial(universidade.value))
 const iniciais = computed(() => getIniciais(universidade.value))
 const anoFundacao = computed(() => getAnoFundacao(universidade.value))
-const isPublica = computed(() => UniversidadePublica(universidade.value))
 
 const favorito = computed(() =>
   universidade.value ? favoritosStore.isFavorito(Number(universidade.value.id)) : false,
 )
 
 function alternarFavorito() {
+  if (!authStore.isLoggedIn) {
+    router.push({ name: 'login', query: { redirect: route.fullPath } })
+    return
+  }
+
   const id = Number(universidade.value.id)
   if (favorito.value) {
     favoritosStore.removerFavorito(id)
@@ -73,14 +75,10 @@ function onFecharCurso() {
         <div class="logo">{{ iniciais }}</div>
 
         <div class="conteudoCabecalho">
-          <div class="selos">
-            <span class="selo" :class="isPublica ? 'seloPublica' : 'seloPrivada'">
-              {{ universidade.categoria_administrativa }}
-            </span>
-            <span class="selo seloSituacao" v-if="universidade.situacao">
-              {{ universidade.situacao }}
-            </span>
-          </div>
+          <p class="selos">
+            {{ universidade.categoria_administrativa }}
+            <span v-if="universidade.situacao" class="situacao"> · {{ universidade.situacao }}</span>
+          </p>
 
           <h1>{{ universidade.nome }}</h1>
           <p class="localizacao">{{ universidade.municipio }}, {{ universidade.uf }}</p>
@@ -88,22 +86,10 @@ function onFecharCurso() {
 
         <div class="acoesCabecalho">
           <div class="nota" v-if="universidade.igc && universidade.igc !== '-'">
-            {{ universidade.igc }}
+            <span class="notaValor">{{ universidade.igc }}</span>
             <span class="notaLegenda">IGC/MEC</span>
           </div>
-          <button
-            class="botaoFavoritar"
-            type="button"
-            :aria-label="favorito ? 'Remover dos favoritos' : 'Adicionar aos favoritos'"
-            @click="alternarFavorito"
-          >
-            <HugeiconsIcon
-              :icon="HeartIcon"
-              :size="20"
-              :color="favorito ? '#f0cdd0' : 'currentColor'"
-              :stroke-width="1.5"
-              aria-hidden="true"
-            />
+          <button class="botaoFavoritar" type="button" @click="alternarFavorito">
             {{ favorito ? 'Remover favorito' : 'Favoritar' }}
           </button>
           <a class="botaoSite" :href="siteOficial" target="_blank" rel="noopener noreferrer">
@@ -244,12 +230,7 @@ function onFecharCurso() {
         <h2>Cursos oferecidos</h2>
         <p class="subtituloCursos">{{ cursosDaUniversidade.length }} cursos disponíveis</p>
 
-        <input
-          v-model="pesquisaCurso"
-          type="text"
-          class="buscaCursoInput"
-          placeholder="Filtrar cursos..."
-        />
+        <input v-model="pesquisaCurso" type="text" class="buscaCursoInput" placeholder="Filtrar cursos..." />
 
         <div class="chipsCursos">
           <button
@@ -379,7 +360,7 @@ function onFecharCurso() {
   display: flex;
   align-items: center;
   gap: 1.5rem;
-  background: linear-gradient(135deg, #30070c, #121216);
+  background-color: var(--vermelho);
   border-radius: 16px;
   padding: 2rem;
   color: #ffffff;
@@ -387,16 +368,17 @@ function onFecharCurso() {
 }
 
 .logo {
-  width: 80px;
-  height: 80px;
-  min-width: 80px;
-  border-radius: 14px;
-  background-color: var(--vermelho);
+  width: 64px;
+  height: 64px;
+  min-width: 64px;
+  border-radius: 50%;
+  border: 2px solid #ffffff;
+  color: #ffffff;
   display: flex;
   align-items: center;
   justify-content: center;
   font-weight: 800;
-  font-size: 1.3rem;
+  font-size: 1rem;
   letter-spacing: 1px;
 }
 
@@ -406,28 +388,14 @@ function onFecharCurso() {
 }
 
 .selos {
-  display: flex;
-  gap: 0.5rem;
-  margin-bottom: 0.6rem;
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: #ffffff;
+  margin: 0 0 0.5rem;
 }
-
-.selo {
-  font-size: 0.75rem;
-  font-weight: 600;
-  padding: 0.25rem 0.65rem;
-  border-radius: 999px;
-}
-.seloPublica {
-  background-color: #41414a;
-  color: #eeeef0;
-}
-.seloPrivada {
-  background-color: #58141c;
-  color: #f0cdd0;
-}
-.seloSituacao {
-  background-color: #4c4c57;
-  color: #f7f7f8;
+.selos .situacao {
+  color: rgba(255, 255, 255, 0.75);
+  font-weight: 500;
 }
 
 .cabecalho h1 {
@@ -437,29 +405,30 @@ function onFecharCurso() {
 
 .localizacao {
   margin: 0;
-  color: #d9d9de;
+  color: rgba(255, 255, 255, 0.85);
   font-size: 0.95rem;
 }
 
 .acoesCabecalho {
   display: flex;
   align-items: center;
-  gap: 0.8rem;
+  gap: 1.2rem;
   flex-wrap: wrap;
 }
 
 .nota {
-  background-color: #41414a;
-  padding: 0.5rem 0.9rem;
-  border-radius: 10px;
   text-align: center;
-  font-weight: 700;
+}
+.notaValor {
+  display: block;
+  font-size: 1.3rem;
+  font-weight: 800;
+  color: #ffffff;
 }
 .notaLegenda {
-  display: block;
-  font-size: 0.65rem;
-  font-weight: 400;
-  color: var(--texto-fraco);
+  font-size: 0.62rem;
+  letter-spacing: 0.5px;
+  color: rgba(255, 255, 255, 0.75);
 }
 
 .botaoFavoritar,
@@ -473,16 +442,15 @@ function onFecharCurso() {
   text-decoration: none;
   display: inline-flex;
   align-items: center;
-  gap: 0.45rem;
 }
 .botaoFavoritar {
   background-color: transparent;
   color: #ffffff;
-  border: 1px solid #4c4c57;
+  border: 1px solid rgba(255, 255, 255, 0.5);
 }
 .botaoSite {
   background-color: #ffffff;
-  color: #1c1c22;
+  color: var(--vermelho);
 }
 
 .estatisticas {
@@ -499,7 +467,7 @@ function onFecharCurso() {
   padding: 1.2rem;
 }
 .caixaEstatistica:nth-child(odd) {
-  background: linear-gradient(135deg, var(--vermelho-escuro), var(--vermelho));
+  background-color: var(--vermelho);
   border: none;
   color: #ffffff;
 }
@@ -599,12 +567,12 @@ function onFecharCurso() {
   gap: 0.5rem;
 }
 .etiqueta {
-  background-color: var(--vermelho-claro);
-  color: var(--vermelho);
+  border: 1px solid var(--borda);
+  color: #4c4c57;
   font-size: 0.8rem;
   font-weight: 600;
-  padding: 0.35rem 0.75rem;
-  border-radius: 999px;
+  padding: 0.3rem 0.75rem;
+  border-radius: 8px;
 }
 
 .gradeDiferenciais {
@@ -619,7 +587,7 @@ function onFecharCurso() {
   padding: 0.8rem;
 }
 .itemDiferencial:nth-child(odd) {
-  background: linear-gradient(135deg, var(--vermelho), #68121b);
+  background-color: var(--vermelho);
   border: none;
 }
 .itemDiferencial:nth-child(odd) p {
@@ -643,7 +611,7 @@ function onFecharCurso() {
   padding: 0.9rem;
 }
 .avaliacaoItem:nth-child(even) {
-  background: linear-gradient(135deg, #68121b, #58141c);
+  background-color: #58141c;
   border: none;
 }
 .avaliacaoItem:nth-child(even) .notaRotulo {
@@ -701,7 +669,7 @@ function onFecharCurso() {
 }
 
 .buscaCursoInput:focus {
-  border-color: #d06f78;
+  border-color: #1c1c22;
 }
 
 .chipsCursos {
@@ -724,8 +692,8 @@ function onFecharCurso() {
 }
 
 .chipCurso:hover {
-  border-color: #f0cdd0;
-  color: var(--vermelho);
+  border-color: #1c1c22;
+  color: #1c1c22;
 }
 
 .chipCurso.ativo {
@@ -743,7 +711,7 @@ function onFecharCurso() {
 .detalheCurso {
   margin-top: 1.2rem;
   background: #fff;
-  border: 1px solid #f0cdd0;
+  border: 1px solid var(--borda);
   border-radius: 14px;
   padding: 1.2rem;
 }
@@ -847,7 +815,7 @@ function onFecharCurso() {
 }
 
 .caixaCadastro {
-  background: linear-gradient(135deg, #30070c, #121216);
+  background-color: #1c1c22;
   color: #ffffff;
 }
 .caixaCadastro h3 {
