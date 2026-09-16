@@ -1,217 +1,398 @@
 <script setup>
-import { ref, computed, onMounted } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
-import { useVestibularesStore } from '@/stores/vestibulares'
 import { useAuthStore } from '@/stores/auth'
+import { useVestibularesStore } from '@/stores/vestibulares'
 import { useComentariosStore } from '@/stores/comentarios'
-import VestibularForm from '@/components/paginaUniversidades/VestibularForm.vue'
-import universidades from '@/data/universidades.js'
 
 const router = useRouter()
-const vStore = useVestibularesStore()
-const cStore = useComentariosStore()
 const auth = useAuthStore()
-
-const modal = ref(false)
-const editing = ref(null)
-const tab = ref('meus')
-const filter = ref('todos')
-const loading = ref(false)
-
-const myUni = computed(() => auth.professorUniversidadeId ? universidades.find(u => u.id === auth.professorUniversidadeId) : null)
-const mine = computed(() => {
-  let l = vStore.getByUniversidade(auth.professorUniversidadeId)
-  if (filter.value !== 'todos') l = l.filter(v => v.status === filter.value)
-  return l.sort((a,b) => new Date(b.atualizado_em) - new Date(a.atualizado_em))
+const vestibulares = useVestibularesStore()
+const comentarios = useComentariosStore()
+const filtro = ref('todos')
+const mostrarFormulario = ref(false)
+const novoVestibular = ref({
+  nome_vestibular: '',
+  tipo: 'ENEM'
 })
-const stats = computed(() => {
-  const all = vStore.getByUniversidade(auth.professorUniversidadeId)
-  return { total: all.length, pub: all.filter(v=>v.status==='publicado').length, rasc: all.filter(v=>v.status==='rascunho').length, arch: all.filter(v=>v.status==='arquivado').length, views: all.reduce((s,v)=>s+(v.visualizacoes||0),0), com: all.reduce((s,v)=>s+cStore.count(v.id),0) }
+
+const lista = computed(() => {
+  return vestibulares
+    .getByUniversidade(auth.professorUniversidadeId)
+    .sort((a, b) => new Date(b.atualizado_em) - new Date(a.atualizado_em))
 })
-const labels = { publicado:'Publicado', rascunho:'Rascunho', arquivado:'Arquivado' }
-const sClass = { publicado:'pub', rascunho:'rasc', arquivado:'arch' }
+
+const listaFiltrada = computed(() => {
+  if (filtro.value === 'todos') return lista.value
+  return lista.value.filter(item => item.status === filtro.value)
+})
+
+const cardPrincipal = computed(() => listaFiltrada.value[0] || null)
 
 onMounted(() => {
-  if (!auth.isLoggedIn || !auth.isProfessor) { router.push('/'); return }
-  vStore.init(); cStore.init()
+  if (!auth.isLoggedIn || !(auth.isProfessor || auth.profile?.tipo_usuario === 'professor')) {
+    router.push('/')
+    return
+  }
+
+  vestibulares.init()
+  comentarios.init()
 })
 
-function status(v) {
-  if (v.status !== 'publicado') return { label: labels[v.status], class: 'st-' + sClass[v.status] }
-  const now = new Date(); now.setHours(0,0,0,0)
-  const ini = v.data_inscricao_inicio ? new Date(v.data_inscricao_inicio) : null
-  const fim = v.data_inscricao_fim ? new Date(v.data_inscricao_fim) : null
-  const prov = v.data_prova ? new Date(v.data_prova) : null
-  ini?.setHours(0,0,0,0); fim?.setHours(23,59,59,999); prov?.setHours(0,0,0,0)
-  if (ini && fim && now>=ini && now<=fim) return { label:'🟢 Inscrições Abertas', class:'st-open' }
-  if (fim && now>fim && prov && now<prov) return { label:'🔴 Inscrições Encerradas', class:'st-closed' }
-  if (prov && now>=prov) { if (v.data_resultado) { const r=new Date(v.data_resultado); r.setHours(0,0,0,0); if (now>=r) return { label:'📊 Resultado', class:'st-res' } } return { label:'📝 Prova Realizada', class:'st-exam' } }
-  if (ini && now<ini) { const d=Math.ceil((ini-now)/864e5); return { label:d<=30?'🟡 Em Breve':'⚪ Futuro', class:d<=30?'st-soon':'st-later' } }
-  return { label:'⚪ Futuro', class:'st-later' }
+function abrirFormulario() {
+  mostrarFormulario.value = true
 }
 
-function fmt(d) { return d ? new Date(d+'T00:00:00').toLocaleDateString('pt-BR') : '—' }
+async function criarVestibular() {
+  const nome = novoVestibular.value.nome_vestibular.trim()
 
-function novo() { editing.value = null; modal.value = true }
-function edit(v) { editing.value = v; modal.value = true }
-async function dup(v) { if (!confirm('Duplicar?')) return; try { await vStore.criar({...v, nome_vestibular:v.nome_vestibular+' (Cópia)', status:'rascunho', criado_em:new Date().toISOString(), atualizado_em:new Date().toISOString()}) } catch(e) { alert(e.message) } }
-async function arch(v) { if (!confirm('Arquivar?')) return; try { await vStore.atualizar(v.id, {status:'arquivado'}) } catch(e) { alert(e.message) } }
-async function rest(v) { try { await vStore.atualizar(v.id, {status:'rascunho'}) } catch(e) { alert(e.message) } }
-async function del(v) { if (!confirm('Excluir "'+v.nome_vestibular+'"?')) return; try { await vStore.remover(v.id) } catch(e) { alert(e.message) } }
-function view(v) { router.push({name:'universidade', params:{id:v.universidade_id}}) }
-function saved() { modal.value = false; editing.value = null }
+  if (!nome) {
+    alert('Digite o nome do vestibular.')
+    return
+  }
+
+  try {
+    await vestibulares.criar({
+      ...novoVestibular.value,
+      nome_vestibular: nome,
+      status: 'rascunho',
+      criado_em: new Date().toISOString(),
+      atualizado_em: new Date().toISOString()
+    })
+
+    novoVestibular.value = { nome_vestibular: '', tipo: 'ENEM' }
+    mostrarFormulario.value = false
+    filtro.value = 'todos'
+  } catch (error) {
+    alert(error.message || 'Erro ao criar vestibular.')
+  }
+}
 </script>
 
 <template>
-  <div class="dash">
-    <header>
-      <div class="hc">
-        <div><h1>🏫 Painel do Professor</h1><p v-if="myUni" class="uni">{{myUni.nome}} ({{myUni.sigla}})</p></div>
-        <router-link to="/universidades" class="back">← Ver como estudante</router-link>
-      </div>
-    </header>
-    <div class="stats">
-      <div class="sc"><span>{{stats.total}}</span><span>Total</span></div>
-      <div class="sc pub"><span>{{stats.pub}}</span><span>Publicados</span></div>
-      <div class="sc rasc"><span>{{stats.rasc}}</span><span>Rascunhos</span></div>
-      <div class="sc arch"><span>{{stats.arch}}</span><span>Arquivados</span></div>
-      <div class="sc"><span>{{stats.views}}</span><span>Visualizações</span></div>
-      <div class="sc"><span>{{stats.com}}</span><span>Comentários</span></div>
-    </div>
+  <div class="dashboard">
     <div class="toolbar">
-      <div class="tabs">
-        <button v-for="t in [{id:'meus',l:'Meus Vestibulares'},{id:'coments',l:'Comentários Recentes'}]" :key="t.id" class="tb" :class="{on:tab===t.id}" @click="tab=t.id">{{t.l}}</button>
+      <div>
+        <p class="label">Painel do professor</p>
       </div>
-      <div v-if="tab==='meus'" class="filters">
-        <select v-model="filter" class="sel"><option value="todos">Todos</option><option value="publicado">🌍 Publicados</option><option value="rascunho">📝 Rascunhos</option><option value="arquivado">📦 Arquivados</option></select>
-        <button class="btn" @click="novo">+ Novo</button>
-      </div>
-    </div>
-    <div class="content">
-      <div v-if="tab==='meus'">
-        <div v-if="mine.length" class="table-wrap">
-          <table>
-            <thead><tr><th>Vestibular</th><th>Tipo</th><th>Inscrições</th><th>Prova</th><th>Status</th><th>Interações</th><th>Ações</th></tr></thead>
-            <tbody>
-              <tr v-for="v in mine" :key="v.id" :class="status(v).class">
-                <td><div class="vn">{{v.nome_vestibular}}</div><div class="vi">ID: {{v.id}}</div></td>
-                <td><span class="tag">{{v.tipo}}</span></td>
-                <td v-if="v.data_inscricao_inicio||v.data_inscricao_fim">{{fmt(v.data_inscricao_inicio)}} → {{fmt(v.data_inscricao_fim)}}</td><td v-else class="nd">Não definidas</td>
-                <td>{{fmt(v.data_prova)}}</td>
-                <td><span class="st" :class="status(v).class">{{status(v).label}}</span><span v-if="v.status!=='publicado'" class="adm">({{labels[v.status]}})</span></td>
-                <td><div class="int"><span>👁️ {{v.visualizacoes||0}}</span><span>💬 {{cStore.count(v.id)}}</span></div></td>
-                <td>
-                  <div class="acts">
-                    <button class="a vw" @click="view(v)" title="Ver">👁️</button>
-                    <button class="a ed" @click="edit(v)" title="Editar">✏️</button>
-                    <button class="a dp" @click="dup(v)" title="Duplicar">📋</button>
-                    <button v-if="v.status==='publicado'||v.status==='rascunho'" class="a ar" @click="arch(v)" title="Arquivar">📦</button>
-                    <button v-if="v.status==='arquivado'" class="a rs" @click="rest(v)" title="Restaurar">♻️</button>
-                    <button class="a dl" @click="del(v)" title="Excluir">🗑️</button>
-                  </div>
-                </td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-        <div v-else class="empty">📅<h3>Nenhum vestibular</h3><p>Crie o primeiro para sua instituição.</p><button class="btn big" @click="novo">+ Criar</button></div>
-      </div>
-      <div v-else>
-        <div v-if="cStore.list.length" class="coms">
-          <div class="cc" v-for="c in cStore.list.slice(0,20)" :key="c.id">
-            <div class="ch"><div class="au"><span class="av">{{c.user_nome.split(' ').map(n=>n[0]).join('').toUpperCase().slice(0,2)}}</span><div><span class="n">{{c.user_nome}}</span><span class="t" :class="c.user_tipo">{{c.user_tipo==='professor'?'👨‍🏫':'🎓'}}</span></div></div><span class="ti">{{new Date(c.criado_em).toLocaleDateString('pt-BR')}}</span></div>
-            <p>{{c.conteudo}}</p>
-            <div class="cm"><span>{{vStore.getOne(c.vestibular_id)?.nome_vestibular||'ID '+c.vestibular_id}}</span><span>{{c.respostas?.length||0}} respostas</span></div>
-          </div>
-        </div>
-        <div v-else class="empty">💬<h3>Sem comentários</h3><p>Comentários dos estudantes aparecerão aqui.</p></div>
+      <div class="toolbar-actions">
+        <select v-model="filtro">
+          <option value="todos">Todos</option>
+          <option value="publicado">Publicado</option>
+          <option value="rascunho">Rascunho</option>
+          <option value="arquivado">Arquivado</option>
+        </select>
+        <button class="new-button" @click="abrirFormulario">Novo vestibular</button>
       </div>
     </div>
+
+    <div v-if="mostrarFormulario" class="form-card">
+      <h2>Criar vestibular</h2>
+      <div class="field">
+        <label>Nome</label>
+        <input v-model="novoVestibular.nome_vestibular" placeholder="Ex: Vestibular 2026" />
+      </div>
+      <div class="field">
+        <label>Tipo</label>
+        <input v-model="novoVestibular.tipo" placeholder="Ex: ENEM" />
+      </div>
+      <div class="form-actions">
+        <button class="cancel-button" @click="mostrarFormulario = false">Cancelar</button>
+        <button class="save-button" @click="criarVestibular">Salvar</button>
+      </div>
+    </div>
+
+    <div v-if="cardPrincipal" class="main-card">
+      <div class="header">
+        <div class="title-wrap">
+          <p class="mini-label">Vestibular principal</p>
+          <h1>{{ cardPrincipal.nome_vestibular }}</h1>
+        </div>
+        <span class="badge" :class="cardPrincipal.status">{{ cardPrincipal.status }}</span>
+      </div>
+
+      <div class="info-grid">
+        <div>
+          <span class="title">Tipo</span>
+          <strong>{{ cardPrincipal.tipo }}</strong>
+        </div>
+        <div>
+          <span class="title">Comentários</span>
+          <strong>{{ comentarios.count(cardPrincipal.id) }}</strong>
+        </div>
+        <div>
+          <span class="title">Itens</span>
+          <strong>{{ listaFiltrada.length }}</strong>
+        </div>
+      </div>
+    </div>
+
+    <div v-if="listaFiltrada.length" class="list-card">
+      <h2>Todos os vestibulares</h2>
+      <div v-for="item in listaFiltrada" :key="item.id" class="list-item">
+        <div>
+          <strong>{{ item.nome_vestibular }}</strong>
+          <span>{{ item.tipo }}</span>
+        </div>
+        <span class="small-badge" :class="item.status">{{ item.status }}</span>
+      </div>
+    </div>
+
+    <p v-else class="empty">Nenhum vestibular encontrado.</p>
   </div>
-  <VestibularForm v-model="modal" :vestibular="editing" @salvo="saved" />
 </template>
 
 <style scoped>
-.dash { min-height:100vh; background:#fffcf7; color:#1c1c22 }
-header { background:linear-gradient(135deg,#30070c,#121216); color:#fff; padding:2rem 1.5rem }
-.hc { max-width:1200px; margin:0 auto; display:flex; justify-content:space-between; align-items:center; gap:1rem; flex-wrap:wrap }
-header h1 { margin:0 0 .25rem; font-size:1.75rem }
-.uni { margin:0; opacity:.8; font-size:1rem }
-.back { display:inline-flex; align-items:center; gap:.5rem; padding:.6rem 1.2rem; border-radius:999px; background:rgba(255,255,255,.1); color:#fff; text-decoration:none; font-weight:600; border:1px solid rgba(255,255,255,.2) }
-.back:hover { background:rgba(255,255,255,.2) }
-.stats { max-width:1200px; margin:0 auto; padding:1.5rem; display:grid; grid-template-columns:repeat(auto-fit,minmax(140px,1fr)); gap:1rem }
-.sc { background:#fff; border:1px solid #eeeef0; border-radius:14px; padding:1.25rem; text-align:center }
-.sc:hover { box-shadow:0 8px 20px rgba(28,28,34,.06) }
-.sc.pub { border-left:4px solid #22c55e }
-.sc.rasc { border-left:4px solid #9ca3af }
-.sc.arch { border-left:4px solid #6b7280 }
-.sc span:first-child { display:block; font-size:2rem; font-weight:800; color:#1c1c22; line-height:1 }
-.sc span:last-child { display:block; margin-top:.5rem; font-size:.75rem; color:#91919f; text-transform:uppercase; letter-spacing:.05em }
-.toolbar { max-width:1200px; margin:0 auto 1.5rem; padding:0 1.5rem; display:flex; flex-direction:column; gap:1rem }
-.tabs { display:flex; gap:.5rem; border-bottom:1px solid #eeeef0; padding-bottom:.5rem }
-.tb { padding:.5rem 1rem; border:none; background:none; color:#5d5d6b; font-weight:600; font-size:.85rem; border-radius:8px; cursor:pointer }
-.tb:hover { background:#fdfaf4; color:#7a0f1a }
-.tb.on { background:#fff; color:#7a0f1a; box-shadow:0 2px 8px rgba(28,28,34,.08) }
-.filters { display:flex; align-items:center; justify-content:space-between; gap:1rem; flex-wrap:wrap }
-.sel { padding:.5rem 1rem; border:1px solid #eeeef0; border-radius:10px; background:#fdfaf4; font-size:.85rem; color:#1c1c22; cursor:pointer }
-.sel:focus { outline:none; border-color:#9e1f2e }
-.btn { display:inline-flex; align-items:center; gap:.5rem; padding:.6rem 1.2rem; border-radius:999px; background:linear-gradient(135deg,#7a0f1a,#9e1f2e); color:#fff; font-weight:600; font-size:.85rem; border:none; cursor:pointer }
-.btn:hover { transform:translateY(-1px); box-shadow:0 6px 16px rgba(122,15,26,.3) }
-.btn.big { padding:.85rem 2rem; font-size:1rem }
-.content { max-width:1200px; margin:0 auto; padding:0 1.5rem 2rem }
-.table-wrap { overflow-x:auto }
-table { width:100%; border-collapse:collapse; background:#fff; border:1px solid #eeeef0; border-radius:12px; overflow:hidden }
-th,td { padding:1rem; text-align:left; border-bottom:1px solid #eeeef0 }
-th { background:#faf6ef; font-weight:700; font-size:.75rem; color:#91919f; text-transform:uppercase; letter-spacing:.05em }
-tbody tr:last-child td { border-bottom:none }
-tbody tr:hover { background:#fdfaf4 }
-tr.st-open td:first-child { border-left:4px solid #22c55e }
-tr.st-soon td:first-child { border-left:4px solid #f59e0b }
-tr.st-later td:first-child { border-left:4px solid #6366f1 }
-tr.st-closed td:first-child { border-left:4px solid #ef4444 }
-tr.st-exam td:first-child { border-left:4px solid #8b5cf6 }
-tr.st-res td:first-child { border-left:4px solid #06b6d4 }
-tr.st-rasc td:first-child { border-left:4px solid #9ca3af }
-tr.st-arch td:first-child { border-left:4px solid #6b7280 }
-.vn { font-weight:600; color:#1c1c22 }
-.vi { font-size:.7rem; color:#91919f; margin-top:.2rem }
-.tag { display:inline-block; padding:.2rem .6rem; border-radius:999px; background:#f9e8e9; color:#7a0f1a; font-size:.7rem; font-weight:600 }
-.nd { color:#91919f; font-size:.8rem }
-.st { display:inline-block; padding:.3rem .7rem; border-radius:999px; font-size:.7rem; font-weight:700 }
-.st.st-open { background:#dcfce7; color:#166534 }
-.st.st-soon { background:#fef3c7; color:#92400e }
-.st.st-later { background:#e0e7ff; color:#3730a3 }
-.st.st-closed { background:#fee2e2; color:#991b1b }
-.st.st-exam { background:#f3e8ff; color:#6b21a8 }
-.st.st-res { background:#cffafe; color:#155e75 }
-.st.st-rasc { background:#f3f4f6; color:#374151 }
-.st.st-arch { background:#f3f4f6; color:#374151 }
-.adm { display:block; font-size:.65rem; color:#91919f; margin-top:.2rem }
-.int { display:flex; flex-direction:column; gap:.2rem; font-size:.8rem; color:#5d5d6b }
-.acts { display:flex; gap:.35rem; flex-wrap:wrap }
-.a { width:32px; height:32px; border-radius:8px; border:none; background:#f7f7f8; cursor:pointer; font-size:.9rem; display:flex; align-items:center; justify-content:center; transition:all .15s }
-.a:hover { background:#eeeef0; transform:scale(1.05) }
-.a.vw:hover { background:#dcfce7 }
-.a.ed:hover { background:#e0e7ff }
-.a.dp:hover { background:#fef3c7 }
-.a.ar:hover { background:#f3f4f6 }
-.a.rs:hover { background:#dcfce7 }
-.a.dl:hover { background:#fee2e2 }
-.coms { display:flex; flex-direction:column; gap:1rem }
-.cc { background:#fff; border:1px solid #eeeef0; border-radius:12px; padding:1rem }
-.ch { display:flex; justify-content:space-between; margin-bottom:.5rem }
-.ch .au { display:flex; align-items:center; gap:.5rem }
-.ch .av { width:32px; height:32px; border-radius:50%; background:linear-gradient(135deg,#7a0f1a,#9e1f2e); color:#fff; display:flex; align-items:center; justify-content:center; font-weight:700; font-size:.75rem }
-.n { font-weight:600; font-size:.85rem }
-.t { font-size:.65rem; padding:.15rem .4rem; border-radius:999px }
-.t.professor { background:#f3e8ff; color:#6b21a8 }
-.t.estudante { background:#e0e7ff; color:#3730a3 }
-.ch .ti { font-size:.75rem; color:#91919f }
-.cc p { margin:0 0 .5rem; color:#41414a; line-height:1.5 }
-.cm { display:flex; gap:1rem; font-size:.75rem; color:#91919f }
-.empty { text-align:center; padding:4rem 2rem; color:#5d5d6b }
-.empty h3 { margin:0 0 .5rem; font-size:1.25rem; color:#1c1c22 }
-.empty p { margin:0 0 1.5rem; font-size:.95rem }
-@media (max-width:900px) { th:nth-child(6),td:nth-child(6),th:nth-child(3),td:nth-child(3){display:none} }
-@media (max-width:640px) { .hc{flex-direction:column;align-items:flex-start} .toolbar{padding:0 1rem} .content{padding:0 1rem 2rem} .filters{flex-direction:column;align-items:stretch} .sel,.btn{width:100%} th:nth-child(4),td:nth-child(4){display:none} }
+* { box-sizing: border-box; }
+
+.dashboard {
+  padding: 24px;
+  font-family: Arial, sans-serif;
+  background: #f5f5f5;
+}
+
+.toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 18px;
+  max-width: 700px;
+}
+
+.toolbar-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.label,
+.mini-label {
+  margin: 0;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #777;
+}
+
+select, input {
+  padding: 8px 12px;
+  border: 1px solid #d9d9d9;
+  border-radius: 8px;
+  background: white;
+  color: #222;
+  min-width: 150px;
+}
+
+input {
+  width: 100%;
+}
+
+.new-button,
+.save-button,
+.cancel-button {
+  border: none;
+  border-radius: 8px;
+  padding: 9px 14px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.new-button,
+.save-button {
+  background: #1a1a1a;
+  color: white;
+}
+
+.cancel-button {
+  background: #f0f0f0;
+  color: #333;
+}
+
+.form-card {
+  background: white;
+  border: 1px solid #e5e5e5;
+  border-radius: 12px;
+  padding: 18px;
+  max-width: 700px;
+  margin-bottom: 18px;
+}
+
+.form-card h2 {
+  margin: 0 0 16px;
+  font-size: 20px;
+}
+
+.field {
+  margin-bottom: 12px;
+}
+
+.field label {
+  display: block;
+  margin-bottom: 6px;
+  font-size: 12px;
+  color: #666;
+  text-transform: uppercase;
+}
+
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 16px;
+}
+
+.main-card {
+  background: linear-gradient(180deg, #ffffff 0%, #fafafa 100%);
+  border: 1px solid #e5e5e5;
+  border-radius: 16px;
+  padding: 24px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
+  max-width: 700px;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 18px;
+  margin-bottom: 22px;
+}
+
+.title-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+h1 {
+  margin: 0;
+  font-size: 30px;
+  color: #1a1a1a;
+  line-height: 1.2;
+}
+
+.badge {
+  display: inline-block;
+  padding: 8px 12px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: bold;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.badge.publicado {
+  background: #eaf9ef;
+  color: #1d7a45;
+}
+
+.badge.rascunho {
+  background: #fff6dc;
+  color: #8d6400;
+}
+
+.badge.arquivado {
+  background: #f1f1f1;
+  color: #555;
+}
+
+.info-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.info-grid div {
+  background: #f9f9f9;
+  border: 1px solid #ececec;
+  border-radius: 10px;
+  padding: 14px 12px;
+}
+
+.title {
+  display: block;
+  margin-bottom: 8px;
+  color: #777;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+strong {
+  font-size: 18px;
+  color: #1e1e1e;
+}
+
+.list-card {
+  margin-top: 18px;
+  background: #fff;
+  border: 1px solid #e5e5e5;
+  border-radius: 14px;
+  padding: 18px;
+  max-width: 700px;
+}
+
+.list-card h2 {
+  margin: 0 0 14px;
+  font-size: 18px;
+}
+
+.list-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 0;
+  border-bottom: 1px solid #eee;
+}
+
+.list-item:last-child {
+  border-bottom: none;
+}
+
+.list-item strong {
+  display: block;
+  font-size: 16px;
+  margin-bottom: 4px;
+}
+
+.list-item span {
+  color: #666;
+  font-size: 13px;
+}
+
+.small-badge {
+  display: inline-block;
+  padding: 6px 10px;
+  border-radius: 999px;
+  font-size: 10px;
+  font-weight: bold;
+  text-transform: uppercase;
+}
+
+.small-badge.publicado {
+  background: #eaf9ef;
+  color: #1d7a45;
+}
+
+.small-badge.rascunho {
+  background: #fff6dc;
+  color: #8d6400;
+}
+
+.small-badge.arquivado {
+  background: #f1f1f1;
+  color: #555;
+}
+
+.empty {
+  color: #666;
+  background: #fff;
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  padding: 20px;
+  max-width: 700px;
+}
 </style>
+

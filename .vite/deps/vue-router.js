@@ -3260,7 +3260,7 @@ var require_speakingurl$1 = /* @__PURE__ */ __commonJSMin(((exports, module) => 
 		* @param   {string} input string
 		*/
 		var escapeChars = function escapeChars(input) {
-			return input.replace(/[-\\^$*+?.()|[\]{}\/]/g, "\\$&");
+			return input.replace(/[-\\^$*+?.()|[\]{}/]/g, "\\$&");
 		};
 		/**
 		* check if the char is an already converted char from custom list

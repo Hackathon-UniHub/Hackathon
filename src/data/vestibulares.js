@@ -24,7 +24,9 @@ function load() {
         return [...vestibulares, ...parsed.filter(p => !vestibulares.some(v => v.id === p.id))]
       }
     }
-  } catch (e) {}
+  } catch {
+    // ignore
+  }
   return vestibulares
 }
 

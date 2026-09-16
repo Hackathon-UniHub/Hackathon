@@ -30,6 +30,71 @@ const loading = ref(false)
 const universidadeSelecionada = ref('')
 const searchQuery = ref('')
 const mostrarDropdown = ref(false)
+const dropdownRef = ref(null)
+const inputWrapRef = ref(null)
+const dropdownStyle = ref({})
+
+
+function toggleDropdown() {
+  if (!isProfessor.value) return
+  mostrarDropdown.value = !mostrarDropdown.value
+  if (mostrarDropdown.value) {
+    atualizarPosicaoDropdown()
+  }
+}
+
+function atualizarPosicaoDropdown() {
+  if (!inputWrapRef.value) return
+  const rect = inputWrapRef.value.getBoundingClientRect()
+  dropdownStyle.value = {
+    position: 'fixed',
+    top: `${rect.bottom + 4}px`,
+    left: `${rect.left}px`,
+    width: `${rect.width}px`,
+  }
+}
+
+function selecionarUniversidade(id) {
+  universidadeSelecionada.value = String(id)
+  searchQuery.value = ''
+  mostrarDropdown.value = false
+}
+
+function limparUniversidade() {
+  universidadeSelecionada.value = ''
+  searchQuery.value = ''
+}
+
+function clickFora(e) {
+  if (
+    dropdownRef.value &&
+    !dropdownRef.value.contains(e.target) &&
+    inputWrapRef.value &&
+    !inputWrapRef.value.contains(e.target)
+  ) {
+    mostrarDropdown.value = false
+  }
+}
+
+function handleScrollOuReiszie() {
+  if (mostrarDropdown.value) {
+    atualizarPosicaoDropdown()
+  }
+}
+
+onMounted(() => {
+  document.body.style.background = 'linear-gradient(to bottom, #920205, #2C0102)'
+  document.addEventListener('click', clickFora)
+  window.addEventListener('resize', handleScrollOuReiszie)
+  window.addEventListener('scroll', handleScrollOuReiszie, true) // true = captura scroll de qualquer elemento, incluindo .auth-card
+})
+
+onUnmounted(() => {
+  document.body.style.background = ''
+  document.removeEventListener('click', clickFora)
+  window.removeEventListener('resize', handleScrollOuReiszie)
+  window.removeEventListener('scroll', handleScrollOuReiszie, true)
+})
 
 const universidadesFiltradas = computed(() => {
   if (!searchQuery.value.trim()) return universidades.slice(0, 10)
@@ -98,21 +163,16 @@ async function handleMicrosoftSignUp() {
   }
 }
 
-function selecionarUniversidade(id) {
-  universidadeSelecionada.value = String(id)
-  searchQuery.value = ''
-  mostrarDropdown.value = false
+function definirTipoUsuario(valor) {
+  tipoUsuario.value = valor
+
+  if (valor !== 'professor') {
+    limparUniversidade()
+    mostrarDropdown.value = false
+  }
 }
 
-function limparUniversidade() {
-  universidadeSelecionada.value = ''
-  searchQuery.value = ''
-}
 
-function toggleDropdown() {
-  if (!isProfessor.value) return
-  mostrarDropdown.value = !mostrarDropdown.value
-}
 
 onMounted(() => {
   document.body.style.background = 'linear-gradient(to bottom, #920205, #2C0102)'
@@ -124,12 +184,7 @@ onUnmounted(() => {
   document.removeEventListener('click', clickFora)
 })
 
-function clickFora(e) {
-  const dropdown = document.querySelector('.universidade-dropdown')
-  if (dropdown && !dropdown.contains(e.target)) {
-    mostrarDropdown.value = false
-  }
-}
+
 </script>
 
 <template>
@@ -143,7 +198,7 @@ function clickFora(e) {
           type="button"
           class="tipo-btn"
           :class="{ ativo: tipoUsuario === 'estudante' }"
-          @click="tipoUsuario = 'estudante'"
+          @click="definirTipoUsuario('estudante')"
         >
           <HugeiconsIcon :icon="BookOpenIcon" :size="24" :stroke-width="1.5" />
           <span>Estudante</span>
@@ -155,7 +210,7 @@ function clickFora(e) {
           type="button"
           class="tipo-btn"
           :class="{ ativo: tipoUsuario === 'professor' }"
-          @click="tipoUsuario = 'professor'"
+          @click="definirTipoUsuario('professor')"
         >
           <HugeiconsIcon :icon="BriefcaseIcon" :size="24" :stroke-width="1.5" />
           <span>Professor</span>
@@ -218,57 +273,80 @@ function clickFora(e) {
           </div>
         </div>
 
-        <div class="field" v-if="isProfessor">
-          <label>Sua universidade *</label>
-          <div class="universidade-select">
-            <div class="input-wrap" @click="toggleDropdown">
-              <HugeiconsIcon class="icon" :icon="BuildingIcon" :size="32" color="currentColor" :stroke-width="1.5"/>
-              <input
-                type="text"
-                :value="selectedUni ? `${selectedUni.sigla} - ${selectedUni.nome}` : ''"
-                :placeholder="universidadeSelecionada ? '' : 'Busque sua universidade...'"
-                readonly
-                autocomplete="off"
-              />
-              <span class="dropdown-arrow">▼</span>
-              <button
-                v-if="universidadeSelecionada"
-                type="button"
-                class="clear-universidade"
-                @click.stop="limparUniversidade"
-                aria-label="Limpar seleção"
-              >×</button>
+<div class="field" v-if="isProfessor">
+  <label>Sua universidade *</label>
+
+  <div class="universidade-select">
+    <div class="input-wrap" ref="inputWrapRef" @click="toggleDropdown">
+      <HugeiconsIcon
+        class="icon"
+        :icon="BuildingIcon"
+        :size="32"
+        color="currentColor"
+        :stroke-width="1.5"
+      />
+
+      <input
+        type="text"
+        :value="selectedUni ? `${selectedUni.sigla} - ${selectedUni.nome}` : ''"
+        placeholder="Busque sua universidade..."
+        readonly
+        autocomplete="off"
+      />
+
+      <span class="dropdown-arrow">▼</span>
+
+      <button
+        v-if="universidadeSelecionada"
+        type="button"
+        class="clear-universidade"
+        @click.stop="limparUniversidade"
+        aria-label="Limpar seleção"
+      >
+        ×
+      </button>
+    </div>
+
+    <Teleport to="body">
+      <div
+        v-if="mostrarDropdown"
+        ref="dropdownRef"
+        class="universidade-dropdown"
+        :style="dropdownStyle"
+      >
+        <div class="dropdown-search">
+          <input
+            v-model="searchQuery"
+            type="text"
+            placeholder="Buscar por nome, sigla, cidade ou estado..."
+            autocomplete="off"
+          />
+        </div>
+
+        <div class="dropdown-list">
+          <div
+            v-for="uni in universidadesFiltradas"
+            :key="uni.id"
+            class="dropdown-item"
+            :class="{ selecionado: universidadeSelecionada === String(uni.id) }"
+            @click="selecionarUniversidade(uni.id)"
+          >
+            <div class="item-info">
+              <span class="item-sigla">{{ uni.sigla }}</span>
+              <span class="item-nome">{{ uni.nome }}</span>
             </div>
-            <div v-if="mostrarDropdown" class="universidade-dropdown">
-              <div class="dropdown-search">
-                <input
-                  type="text"
-                  v-model="searchQuery"
-                  placeholder="Buscar por nome, sigla, cidade ou estado..."
-                  autocomplete="off"
-                />
-              </div>
-              <div class="dropdown-list">
-                <div
-                  v-for="uni in universidadesFiltradas"
-                  :key="uni.id"
-                  class="dropdown-item"
-                  :class="{ selecionado: universidadeSelecionada === String(uni.id) }"
-                  @click="selecionarUniversidade(uni.id)"
-                >
-                  <div class="item-info">
-                    <span class="item-sigla">{{ uni.sigla }}</span>
-                    <span class="item-nome">{{ uni.nome }}</span>
-                  </div>
-                  <span class="item-local">{{ uni.municipio }}, {{ uni.uf }}</span>
-                </div>
-                <div v-if="universidadesFiltradas.length === 0" class="dropdown-empty">
-                  Nenhuma universidade encontrada
-                </div>
-              </div>
-            </div>
+
+            <span class="item-local">{{ uni.municipio }}, {{ uni.uf }}</span>
+          </div>
+
+          <div v-if="universidadesFiltradas.length === 0" class="dropdown-empty">
+            Nenhuma universidade encontrada
           </div>
         </div>
+      </div>
+    </Teleport>
+  </div>
+</div>
 
         <button type="submit" class="primary-btn" :disabled="!canSubmit">
           {{ loading ? 'Criando...' : 'Inscrever-se' }}
@@ -548,7 +626,6 @@ form {
   text-decoration: underline;
 }
 
-/* UNIVERSIDADE SELECT */
 .universidade-select {
   position: relative;
 }
@@ -661,4 +738,49 @@ form {
   color: #91919f;
   font-size: 0.85rem;
 }
+
+.universidade-dropdown {
+  position: fixed; 
+  background: #fff;
+  border: 1px solid #eeeef0;
+  border-radius: 12px;
+  box-shadow: 0 12px 28px rgba(28, 28, 34, 0.15);
+  overflow: hidden;
+  z-index: 1000;
+  color: #1c1c22;
+}
+.dropdown-search { padding: 0.5rem; border-bottom: 1px solid #eeeef0; }
+.dropdown-search input {
+  width: 100%;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid #eeeef0;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  outline: none;
+}
+.dropdown-search input:focus { border-color: #9e1f2e; }
+.dropdown-list { max-height: 280px; overflow-y: auto; }
+.dropdown-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.75rem 1rem;
+  cursor: pointer;
+  transition: background 0.1s;
+  border-bottom: 1px solid #f7f7f8;
+}
+.dropdown-item:last-child { border-bottom: none; }
+.dropdown-item:hover { background: #fdfaf4; }
+.dropdown-item.selecionado { background: #fdf5f5; }
+.item-info { display: flex; flex-direction: column; gap: 0.15rem; min-width: 0; }
+.item-sigla { font-weight: 700; font-size: 0.75rem; color: #7a0f1a; }
+.item-nome {
+  font-size: 0.85rem;
+  color: #1c1c22;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.item-local { font-size: 0.7rem; color: #91919f; white-space: nowrap; }
+.dropdown-empty { padding: 1rem; text-align: center; color: #91919f; font-size: 0.85rem; }
 </style>

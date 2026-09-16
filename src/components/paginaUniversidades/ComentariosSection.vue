@@ -4,11 +4,8 @@ import { useComentariosStore } from '@/stores/comentarios'
 import { useAuthStore } from '@/stores/auth'
 
 const props = defineProps({ vestibularId: Number, contagem: Number })
-const emit = defineEmits(['toggle'])
-
 const store = useComentariosStore()
 const auth = useAuthStore()
-
 const open = ref(false)
 const newComment = ref('')
 const replyingTo = ref(null)
@@ -28,7 +25,7 @@ function isProf(c) { return auth.isProfessor && auth.professorUniversidadeId ===
 async function sendComment() {
   if (!newComment.value.trim() || !auth.isLoggedIn) { error.value = 'Faça login para comentar'; setTimeout(()=>error.value=null,3e3); return }
   loading.value = true
-  try { await store.criarComentario(props.vestibularId, newComment.value.trim()); newComment.value = '' } catch(e) { error.value = 'Erro ao comentar' } finally { loading.value = false }
+  try { await store.criarComentario(props.vestibularId, newComment.value.trim()); newComment.value = '' } catch { error.value = 'Erro ao comentar' } finally { loading.value = false }
 }
 
 async function sendReply(cid) {
@@ -36,13 +33,12 @@ async function sendReply(cid) {
   if (!txt) return
   const isOficial = auth.isProfessor && auth.professorUniversidadeId === comments.value.find(c=>c.id===cid)?.user_universidade_id
   loading.value = true
-  try { await store.criarResposta(cid, txt, isOficial); replyText.value[cid] = ''; replyingTo.value = null } catch(e) {} finally { loading.value = false }
+  try { await store.criarResposta(cid, txt, isOficial); replyText.value[cid] = ''; replyingTo.value = null } catch { /* ignore */ } finally { loading.value = false }
 }
 
-async function delComment(id) { if (confirm('Excluir?')) { try { await store.remover(id) } catch(e) { error.value='Erro'; setTimeout(()=>error.value=null,3e3) } } }
-async function delReply(cid, rid) { if (confirm('Excluir?')) { try { await store.removerResposta(cid, rid) } catch(e) { error.value='Erro'; setTimeout(()=>error.value=null,3e3) } } }
+async function delComment(id) { if (confirm('Excluir?')) { try { await store.remover(id) } catch { error.value='Erro'; setTimeout(()=>error.value=null,3e3) } } }
+async function delReply(cid, rid) { if (confirm('Excluir?')) { try { await store.removerResposta(cid, rid) } catch { error.value='Erro'; setTimeout(()=>error.value=null,3e3) } } }
 
-function canEdit(c) { return store.podeEditar(c) }
 function canDel(c) { return store.podeModerar(c) || store.podeEditar(c) }
 </script>
 

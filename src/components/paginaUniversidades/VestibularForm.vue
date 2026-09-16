@@ -1,13 +1,11 @@
 <script setup>
-import { ref, watch, onMounted, onUnmounted } from 'vue'
+import { ref, computed, watch, onMounted, onUnmounted } from 'vue'
 import { useVestibularesStore } from '@/stores/vestibulares'
-import { useAuthStore } from '@/stores/auth'
 
 const props = defineProps({ modelValue: Boolean, vestibular: Object })
 const emit = defineEmits(['update:modelValue', 'salvo'])
 
 const store = useVestibularesStore()
-const auth = useAuthStore()
 
 const loading = ref(false)
 const error = ref(null)
@@ -38,7 +36,8 @@ async function save() {
   loading.value = true; error.value = null
   try {
     const data = { ...form.value, edital_url: form.value.edital_url.trim()||null, inscricao_url: form.value.inscricao_url.trim()||null, data_prova: form.value.data_prova||null, data_resultado: form.value.data_resultado||null }
-    editing.value ? await store.atualizar(props.vestibular.id, data) : await store.criar(data)
+    if (editing.value) await store.atualizar(props.vestibular.id, data)
+    else await store.criar(data)
     emit('salvo'); close()
   } catch(e) { error.value = e.message==='USUARIO_NAO_LOGADO'?'Faça login':e.message==='APENAS_PROFESSOR'?'Apenas professores':e.message==='SEM_PERMISSAO'?'Sem permissão':'Erro ao salvar' }
   finally { loading.value = false }

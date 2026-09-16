@@ -14,7 +14,9 @@ function load() {
   try {
     const stored = localStorage.getItem('comentarios_local')
     if (stored) return JSON.parse(stored)
-  } catch (e) {}
+  } catch {
+    // ignore
+  }
   return []
 }
 

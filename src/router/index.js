@@ -69,7 +69,7 @@ const router = createRouter({
 router.beforeEach(async (to) => {
   const authStore = useAuthStore()
 
-  // espera a sessão inicial terminar de carregar antes de decidir qualquer coisa
+
   if (authStore.loading) {
     await new Promise((resolve) => {
       const unwatch = authStore.$subscribe((mutation, state) => {
@@ -85,7 +85,13 @@ router.beforeEach(async (to) => {
     return { name: 'login', query: { redirect: to.fullPath } }
   }
 
-  if (to.meta.requiresProfessor && !authStore.isProfessor) {
+  const isProfessorUser =
+    authStore.isProfessor ||
+    authStore.profile?.tipo_usuario === 'professor' ||
+    authStore.user?.user_metadata?.tipo_usuario === 'professor' ||
+    authStore.session?.user?.user_metadata?.tipo_usuario === 'professor'
+
+  if (to.meta.requiresProfessor && !isProfessorUser) {
     return { name: 'home' }
   }
 })

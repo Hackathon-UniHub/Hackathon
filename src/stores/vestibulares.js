@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
-import { getAll, getByUni, getById, add, update, remove, getStatus } from '@/data/vestibulares.js'
+import { getAll, add, update, remove, getStatus } from '@/data/vestibulares.js'
 import { useAuthStore } from '@/stores/auth'
 
 export const useVestibularesStore = defineStore('vestibulares', () => {
@@ -9,6 +9,7 @@ export const useVestibularesStore = defineStore('vestibulares', () => {
   const error = ref(null)
 
   function init() { list.value = getAll() }
+  function inicializar() { list.value = getAll() }
   function reload() { list.value = getAll() }
 
   const byUni = computed(() => {
@@ -59,5 +60,5 @@ export const useVestibularesStore = defineStore('vestibulares', () => {
     return auth.isLoggedIn && auth.profile?.tipo_usuario === 'professor' && v.professor_id === auth.user.id
   }
 
-  return { list, loading, error, init, reload, getByUniversidade, getPublicados, getOne, status, criar, atualizar, remover, canManage }
+  return { list, loading, error, init, inicializar, reload, getByUniversidade, getPublicados, getOne, status, criar, atualizar, remover, canManage }
 })

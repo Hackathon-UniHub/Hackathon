@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
-import { getAll, getByVestibular, countByVestibular, addComentario, addResposta, editComentario, deleteComentario, deleteResposta, canModerate, canEdit } from '@/data/comentarios.js'
+import { getAll, countByVestibular, addComentario, addResposta, editComentario, deleteComentario, deleteResposta, canModerate, canEdit } from '@/data/comentarios.js'
 import { useAuthStore } from '@/stores/auth'
 
 export const useComentariosStore = defineStore('comentarios', () => {

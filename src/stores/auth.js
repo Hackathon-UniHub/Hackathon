@@ -1,6 +1,11 @@
 import { defineStore } from 'pinia'
 import { supabase } from '@/services/supabase'
 
+function limparFavoritosLocaisPorUsuario(userId) {
+  if (!userId) return
+  sessionStorage.removeItem(`favoritos_${userId}`)
+}
+
 const PROFILE_STORAGE_KEY = 'unihub_profile_local'
 
 function loadLocalProfile(userId) {
@@ -51,8 +56,14 @@ export const useAuthStore = defineStore('auth', {
   getters: {
     isLoggedIn: (state) => !!state.session,
     hasProfile: (state) => !!state.profile,
-    isProfessor: (state) => state.profile?.tipo_usuario === 'professor',
-    isEstudante: (state) => state.profile?.tipo_usuario === 'estudante',
+    isProfessor: (state) =>
+      state.profile?.tipo_usuario === 'professor' ||
+      state.user?.user_metadata?.tipo_usuario === 'professor' ||
+      state.session?.user?.user_metadata?.tipo_usuario === 'professor',
+    isEstudante: (state) =>
+      state.profile?.tipo_usuario === 'estudante' ||
+      state.user?.user_metadata?.tipo_usuario === 'estudante' ||
+      state.session?.user?.user_metadata?.tipo_usuario === 'estudante',
     professorUniversidadeId: (state) => state.profile?.universidade_id || null,
   },
 
@@ -116,10 +127,8 @@ export const useAuthStore = defineStore('auth', {
     async logout() {
       await supabase.auth.signOut()
 
-      const { useFavoritosStore } = await import('@/stores/favoritos')
-      useFavoritosStore().limparFavoritos()
-
       if (this.user) {
+        limparFavoritosLocaisPorUsuario(this.user.id)
         clearLocalProfile(this.user.id)
       }
 
