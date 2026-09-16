@@ -20,6 +20,18 @@ export function filtrarUniversidades(universidades, busca) {
   })
 }
 
+export function filtrarUniversidadesPorCurso(universidades, buscaCurso, getCursos) {
+  const buscaNormalizada = normalizar(buscaCurso.trim())
+
+  if (!buscaNormalizada) return universidades
+
+  return universidades.filter((universidade) =>
+    getCursos(universidade.id).some((curso) =>
+      normalizar(curso.nome_curso).includes(buscaNormalizada),
+    ),
+  )
+}
+
 export function agruparUniversidadesPorEstado(universidades) {
   const grupos = {}
 
