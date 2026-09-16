@@ -173,9 +173,10 @@ onMounted(() => {
           </div>
         </div>
 
-        <VestibularesList :universidade-id="universidade.id" @editar="abrirEdicaoVestibular" />
+        <div class="colunaLateral">
+          <VestibularesList :universidade-id="universidade.id" @editar="abrirEdicaoVestibular" />
 
-        <div class="caixaInstitucional">
+          <div class="caixaInstitucional">
           <div class="tituloInstitucional">
             <h3>Informações institucionais</h3>
             <img class="medalha" src="/src/components/icons/medalha.svg" alt="medalha" />
@@ -223,6 +224,7 @@ onMounted(() => {
           <div class="linhaDado" v-if="universidade.sinalizacoes_vigentes">
             <span class="dadoRotulo">Sinalizações vigentes</span>
             <span class="dadoValor alerta">{{ universidade.sinalizacoes_vigentes }}</span>
+          </div>
           </div>
         </div>
 
@@ -481,8 +483,13 @@ onMounted(() => {
 }
 
 .caixaInstitucional {
+  margin-top: 0;
+}
+
+.colunaLateral {
   grid-column: 2;
-  grid-row: 1;
+  grid-row: 1 / span 2;
+  min-width: 0;
 }
 
 .conteudo > .secao {
@@ -507,9 +514,13 @@ onMounted(() => {
     grid-column: 1;
     grid-row: 2;
   }
-  .caixaInstitucional {
+  .colunaLateral {
     grid-column: 1;
     grid-row: 3;
+  }
+  .caixaInstitucional {
+    grid-column: 1;
+    grid-row: auto;
   }
   .caixaCadastro {
     grid-column: 1;

@@ -23,6 +23,7 @@ export const useComentariosStore = defineStore('comentarios', () => {
   async function criarComentario(vid, texto) {
     const auth = useAuthStore()
     if (!auth.isLoggedIn) throw new Error('USUARIO_NAO_LOGADO')
+    if (!auth.isEstudante && !auth.isProfessor) throw new Error('TIPO_USUARIO_NAO_PERMITIDO')
     const c = addComentario({ vestibular_id: vid, user_id: auth.user.id, user_nome: auth.profile?.full_name || auth.user.email?.split('@')[0] || 'Estudante', user_tipo: auth.profile?.tipo_usuario || 'estudante', user_universidade_id: auth.profile?.universidade_id || null, conteudo: texto })
     reload()
     return c

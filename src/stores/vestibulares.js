@@ -27,7 +27,11 @@ export const useVestibularesStore = defineStore('vestibulares', () => {
     const auth = useAuthStore()
     if (!auth.isLoggedIn) throw new Error('USUARIO_NAO_LOGADO')
     if (auth.profile?.tipo_usuario !== 'professor') throw new Error('APENAS_PROFESSOR')
-    const v = { ...data, universidade_id: auth.profile.universidade_id, professor_id: auth.user.id, status: data.status || 'rascunho' }
+    const universidadeId = Number(auth.profile.universidade_id)
+    if (!universidadeId || (data.universidade_id && Number(data.universidade_id) !== universidadeId)) {
+      throw new Error('UNIVERSIDADE_NAO_VINCULADA')
+    }
+    const v = { ...data, universidade_id: universidadeId, professor_id: auth.user.id, status: data.status || 'rascunho' }
     const novo = add(v)
     reload()
     return novo
@@ -39,9 +43,23 @@ export const useVestibularesStore = defineStore('vestibulares', () => {
     const v = getOne(id)
     if (!v) throw new Error('VESTIBULAR_NAO_ENCONTRADO')
     if (auth.profile?.tipo_usuario !== 'professor' || v.professor_id !== auth.user.id) throw new Error('SEM_PERMISSAO')
-    const r = update(id, data)
+    const r = update(id, { ...data, universidade_id: v.universidade_id })
     reload()
     return r
+  }
+
+  async function publicar(id) {
+    const auth = useAuthStore()
+    if (!auth.isLoggedIn) throw new Error('USUARIO_NAO_LOGADO')
+    const v = getOne(id)
+    if (!v) throw new Error('VESTIBULAR_NAO_ENCONTRADO')
+    if (auth.profile?.tipo_usuario !== 'professor' || v.professor_id !== auth.user.id) {
+      throw new Error('SEM_PERMISSAO')
+    }
+
+    const publicado = update(id, { status: 'publicado' })
+    reload()
+    return publicado
   }
 
   async function remover(id) {
@@ -60,5 +78,5 @@ export const useVestibularesStore = defineStore('vestibulares', () => {
     return auth.isLoggedIn && auth.profile?.tipo_usuario === 'professor' && v.professor_id === auth.user.id
   }
 
-  return { list, loading, error, init, inicializar, reload, getByUniversidade, getPublicados, getOne, status, criar, atualizar, remover, canManage }
+  return { list, loading, error, init, inicializar, reload, getByUniversidade, getPublicados, getOne, status, criar, atualizar, publicar, remover, canManage }
 })
