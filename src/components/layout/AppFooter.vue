@@ -49,8 +49,8 @@ import { InstagramIcon, Facebook01Icon, NewTwitterIcon } from '@hugeicons/core-f
           <h4>Produto</h4>
           <ul>
             <li><RouterLink to="/mapa">Mapa interativo</RouterLink></li>
-            <li><RouterLink to="/explorar">Explorar</RouterLink></li>
-            <li><RouterLink to="/como-funciona">Como funciona</RouterLink></li>
+            <li><RouterLink to="/universidades">Explorar</RouterLink></li>
+            <li><RouterLink :to="{ path: '/', hash: '#como-funciona' }">Como funciona</RouterLink></li>
           </ul>
         </div>
 

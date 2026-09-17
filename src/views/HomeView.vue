@@ -1,14 +1,18 @@
 <script setup>
-import { computed, onMounted } from 'vue'
+import { computed, onMounted, onUnmounted } from 'vue'
 import { RouterLink } from 'vue-router'
-import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import notasUniversidades from '@/data/notasUniversidades.js'
 import universidades from '@/data/universidades.js'
 import { normalizarNome } from '@/utils/universidadesUtils.js'
 
-const router = useRouter()
 const authStore = useAuthStore()
+let observador = null
+const destinoComecarAgora = computed(() =>
+  authStore.isLoggedIn
+    ? { path: '/universidades' }
+    : { name: 'login', query: { redirect: '/universidades' } },
+)
 const universidadesMaisBemRanqueadas = computed(() => {
   return [...notasUniversidades]
     .sort((primeira, segunda) => primeira.Ranking - segunda.Ranking)
@@ -27,30 +31,10 @@ const universidadesMaisBemRanqueadas = computed(() => {
     .filter(Boolean)
 })
 
-async function comecarAgora() {
-  if (authStore.loading) {
-    await new Promise((resolve) => {
-      const unwatch = authStore.$subscribe((mutation, state) => {
-        if (!state.loading) {
-          unwatch()
-          resolve()
-        }
-      })
-    })
-  }
-
-  if (authStore.isLoggedIn) {
-    router.push('/universidades')
-    return
-  }
-
-  router.push({ name: 'login', query: { redirect: '/universidades' } })
-}
-
 onMounted(() => {
   const elementosAnimados = document.querySelectorAll('.pagina > section')
 
-  const observador = new IntersectionObserver(
+  observador = new IntersectionObserver(
     (entradas) => {
       entradas.forEach((entrada) => {
         if (entrada.isIntersecting) {
@@ -63,6 +47,11 @@ onMounted(() => {
   )
 
   elementosAnimados.forEach((elemento) => observador.observe(elemento))
+})
+
+onUnmounted(() => {
+  observador?.disconnect()
+  observador = null
 })
 </script>
 
@@ -80,9 +69,9 @@ onMounted(() => {
           <p>Compare instituições, explore no mapa e tome decisões com confiança.</p>
 
           <div class="acoesPrincipal">
-            <button type="button" class="botao botaoPrimario" @click="comecarAgora">
+            <RouterLink :to="destinoComecarAgora" class="botao botaoPrimario">
               Começar agora
-            </button>
+            </RouterLink>
             <RouterLink to="/mapa" class="botao botaoSecundario">Ver mapa interativo</RouterLink>
           </div>
 
@@ -179,7 +168,7 @@ onMounted(() => {
       </div>
     </section>
 
-    <section class="comoFunciona">
+    <section id="como-funciona" class="comoFunciona">
       <div class="container conteudoComoFunciona">
         <span class="destaque destaqueClaro">Como funciona</span>
         <h2>Como o <span class="textoDestaque">UniHub</span> funciona?</h2>
@@ -205,7 +194,7 @@ onMounted(() => {
           </article>
         </div>
 
-        <div class="caixaAcao">
+        <div v-if="!authStore.isLoggedIn && !authStore.user" class="caixaAcao">
           <RouterLink to="/criar-conta" class="botao botaoPrimario">Criar conta grátis</RouterLink>
         </div>
       </div>
