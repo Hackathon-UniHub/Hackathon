@@ -13,6 +13,10 @@ export const useVestibularesStore = defineStore('vestibulares', () => {
     return auth.user?.id || null
   }
 
+  function representanteAtual(auth) {
+    return auth.isProfessor || auth.profile?.tipo_usuario === 'professor'
+  }
+
   function init() { list.value = getAll(professorIdAtual()) }
   function inicializar() { list.value = getAll(professorIdAtual()) }
   function reload() { list.value = getAll(professorIdAtual()) }
@@ -31,7 +35,7 @@ export const useVestibularesStore = defineStore('vestibulares', () => {
   async function criar(data) {
     const auth = useAuthStore()
     if (!auth.isLoggedIn) throw new Error('USUARIO_NAO_LOGADO')
-    if (auth.profile?.tipo_usuario !== 'professor') throw new Error('APENAS_PROFESSOR')
+    if (!representanteAtual(auth)) throw new Error('APENAS_PROFESSOR')
     const universidadeId = Number(auth.profile.universidade_id)
     if (!universidadeId || (data.universidade_id && Number(data.universidade_id) !== universidadeId)) {
       throw new Error('UNIVERSIDADE_NAO_VINCULADA')
@@ -47,7 +51,7 @@ export const useVestibularesStore = defineStore('vestibulares', () => {
     if (!auth.isLoggedIn) throw new Error('USUARIO_NAO_LOGADO')
     const v = getOne(id)
     if (!v) throw new Error('VESTIBULAR_NAO_ENCONTRADO')
-    if (auth.profile?.tipo_usuario !== 'professor' || v.professor_id !== auth.user.id) throw new Error('SEM_PERMISSAO')
+    if (!representanteAtual(auth) || v.professor_id !== auth.user.id) throw new Error('SEM_PERMISSAO')
     const r = update(id, { ...data, universidade_id: v.universidade_id })
     reload()
     return r
@@ -58,7 +62,7 @@ export const useVestibularesStore = defineStore('vestibulares', () => {
     if (!auth.isLoggedIn) throw new Error('USUARIO_NAO_LOGADO')
     const v = getOne(id)
     if (!v) throw new Error('VESTIBULAR_NAO_ENCONTRADO')
-    if (auth.profile?.tipo_usuario !== 'professor' || v.professor_id !== auth.user.id) {
+    if (!representanteAtual(auth) || v.professor_id !== auth.user.id) {
       throw new Error('SEM_PERMISSAO')
     }
 
@@ -72,7 +76,7 @@ export const useVestibularesStore = defineStore('vestibulares', () => {
     if (!auth.isLoggedIn) throw new Error('USUARIO_NAO_LOGADO')
     const v = getOne(id)
     if (!v) throw new Error('VESTIBULAR_NAO_ENCONTRADO')
-    if (auth.profile?.tipo_usuario !== 'professor' || v.professor_id !== auth.user.id) throw new Error('SEM_PERMISSAO')
+    if (!representanteAtual(auth) || v.professor_id !== auth.user.id) throw new Error('SEM_PERMISSAO')
     remove(id)
     reload()
     return true
@@ -80,7 +84,7 @@ export const useVestibularesStore = defineStore('vestibulares', () => {
 
   function canManage(v) {
     const auth = useAuthStore()
-    return auth.isLoggedIn && auth.profile?.tipo_usuario === 'professor' && v.professor_id === auth.user.id
+    return auth.isLoggedIn && representanteAtual(auth) && v.professor_id === auth.user.id
   }
 
   return { list, loading, error, init, inicializar, reload, getByUniversidade, getPublicados, getOne, status, criar, atualizar, publicar, remover, canManage }
