@@ -34,7 +34,7 @@ const nomeProfessor = computed(() =>
   auth.profile?.full_name ||
   auth.user?.user_metadata?.full_name ||
   auth.user?.email?.split('@')[0] ||
-  'Professor',
+  'Representante da Universidade',
 )
 
 onMounted(() => {
@@ -88,7 +88,7 @@ function vestibularSalvo() {
   <div class="page">
     <div class="card">
       <div class="topo">
-        <p>Painel do professor</p>
+        <p>Painel da universidade</p>
         <div class="topo-actions">
           <select v-model="filtro">
             <option value="todos">Todos</option>
@@ -96,14 +96,14 @@ function vestibularSalvo() {
             <option value="rascunho">Rascunho</option>
             <option value="arquivado">Arquivado</option>
           </select>
-          <button class="primary" @click="abrirFormulario">Novo vestibular</button>
+          <button type="button" class="primary" @click="abrirFormulario">Novo vestibular</button>
         </div>
       </div>
 
       <section class="perfil">
         <div class="avatar">{{ nomeProfessor.charAt(0).toUpperCase() }}</div>
         <div>
-          <small>Professor</small>
+          <small>Representante da Universidade</small>
           <h2>{{ nomeProfessor }}</h2>
           <p>{{ universidade?.nome || 'Universidade não vinculada' }}</p>
           <span v-if="auth.user?.email">{{ auth.user.email }}</span>

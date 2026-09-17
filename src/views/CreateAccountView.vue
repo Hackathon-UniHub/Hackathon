@@ -198,7 +198,7 @@ onUnmounted(() => {
           @click="definirTipoUsuario('professor')"
         >
           <HugeiconsIcon :icon="BriefcaseIcon" :size="24" :stroke-width="1.5" />
-          <span>Professor</span>
+          <span>Representante da Universidade</span>
           <small>Cadastrar vestibulares da sua instituição</small>
         </button>
       </div>

@@ -11,9 +11,6 @@ const texto = ref('')
 const comentarios = computed(() => props.universidadeId
   ? store.getByUniversidade(props.universidadeId)
   : store.getByVest(props.vestibularId))
-const quantidade = computed(() => props.universidadeId
-  ? store.countUniversidade(props.universidadeId)
-  : store.count(props.vestibularId))
 
 onMounted(() => store.init())
 
@@ -36,8 +33,8 @@ async function excluir(id) {
 
 <template>
   <section class="comentarios">
-    <button class="abrir" type="button" @click="aberto = !aberto">
-      {{ aberto ? 'Ocultar' : 'Ver' }} comentários ({{ quantidade }})
+    <button type="button" class="abrir" @click="aberto = !aberto">
+      {{ aberto ? 'Ocultar comentários' : 'Ver comentários' }}
     </button>
 
     <div v-if="aberto" class="conteudo">

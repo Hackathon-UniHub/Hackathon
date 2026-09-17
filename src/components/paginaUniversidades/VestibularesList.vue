@@ -61,7 +61,7 @@ function formatDate(date) {
 
         <div class="botoes">
           <a
-            v-if="vestibular.inscricao_url && vestibular.data_inscricao_fim && new Date(vestibular.data_inscricao_fim + 'T23:59:59') >= new Date()"
+            v-if="!auth.isProfessor && vestibular.inscricao_url && vestibular.data_inscricao_fim && new Date(vestibular.data_inscricao_fim + 'T23:59:59') >= new Date()"
             :href="vestibular.inscricao_url"
             target="_blank"
             rel="noopener"

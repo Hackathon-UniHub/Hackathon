@@ -200,7 +200,7 @@ onUnmounted(() => document.removeEventListener('keydown', fecharComTecla))
 
       <div class="campo">
         <label>Descrição</label>
-        <textarea v-model="form.descricao" rows="4" placeholder="Descreva o vestibular..."></textarea>
+        <textarea v-model="form.descricao" rows="3" placeholder="Descreva o vestibular..."></textarea>
       </div>
 
       <div class="botoes">
@@ -221,24 +221,25 @@ onUnmounted(() => document.removeEventListener('keydown', fecharComTecla))
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 20px;
+  padding: 16px;
   z-index: 1000;
 }
 
 .modal {
   width: 100%;
-  max-width: 700px;
+  max-width: 640px;
+  max-height: calc(100vh - 32px);
+  overflow-y: auto;
   background: white;
-  border-radius: 16px;
-  padding: 20px;
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.16);
+  border-radius: 12px;
+  padding: 16px;
 }
 
 .topo {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 20px;
+  margin-bottom: 12px;
 }
 
 .topo h2 {
@@ -255,6 +256,12 @@ onUnmounted(() => document.removeEventListener('keydown', fecharComTecla))
   border-radius: 999px;
   font-size: 1.5rem;
   cursor: pointer;
+  box-shadow: none;
+  transition: none;
+}
+
+.fechar:hover {
+  background: #e5e7eb;
 }
 
 .erro {
@@ -263,21 +270,21 @@ onUnmounted(() => document.removeEventListener('keydown', fecharComTecla))
   border: 1px solid #fecaca;
   border-radius: 10px;
   padding: 10px 12px;
-  margin-bottom: 16px;
+  margin-bottom: 10px;
   font-size: 0.9rem;
 }
 
 .campo {
   display: flex;
   flex-direction: column;
-  gap: 8px;
-  margin-bottom: 16px;
+  gap: 5px;
+  margin-bottom: 10px;
 }
 
 .linha {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 16px;
+  gap: 12px;
 }
 
 label {
@@ -300,14 +307,14 @@ textarea {
 
 textarea {
   resize: vertical;
-  min-height: 100px;
+  min-height: 72px;
 }
 
 .botoes {
   display: flex;
   justify-content: flex-end;
-  gap: 12px;
-  margin-top: 20px;
+  gap: 10px;
+  margin-top: 12px;
 }
 
 .btn {
@@ -316,6 +323,8 @@ textarea {
   padding: 10px 18px;
   font-weight: 600;
   cursor: pointer;
+  box-shadow: none;
+  transition: none;
 }
 
 .btn:disabled {
@@ -328,9 +337,17 @@ textarea {
   color: #374151;
 }
 
+.btn.secundario:hover {
+  background: #e5e7eb;
+}
+
 .btn.principal {
   background: #7a0f1a;
   color: white;
+}
+
+.btn.principal:hover {
+  background: #620c15;
 }
 
 @media (max-width: 640px) {

@@ -8,9 +8,14 @@ export const useVestibularesStore = defineStore('vestibulares', () => {
   const loading = ref(false)
   const error = ref(null)
 
-  function init() { list.value = getAll() }
-  function inicializar() { list.value = getAll() }
-  function reload() { list.value = getAll() }
+  function professorIdAtual() {
+    const auth = useAuthStore()
+    return auth.user?.id || null
+  }
+
+  function init() { list.value = getAll(professorIdAtual()) }
+  function inicializar() { list.value = getAll(professorIdAtual()) }
+  function reload() { list.value = getAll(professorIdAtual()) }
 
   const byUni = computed(() => {
     const m = {}
