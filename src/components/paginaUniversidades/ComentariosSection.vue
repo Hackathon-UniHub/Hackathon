@@ -33,7 +33,7 @@ async function excluir(id) {
 
 <template>
   <section class="comentarios">
-    <button type="button" class="abrir" @click="aberto = !aberto">
+        <button type="button" class="abrir" @click="aberto = !aberto">
       {{ aberto ? 'Ocultar comentários' : 'Ver comentários' }}
     </button>
 

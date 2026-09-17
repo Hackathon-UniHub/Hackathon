@@ -5,7 +5,6 @@ import { useAuthStore } from '@/stores/auth'
 import { useFavoritosStore } from '@/stores/favoritos'
 import VestibularesList from './VestibularesList.vue'
 import VestibularForm from './VestibularForm.vue'
-import ComentariosSection from './ComentariosSection.vue'
 import {
   UniversidadePorId,
   getIniciais,
@@ -245,11 +244,6 @@ function onFecharCurso() {
       <VestibularesList
         :universidade-id="universidade.id"
         @editar="abrirEdicaoVestibular"
-      />
-
-      <ComentariosSection
-        v-if="temCursosDisponiveis(universidade)"
-        :universidade-id="universidade.id"
       />
 
       <div class="secaoCursos" v-if="temCursosDisponiveis(universidade)">
