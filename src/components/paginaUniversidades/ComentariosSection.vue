@@ -33,12 +33,10 @@ async function excluir(id) {
 
 <template>
   <section class="comentarios">
-<<<<<<< HEAD
         <button type="button" class="abrir" @click="aberto = !aberto">
       {{ aberto ? 'Ocultar comentários' : 'Ver comentários' }}
     </button>
-=======
->>>>>>> af2ef0a53ea7468285ce5dc5d9abf8bb720cc3d1
+
 
     <div v-if="aberto" class="conteudo">
       <p v-if="!comentarios.length" class="vazio">Ainda não há comentários.</p>
