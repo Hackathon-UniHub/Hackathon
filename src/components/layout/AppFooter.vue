@@ -241,232 +241,29 @@ import { InstagramIcon, Facebook01Icon, NewTwitterIcon } from '@hugeicons/core-f
   }
 }
 
-/* === RESET === */
-/* http://meyerweb.com/eric/tools/css/reset/
-  v2.0 | 20110126
-  License: none (public domain)
-*/
+@media (max-width: 480px) {
+  .rodapeConteudo {
+    gap: 24px;
+  }
 
-html,
-body,
-div,
-span,
-applet,
-object,
-iframe,
-h1,
-h2,
-h3,
-h4,
-h5,
-h6,
-p,
-blockquote,
-pre,
-a,
-abbr,
-acronym,
-address,
-big,
-cite,
-code,
-del,
-dfn,
-em,
-img,
-ins,
-kbd,
-q,
-s,
-samp,
-small,
-strike,
-strong,
-sub,
-sup,
-tt,
-var,
-b,
-u,
-i,
-center,
-dl,
-dt,
-dd,
-ol,
-ul,
-li,
-fieldset,
-form,
-label,
-legend,
-table,
-caption,
-tbody,
-tfoot,
-thead,
-tr,
-th,
-td,
-/* HTML5 display-role reset for older browsers */
-article,
-aside,
-canvas,
-details,
-embed,
-figure,
-figcaption,
-footer,
-header,
-hgroup,
-menu,
-nav,
-output,
-ruby,
-section,
-summary,
-time,
-mark,
-audio,
-video {
-  margin: 0;
-  padding: 0;
-  border: 0;
-  font-size: 100%;
-  font: inherit;
-  vertical-align: baseline;
-  text-decoration: none;
-}
-article,
-aside,
-details,
-figcaption,
-figure,
-footer,
-header,
-hgroup,
-menu,
-nav,
-section {
-  display: block;
-}
-body {
-  line-height: 1;
-}
-ol,
-ul {
-  list-style: none;
-}
-blockquote,
-q {
-  quotes: none;
-}
-blockquote:before,
-blockquote:after,
-q:before,
-q:after {
-  content: '';
-  content: none;
-}
-table {
-  border-collapse: collapse;
-  border-spacing: 0;
-}
-footer {
-  background-color: black;
-  padding: 6vw 2vw;
-}
+  .blocoMarca {
+    text-align: center;
+  }
 
-.container {
-  /* === RESET === */
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  width: 100%;
-}
+  .linhaMarca {
+    justify-content: center;
+  }
 
-.redes-sociais {
-  display: flex;
-  align-items: center;
-  width: 100%;
-  margin-bottom: 35px;
-}
+  .redesSociais {
+    justify-content: center;
+  }
 
-.redes-sociais::before,
-.redes-sociais::after {
-  content: '';
-  flex: 1;
-  height: 2px;
-  background-color: rgba(255, 255, 255, 0.466);
-}
+  .linksRodape {
+    text-align: center;
+  }
 
-.redes-sociais ul {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 24px;
-  padding: 0 40px;
-}
-
-.redes-sociais img {
-  width: 24px;
-  height: auto;
-  display: block;
-  filter: invert(1);
-  transition:
-    transform 0.2s ease,
-    opacity 0.2s ease;
-}
-
-.redes-sociais img:hover {
-  cursor: pointer;
-  transform: translateY(-4px);
-  opacity: 0.6;
-}
-
-.contato {
-  text-align: center;
-  color: white;
-}
-
-.contato h2 {
-  font-size: 1.2rem;
-  font-weight: 400;
-  margin-bottom: 8px;
-}
-
-.contato p {
-  font-size: 1.1rem;
-}
-
-.rodape > .container {
-  width: 100%;
-  max-width: none;
-  margin-inline: auto;
-}
-
-.rodapeConteudo {
-  align-items: center;
-  justify-content: center;
-}
-
-.blocoMarca {
-  text-align: center;
-}
-
-.redesSociais {
-  justify-content: center;
-}
-
-.linksRodape {
-  justify-items: center;
-  text-align: center;
-}
-
-.rodapeInferior {
-  justify-content: center;
-  gap: 18px;
-  align-items: center;
-  text-align: center;
+  .grupoLinks h4 {
+    text-align: center;
+  }
 }
 </style>

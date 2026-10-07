@@ -77,6 +77,21 @@ body {
   min-height: 100vh;
 }
 
+#app {
+  width: 100%;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+main {
+  width: 100%;
+}
+
+.container {
+  width: min(var(--container-width), calc(100% - 24px));
+  margin-inline: auto;
+}
+
 a {
   text-decoration: none;
   color: inherit;
@@ -94,4 +109,68 @@ button {
 ::selection {
   background: rgba(122, 15, 26, 0.14);
   color: var(--color-text);
+}
+
+/* === RESPONSIVE FOUNDATION === */
+@media (max-width: 900px) {
+  .container {
+    width: min(var(--container-width), calc(100% - 20px));
+  }
+}
+
+@media (max-width: 640px) {
+  html {
+    font-size: 14px;
+  }
+
+  body {
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+
+  .container {
+    width: min(var(--container-width), calc(100% - 16px));
+  }
+}
+
+/* Touch-friendly targets */
+@media (hover: none) and (pointer: coarse) {
+  button,
+  .btn,
+  .botao,
+  a[role="button"],
+  input[type="button"],
+  input[type="submit"] {
+    min-height: 44px;
+    min-width: 44px;
+  }
+
+  .chip,
+  .chipCurso,
+  .botoesEstados .botao {
+    min-height: 40px;
+  }
+}
+
+/* Smooth scrolling with respect for reduced motion */
+@media (prefers-reduced-motion: no-preference) {
+  html {
+    scroll-behavior: smooth;
+  }
+}
+
+/* Focus visible for accessibility */
+:focus-visible {
+  outline: 2px solid var(--brand-700);
+  outline-offset: 2px;
+}
+
+/* Prevent horizontal overflow */
+html, body {
+  overflow-x: hidden;
+}
+
+/* Ensure images don't cause layout shift */
+img {
+  max-width: 100%;
+  height: auto;
 }

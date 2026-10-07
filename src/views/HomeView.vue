@@ -804,6 +804,10 @@ onUnmounted(() => {
     gap: 32px;
   }
 
+  .visualPrincipal {
+    order: 0;
+  }
+
   .acoesPrincipal {
     flex-direction: column;
     align-items: stretch;

@@ -516,9 +516,13 @@ function onFecharCurso() {
 
 .conteudo {
   display: grid;
-  grid-template-columns: 2fr 1fr;
+  grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
   gap: 1.5rem;
   margin-top: 1rem;
+}
+
+.conteudo > * {
+  min-width: 0;
 }
 
 .secoesSuperiores {
@@ -554,7 +558,7 @@ function onFecharCurso() {
 
 @media (max-width: 800px) {
   .conteudo {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
   }
   .secoesSuperiores {
     grid-column: 1;
@@ -570,11 +574,129 @@ function onFecharCurso() {
   }
   .caixaInstitucional {
     grid-column: 1;
-    grid-row: auto;
+    grid-row: 4;
   }
   .caixaCadastro {
     grid-column: 1;
-    grid-row: 4;
+    grid-row: 5;
+  }
+}
+
+@media (max-width: 640px) {
+  .paginaUniversidade {
+    padding: 1.5rem 1rem 3rem;
+  }
+
+  .cabecalho {
+    padding: 1.5rem;
+    border-radius: 12px;
+  }
+
+  .logo {
+    width: 56px;
+    height: 56px;
+    min-width: 56px;
+    font-size: 0.9rem;
+  }
+
+  .cabecalho h1 {
+    font-size: 1.3rem;
+  }
+
+  .acoesCabecalho {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.8rem;
+    width: 100%;
+  }
+
+  .botaoFavoritar,
+  .botaoSite {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .estatisticas {
+    grid-template-columns: 1fr;
+  }
+
+  .caixaEstatistica:nth-child(odd) {
+    background-color: var(--creme-forte);
+    border: 1px solid var(--borda);
+    color: #1c1c22;
+  }
+  .caixaEstatistica:nth-child(odd) .rotuloEstatistica {
+    color: var(--texto-fraco);
+  }
+
+  .secao,
+  .secaoCursos,
+  .caixaInstitucional,
+  .caixaCadastro,
+  .detalheCurso {
+    padding: 1.2rem;
+    border-radius: 12px;
+  }
+
+  .secao h2 {
+    font-size: 1rem;
+  }
+
+  .gradeDiferenciais,
+  .gradeAvaliacoes,
+  .detalheCursoGrade {
+    grid-template-columns: 1fr;
+  }
+
+  .itemDiferencial:nth-child(odd) {
+    background-color: var(--creme-forte);
+    border: 1px solid var(--borda);
+  }
+  .itemDiferencial:nth-child(odd) p {
+    color: #1c1c22;
+  }
+
+  .avaliacaoItem:nth-child(even) {
+    background-color: var(--creme-forte);
+    border: 1px solid var(--borda);
+  }
+  .avaliacaoItem:nth-child(even) .notaRotulo {
+    color: var(--texto-fraco);
+  }
+  .avaliacaoItem:nth-child(even) .notaValor {
+    color: #1c1c22;
+  }
+
+  .chipsCursos {
+    max-height: 180px;
+  }
+
+  .buscaCursoInput {
+    max-width: 100%;
+  }
+
+  .linhaDado {
+    flex-direction: column;
+    gap: 0.1rem;
+  }
+
+  .caixaCadastro {
+    padding: 1.2rem;
+  }
+
+  .botaoPrimario,
+  .botaoSecundario {
+    width: 100%;
+  }
+
+  .detalheCursoCabecalho {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .fecharDetalheCurso {
+    margin-left: 0;
+    margin-top: 0.5rem;
   }
 }
 
@@ -844,6 +966,7 @@ function onFecharCurso() {
 .dadoValor {
   font-size: 0.88rem;
   color: #1c1c22;
+  overflow-wrap: anywhere;
 }
 .dadoValor.alerta {
   color: var(--vermelho-escuro);

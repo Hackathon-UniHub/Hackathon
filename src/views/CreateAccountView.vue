@@ -803,4 +803,31 @@ form {
 }
 .item-local { font-size: 0.7rem; color: #91919f; white-space: nowrap; }
 .dropdown-empty { padding: 1rem; text-align: center; color: #91919f; font-size: 0.85rem; }
+
+@media (max-width: 480px) {
+  .page {
+    height: auto;
+    min-height: 100vh;
+    min-height: 100svh;
+    align-items: flex-start;
+    overflow-y: auto;
+    padding: 1rem;
+  }
+
+  .auth-card {
+    width: 100%;
+    max-height: none;
+    overflow: visible;
+    margin: 0 auto;
+    padding: 1.25rem;
+  }
+
+  .tipo-usuario {
+    grid-template-columns: 1fr;
+  }
+
+  .tipo-btn small {
+    font-size: 0.75rem;
+  }
+}
 </style>

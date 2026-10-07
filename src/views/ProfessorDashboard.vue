@@ -164,12 +164,15 @@ function vestibularSalvo() {
 </template>
 
 <style scoped>
-* { box-sizing: border-box; }
+* {
+  box-sizing: border-box;
+}
 
 .page {
   padding: 24px;
   font-family: Arial, sans-serif;
   background: #f4f4f4;
+  min-height: 100vh;
 }
 
 .card {
@@ -183,6 +186,7 @@ function vestibularSalvo() {
   align-items: center;
   gap: 12px;
   margin-bottom: 18px;
+  flex-wrap: wrap;
 }
 
 .topo p {
@@ -197,6 +201,7 @@ function vestibularSalvo() {
   display: flex;
   align-items: center;
   gap: 10px;
+  flex-wrap: wrap;
 }
 
 .perfil {
@@ -208,6 +213,7 @@ function vestibularSalvo() {
   background: white;
   border: 1px solid #e4e4e4;
   border-radius: 12px;
+  flex-wrap: wrap;
 }
 
 .avatar {
@@ -220,6 +226,7 @@ function vestibularSalvo() {
   color: white;
   font-size: 22px;
   font-weight: 700;
+  flex-shrink: 0;
 }
 
 .perfil h2,
@@ -309,6 +316,7 @@ button {
   justify-content: flex-end;
   gap: 10px;
   margin-top: 14px;
+  flex-wrap: wrap;
 }
 
 .principal-header {
@@ -317,6 +325,7 @@ button {
   align-items: center;
   gap: 12px;
   margin-bottom: 18px;
+  flex-wrap: wrap;
 }
 
 small {
@@ -351,13 +360,13 @@ h1 {
 .badge.rascunho,
 .tag.rascunho {
   background: #fff6dc;
-  color: #8d6400;
+  color: #8d6400.
 }
 
 .badge.arquivado,
 .tag.arquivado {
   background: #f1f1f1;
-  color: #555;
+  color: #555.
 }
 
 .grid {
@@ -393,6 +402,7 @@ h1 {
   gap: 12px;
   padding: 12px 0;
   border-bottom: 1px solid #eee;
+  flex-wrap: wrap;
 }
 
 .item:last-child {
@@ -403,6 +413,7 @@ h1 {
   display: flex;
   align-items: center;
   gap: 8px;
+  flex-wrap: wrap;
 }
 
 .edit {
@@ -440,6 +451,116 @@ h1 {
 
 .vazio {
   color: #666;
+}
+
+/* === RESPONSIVO === */
+@media (max-width: 768px) {
+  .page {
+    padding: 16px;
+  }
+
+  .card {
+    max-width: 100%;
+  }
+
+  .topo {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .topo-actions {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .topo-actions select {
+    flex: 1;
+    min-width: 140px;
+  }
+
+  .perfil {
+    flex-direction: column;
+    align-items: flex-start;
+    text-align: left;
+  }
+
+  .avatar {
+    margin-bottom: 8px;
+  }
+
+  .perfil h2 {
+    font-size: 18px;
+  }
+
+  .principal-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .grid {
+    grid-template-columns: 1fr;
+  }
+
+  .grid div {
+    padding: 10px;
+  }
+
+  .grid strong {
+    font-size: 16px;
+  }
+
+  .item {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .item-acoes {
+    width: 100%;
+    justify-content: flex-start;
+    margin-top: 8px;
+  }
+
+  .formulario,
+  .principal,
+  .lista,
+  .vazio {
+    padding: 14px;
+  }
+}
+
+@media (max-width: 480px) {
+  .page {
+    padding: 12px;
+  }
+
+  .topo-actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .topo-actions select,
+  .topo-actions button {
+    width: 100%;
+  }
+
+  .item-acoes {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .item-acoes button {
+    width: 100%;
+    text-align: center;
+  }
+
+  h1 {
+    font-size: 24px;
+  }
+
+  .formulario h2,
+  .lista h2 {
+    font-size: 18px;
+  }
 }
 </style>
 

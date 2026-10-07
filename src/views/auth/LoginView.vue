@@ -383,4 +383,21 @@ form {
 .footer-link a:hover {
   text-decoration: underline;
 }
+
+@media (max-width: 480px) {
+  .page {
+    align-items: flex-start;
+    padding: 1rem;
+  }
+
+  .auth-card {
+    width: 100%;
+    padding: 2rem 1.25rem;
+  }
+
+  .row {
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+}
 </style>

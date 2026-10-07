@@ -26,13 +26,8 @@ const ocultarLayout = computed(() => route.meta.hideLayout === true)
 
 @media (max-width: 768px) {
   .cabecalhoReserva {
-    height: 140px;
-  }
-}
-
-@media (max-width: 480px) {
-  .cabecalhoReserva {
-    height: 190px;
+    height: auto;
+    min-height: 76px;
   }
 }
 </style>

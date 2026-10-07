@@ -18,6 +18,8 @@ import {
   filtrarUniversidadesPorCurso,
   selecionarUniversidade,
 } from '@/utils/mapaUtils.js'
+import { HugeiconsIcon } from '@hugeicons/vue'
+import { XIcon, FilterIcon } from '@hugeicons/core-free-icons'
 
 const router = useRouter()
 
@@ -33,6 +35,7 @@ const estadosExpandidos = reactive({})
 const busca = ref('')
 const buscaCurso = ref('')
 const cursos = getCursos()
+const painelAberto = ref(false)
 
 const cursosFiltrados = computed(() => getCursosFiltrados(cursos, buscaCurso.value))
 
@@ -68,6 +71,14 @@ const universidadesPorEstado = computed(() =>
 )
 const aoAbrirUniversidade = criarManipuladorAberturaUniversidade(router)
 
+function alternarPainel() {
+  painelAberto.value = !painelAberto.value
+}
+
+function fecharPainel() {
+  painelAberto.value = false
+}
+
 onMounted(() => {
   window.addEventListener('abrir-universidade', aoAbrirUniversidade)
 })
@@ -87,9 +98,26 @@ onUnmounted(() => {
       />
     </section>
 
-    <aside class="mapaInformacoes">
+    <button
+      class="botaoTogglePainel"
+      type="button"
+      @click="alternarPainel"
+      :aria-expanded="painelAberto"
+      aria-label="Alternar painel de informações"
+      aria-controls="mapaInformacoes"
+    >
+      <HugeiconsIcon v-if="!painelAberto" :icon="FilterIcon" :size="24" color="currentColor" :stroke-width="2" />
+      <HugeiconsIcon v-else :icon="XIcon" :size="24" color="currentColor" :stroke-width="2" />
+    </button>
+
+    <aside
+      id="mapaInformacoes"
+      class="mapaInformacoes"
+      :class="{ aberto: painelAberto }"
+      aria-label="Informações do mapa"
+    >
       <div class="mapaInformacoesCabecalho">
-        <RouterLink class="voltar" to="/">← Voltar</RouterLink>
+        <button class="voltar" type="button" @click="fecharPainel">← Voltar</button>
 
         <span class="sobretitulo">Exploração</span>
         <h1>Mapa interativo</h1>
@@ -194,6 +222,13 @@ onUnmounted(() => {
         </p>
       </div>
     </aside>
+
+    <div
+      v-if="painelAberto"
+      class="overlayPainel"
+      @click="fecharPainel"
+      aria-hidden="true"
+    ></div>
   </div>
 </template>
 
@@ -226,6 +261,8 @@ onUnmounted(() => {
   border-radius: 16px;
   background: #ffffff;
   box-shadow: 0 12px 28px rgba(28, 28, 34, 0.12);
+  transform: translateX(0);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
 .mapaInformacoesCabecalho {
@@ -243,8 +280,12 @@ onUnmounted(() => {
 .voltar {
   display: inline-block;
   margin-bottom: 14px;
+  padding: 0;
+  border: 0;
+  background: transparent;
   color: #737384;
   font-size: 0.85rem;
+  cursor: pointer;
 }
 
 .voltar:hover {
@@ -480,14 +521,78 @@ onUnmounted(() => {
   text-align: center;
 }
 
-@media (max-width: 700px) {
+.botaoTogglePainel {
+  display: none;
+}
+
+.overlayPainel {
+  display: none;
+}
+
+/* === RESPONSIVO === */
+@media (max-width: 900px) {
   .mapaInformacoes {
-    top: auto;
-    bottom: 16px;
-    left: 16px;
-    right: 16px;
-    width: auto;
-    height: calc(100% - 32px);
+    width: 320px;
+  }
+}
+
+@media (max-width: 700px) {
+  .botaoTogglePainel {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    z-index: 999;
+    width: 52px;
+    height: 52px;
+    border-radius: 50%;
+    background: #7a0f1a;
+    border: none;
+    color: #ffffff;
+    box-shadow: 0 8px 24px rgba(122, 15, 26, 0.3);
+    cursor: pointer;
+  }
+
+  .botaoTogglePainel:hover {
+    background: #9e1f2e;
+  }
+
+  .mapaInformacoes {
+    top: 0;
+    bottom: 0;
+    left: auto;
+    right: 0;
+    width: 320px;
+    max-width: 85vw;
+    height: 100%;
+    border-radius: 0;
+    border-left: 1px solid rgba(28, 28, 34, 0.1);
+    border-bottom: none;
+    border-top: none;
+    transform: translateX(100%);
+    box-shadow: -12px 0 28px rgba(28, 28, 34, 0.15);
+  }
+
+  .mapaInformacoes.aberto {
+    transform: translateX(0);
+  }
+
+  .overlayPainel {
+    display: block;
+    position: fixed;
+    inset: 0;
+    z-index: 998;
+    background: rgba(0, 0, 0, 0.4);
+    backdrop-filter: blur(2px);
+  }
+}
+
+@media (max-width: 480px) {
+  .mapaInformacoes {
+    width: 100%;
+    max-width: 100%;
   }
 }
 </style>
