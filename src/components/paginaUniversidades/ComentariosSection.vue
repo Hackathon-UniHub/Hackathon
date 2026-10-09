@@ -3,7 +3,11 @@ import { computed, onMounted, ref } from 'vue'
 import { useAuthStore } from '@/stores/auth'
 import { useComentariosStore } from '@/stores/comentarios'
 
-const props = defineProps({ vestibularId: Number, universidadeId: Number })
+const props = defineProps({
+  vestibularId: Number,
+  universidadeId: Number,
+  titulo: { type: String, default: '' },
+})
 const store = useComentariosStore()
 const auth = useAuthStore()
 const aberto = ref(false)
@@ -33,7 +37,8 @@ async function excluir(id) {
 
 <template>
   <section class="comentarios">
-        <button type="button" class="abrir" @click="aberto = !aberto">
+    <h2 v-if="titulo" class="titulo">{{ titulo }}</h2>
+    <button type="button" class="abrir" @click="aberto = !aberto">
       {{ aberto ? 'Ocultar comentários' : 'Ver comentários' }}
     </button>
 
@@ -82,6 +87,12 @@ async function excluir(id) {
   color: #374151;
   cursor: pointer;
   font-weight: 600;
+}
+
+.titulo {
+  margin: 0 0 12px;
+  color: #1c1c22;
+  font-size: 1.1rem;
 }
 
 .conteudo {

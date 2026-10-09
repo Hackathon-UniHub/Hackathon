@@ -5,6 +5,7 @@ import { useAuthStore } from '@/stores/auth'
 import { useFavoritosStore } from '@/stores/favoritos'
 import VestibularesList from './VestibularesList.vue'
 import VestibularForm from './VestibularForm.vue'
+import ComentariosSection from './ComentariosSection.vue'
 import {
   UniversidadePorId,
   getIniciais,
@@ -246,77 +247,94 @@ function onFecharCurso() {
         @editar="abrirEdicaoVestibular"
       />
 
-      <div class="secaoCursos" v-if="temCursosDisponiveis(universidade)">
-        <h2>Cursos oferecidos</h2>
-        <p class="subtituloCursos">{{ cursosDaUniversidade.length }} cursos disponíveis</p>
+      <ComentariosSection
+        :universidade-id="universidade.id"
+        :titulo="`Comentários sobre ${universidade.sigla || universidade.nome}`"
+      />
 
-        <input v-model="pesquisaCurso" type="text" class="buscaCursoInput" placeholder="Filtrar cursos..." />
+      <div class="secaoCursos">
+        <h2>{{ universidade.cursos_pda?.length ? 'Cursos oferecidos' : 'Cursos em destaque' }}</h2>
 
-        <div class="chipsCursos">
-          <button
-            class="chipCurso"
-            v-for="(curso, indice) in cursosFiltrados"
-            :key="`${curso.codigo_curso}-${indice}`"
-            :class="{ ativo: cursoSelecionado === curso }"
-            @click="onSelecionarCurso(curso)"
-          >
-            {{ getRotuloCurso(curso) }}
-          </button>
-          <p class="semResultado" v-if="!cursosFiltrados.length">Nenhum curso encontrado.</p>
-        </div>
+        <template v-if="temCursosDisponiveis(universidade)">
+          <p class="subtituloCursos">
+            {{ cursosDaUniversidade.length }}
+            {{ universidade.cursos_pda?.length ? 'cursos cadastrados' : 'opções de destaque' }}
+          </p>
 
-        <div class="detalheCurso" v-if="cursoSelecionado">
-          <div class="detalheCursoCabecalho">
-            <div>
-              <span class="subtitulo">DETALHES DO CURSO</span>
+          <input v-model="pesquisaCurso" type="text" class="buscaCursoInput" placeholder="Filtrar cursos..." />
 
-              <h3>{{ cursoSelecionado.nome_curso }}</h3>
-              <p>{{ universidade.nome }}</p>
-            </div>
-            <button class="fecharDetalheCurso" type="button" @click="onFecharCurso">×</button>
+          <div class="chipsCursos">
+            <button
+              class="chipCurso"
+              v-for="(curso, indice) in cursosFiltrados"
+              :key="`${curso.codigo_curso || curso.nome_curso}-${indice}`"
+              :class="{ ativo: cursoSelecionado === curso }"
+              @click="onSelecionarCurso(curso)"
+            >
+              {{ getRotuloCurso(curso) }}
+            </button>
+            <p class="semResultado" v-if="!cursosFiltrados.length">Nenhum curso encontrado.</p>
           </div>
 
-          <div class="detalheCursoGrade">
-            <div class="detalheCursoItem">
-              <span class="detalheCursoRotulo">GRAU</span>
-              <span class="detalheCursoValor">{{ cursoSelecionado.grau || '-' }}</span>
+          <div class="detalheCurso" v-if="cursoSelecionado">
+            <div class="detalheCursoCabecalho">
+              <div>
+                <span class="subtitulo">DETALHES DO CURSO</span>
+
+                <h3>{{ cursoSelecionado.nome_curso }}</h3>
+                <p>{{ universidade.nome }}</p>
+              </div>
+              <button class="fecharDetalheCurso" type="button" @click="onFecharCurso">×</button>
             </div>
-            <div class="detalheCursoItem">
-              <span class="detalheCursoRotulo">ÁREA</span>
-              <span class="detalheCursoValor">
-                {{ cursoSelecionado.area_ocde_cine || cursoSelecionado.area_ocde || '-' }}
-              </span>
-            </div>
-            <div class="detalheCursoItem">
-              <span class="detalheCursoRotulo">MODALIDADE</span>
-              <span class="detalheCursoValor">{{ cursoSelecionado.modalidade || '-' }}</span>
-            </div>
-            <div class="detalheCursoItem">
-              <span class="detalheCursoRotulo">SITUAÇÃO</span>
-              <span class="detalheCursoValor">{{ cursoSelecionado.situacao_curso || '-' }}</span>
-            </div>
-            <div class="detalheCursoItem">
-              <span class="detalheCursoRotulo">VAGAS AUTORIZADAS</span>
-              <span class="detalheCursoValor">{{ cursoSelecionado.vagas_autorizadas ?? '-' }}</span>
-            </div>
-            <div class="detalheCursoItem">
-              <span class="detalheCursoRotulo">CARGA HORÁRIA</span>
-              <span class="detalheCursoValor">
-                {{ cursoSelecionado.carga_horaria ? `${cursoSelecionado.carga_horaria}h` : '-' }}
-              </span>
-            </div>
-            <div class="detalheCursoItem">
-              <span class="detalheCursoRotulo">LOCAL</span>
-              <span class="detalheCursoValor">
-                {{ cursoSelecionado.municipio }} - {{ cursoSelecionado.uf }}
-              </span>
-            </div>
-            <div class="detalheCursoItem" v-if="corteEnemSelecionado">
-              <span class="detalheCursoRotulo">CORTE ENEM</span>
-              <span class="detalheCursoValor destaqueCorte">{{ corteEnemSelecionado }}</span>
+
+            <p v-if="cursoSelecionado.ehDestaque" class="semResultado">
+              Detalhes deste curso ainda não estão disponíveis.
+            </p>
+
+            <div v-else class="detalheCursoGrade">
+              <div class="detalheCursoItem">
+                <span class="detalheCursoRotulo">GRAU</span>
+                <span class="detalheCursoValor">{{ cursoSelecionado.grau || '-' }}</span>
+              </div>
+              <div class="detalheCursoItem">
+                <span class="detalheCursoRotulo">ÁREA</span>
+                <span class="detalheCursoValor">
+                  {{ cursoSelecionado.area_ocde_cine || cursoSelecionado.area_ocde || '-' }}
+                </span>
+              </div>
+              <div class="detalheCursoItem">
+                <span class="detalheCursoRotulo">MODALIDADE</span>
+                <span class="detalheCursoValor">{{ cursoSelecionado.modalidade || '-' }}</span>
+              </div>
+              <div class="detalheCursoItem">
+                <span class="detalheCursoRotulo">SITUAÇÃO</span>
+                <span class="detalheCursoValor">{{ cursoSelecionado.situacao_curso || '-' }}</span>
+              </div>
+              <div class="detalheCursoItem">
+                <span class="detalheCursoRotulo">VAGAS AUTORIZADAS</span>
+                <span class="detalheCursoValor">{{ cursoSelecionado.vagas_autorizadas ?? '-' }}</span>
+              </div>
+              <div class="detalheCursoItem">
+                <span class="detalheCursoRotulo">CARGA HORÁRIA</span>
+                <span class="detalheCursoValor">
+                  {{ cursoSelecionado.carga_horaria ? `${cursoSelecionado.carga_horaria}h` : '-' }}
+                </span>
+              </div>
+              <div class="detalheCursoItem">
+                <span class="detalheCursoRotulo">LOCAL</span>
+                <span class="detalheCursoValor">
+                  {{ cursoSelecionado.municipio }} - {{ cursoSelecionado.uf }}
+                </span>
+              </div>
+              <div class="detalheCursoItem" v-if="corteEnemSelecionado">
+                <span class="detalheCursoRotulo">CORTE ENEM</span>
+                <span class="detalheCursoValor destaqueCorte">{{ corteEnemSelecionado }}</span>
+              </div>
             </div>
           </div>
-        </div>
+        </template>
+
+        <p v-else class="semResultado">Não há cursos cadastrados para esta universidade.</p>
       </div>
     </div>
 

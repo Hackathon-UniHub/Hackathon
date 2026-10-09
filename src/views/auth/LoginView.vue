@@ -154,7 +154,9 @@ const userInitial = computed(() => {
         <p>Entrar com o Google</p>
       </button>
 
-      <p v-if="errorMsg" class="error" role="alert">{{ errorMsg }}</p>
+      <!--
+        <p v-if="errorMsg" class="error" role="alert">{{ errorMsg }}</p>
+      -->
 
       <p class="footer-link">
         Não tem uma conta?

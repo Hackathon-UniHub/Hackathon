@@ -28,12 +28,12 @@ function formatDate(date) {
 </script>
 
 <template>
-  <section class="lista" v-if="vestibulares.length">
+  <section class="lista">
     <div class="cabecalho">
       <h2>Vestibulares</h2>
     </div>
 
-    <div class="cards">
+    <div v-if="vestibulares.length" class="cards">
       <article v-for="vestibular in vestibulares" :key="vestibular.id" class="card">
         <div class="topo">
           <div>
@@ -78,10 +78,8 @@ function formatDate(date) {
         <ComentariosSection :vestibular-id="vestibular.id" :contagem="store.count ? store.count(vestibular.id) : 0" />
       </article>
     </div>
-  </section>
 
-  <section v-else class="vazia">
-    <p>Nenhum vestibular disponível.</p>
+    <p v-else class="vazia">Nenhum vestibular publicado para esta universidade.</p>
   </section>
 </template>
 
