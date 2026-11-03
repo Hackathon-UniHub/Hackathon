@@ -248,81 +248,93 @@ function onFecharCurso() {
       />
 
       <ComentariosSection
-        v-if="temCursosDisponiveis(universidade)"
         :universidade-id="universidade.id"
+        :titulo="`Comentários sobre ${universidade.sigla || universidade.nome}`"
       />
 
-      <div class="secaoCursos" v-if="temCursosDisponiveis(universidade)">
-        <h2>Cursos oferecidos</h2>
-        <p class="subtituloCursos">{{ cursosDaUniversidade.length }} cursos disponíveis</p>
+      <div class="secaoCursos">
+        <h2>{{ universidade.cursos_pda?.length ? 'Cursos oferecidos' : 'Cursos em destaque' }}</h2>
 
-        <input v-model="pesquisaCurso" type="text" class="buscaCursoInput" placeholder="Filtrar cursos..." />
+        <template v-if="temCursosDisponiveis(universidade)">
+          <p class="subtituloCursos">
+            {{ cursosDaUniversidade.length }}
+            {{ universidade.cursos_pda?.length ? 'cursos cadastrados' : 'opções de destaque' }}
+          </p>
 
-        <div class="chipsCursos">
-          <button
-            class="chipCurso"
-            v-for="(curso, indice) in cursosFiltrados"
-            :key="`${curso.codigo_curso}-${indice}`"
-            :class="{ ativo: cursoSelecionado === curso }"
-            @click="onSelecionarCurso(curso)"
-          >
-            {{ getRotuloCurso(curso) }}
-          </button>
-          <p class="semResultado" v-if="!cursosFiltrados.length">Nenhum curso encontrado.</p>
-        </div>
+          <input v-model="pesquisaCurso" type="text" class="buscaCursoInput" placeholder="Filtrar cursos..." />
 
-        <div class="detalheCurso" v-if="cursoSelecionado">
-          <div class="detalheCursoCabecalho">
-            <div>
-              <span class="subtitulo">DETALHES DO CURSO</span>
-
-              <h3>{{ cursoSelecionado.nome_curso }}</h3>
-              <p>{{ universidade.nome }}</p>
-            </div>
-            <button class="fecharDetalheCurso" type="button" @click="onFecharCurso">×</button>
+          <div class="chipsCursos">
+            <button
+              class="chipCurso"
+              v-for="(curso, indice) in cursosFiltrados"
+              :key="`${curso.codigo_curso || curso.nome_curso}-${indice}`"
+              :class="{ ativo: cursoSelecionado === curso }"
+              @click="onSelecionarCurso(curso)"
+            >
+              {{ getRotuloCurso(curso) }}
+            </button>
+            <p class="semResultado" v-if="!cursosFiltrados.length">Nenhum curso encontrado.</p>
           </div>
 
-          <div class="detalheCursoGrade">
-            <div class="detalheCursoItem">
-              <span class="detalheCursoRotulo">GRAU</span>
-              <span class="detalheCursoValor">{{ cursoSelecionado.grau || '-' }}</span>
+          <div class="detalheCurso" v-if="cursoSelecionado">
+            <div class="detalheCursoCabecalho">
+              <div>
+                <span class="subtitulo">DETALHES DO CURSO</span>
+
+                <h3>{{ cursoSelecionado.nome_curso }}</h3>
+                <p>{{ universidade.nome }}</p>
+              </div>
+              <button class="fecharDetalheCurso" type="button" @click="onFecharCurso">×</button>
             </div>
-            <div class="detalheCursoItem">
-              <span class="detalheCursoRotulo">ÁREA</span>
-              <span class="detalheCursoValor">
-                {{ cursoSelecionado.area_ocde_cine || cursoSelecionado.area_ocde || '-' }}
-              </span>
-            </div>
-            <div class="detalheCursoItem">
-              <span class="detalheCursoRotulo">MODALIDADE</span>
-              <span class="detalheCursoValor">{{ cursoSelecionado.modalidade || '-' }}</span>
-            </div>
-            <div class="detalheCursoItem">
-              <span class="detalheCursoRotulo">SITUAÇÃO</span>
-              <span class="detalheCursoValor">{{ cursoSelecionado.situacao_curso || '-' }}</span>
-            </div>
-            <div class="detalheCursoItem">
-              <span class="detalheCursoRotulo">VAGAS AUTORIZADAS</span>
-              <span class="detalheCursoValor">{{ cursoSelecionado.vagas_autorizadas ?? '-' }}</span>
-            </div>
-            <div class="detalheCursoItem">
-              <span class="detalheCursoRotulo">CARGA HORÁRIA</span>
-              <span class="detalheCursoValor">
-                {{ cursoSelecionado.carga_horaria ? `${cursoSelecionado.carga_horaria}h` : '-' }}
-              </span>
-            </div>
-            <div class="detalheCursoItem">
-              <span class="detalheCursoRotulo">LOCAL</span>
-              <span class="detalheCursoValor">
-                {{ cursoSelecionado.municipio }} - {{ cursoSelecionado.uf }}
-              </span>
-            </div>
-            <div class="detalheCursoItem" v-if="corteEnemSelecionado">
-              <span class="detalheCursoRotulo">CORTE ENEM</span>
-              <span class="detalheCursoValor destaqueCorte">{{ corteEnemSelecionado }}</span>
+
+            <p v-if="cursoSelecionado.ehDestaque" class="semResultado">
+              Detalhes deste curso ainda não estão disponíveis.
+            </p>
+
+            <div v-else class="detalheCursoGrade">
+              <div class="detalheCursoItem">
+                <span class="detalheCursoRotulo">GRAU</span>
+                <span class="detalheCursoValor">{{ cursoSelecionado.grau || '-' }}</span>
+              </div>
+              <div class="detalheCursoItem">
+                <span class="detalheCursoRotulo">ÁREA</span>
+                <span class="detalheCursoValor">
+                  {{ cursoSelecionado.area_ocde_cine || cursoSelecionado.area_ocde || '-' }}
+                </span>
+              </div>
+              <div class="detalheCursoItem">
+                <span class="detalheCursoRotulo">MODALIDADE</span>
+                <span class="detalheCursoValor">{{ cursoSelecionado.modalidade || '-' }}</span>
+              </div>
+              <div class="detalheCursoItem">
+                <span class="detalheCursoRotulo">SITUAÇÃO</span>
+                <span class="detalheCursoValor">{{ cursoSelecionado.situacao_curso || '-' }}</span>
+              </div>
+              <div class="detalheCursoItem">
+                <span class="detalheCursoRotulo">VAGAS AUTORIZADAS</span>
+                <span class="detalheCursoValor">{{ cursoSelecionado.vagas_autorizadas ?? '-' }}</span>
+              </div>
+              <div class="detalheCursoItem">
+                <span class="detalheCursoRotulo">CARGA HORÁRIA</span>
+                <span class="detalheCursoValor">
+                  {{ cursoSelecionado.carga_horaria ? `${cursoSelecionado.carga_horaria}h` : '-' }}
+                </span>
+              </div>
+              <div class="detalheCursoItem">
+                <span class="detalheCursoRotulo">LOCAL</span>
+                <span class="detalheCursoValor">
+                  {{ cursoSelecionado.municipio }} - {{ cursoSelecionado.uf }}
+                </span>
+              </div>
+              <div class="detalheCursoItem" v-if="corteEnemSelecionado">
+                <span class="detalheCursoRotulo">CORTE ENEM</span>
+                <span class="detalheCursoValor destaqueCorte">{{ corteEnemSelecionado }}</span>
+              </div>
             </div>
           </div>
-        </div>
+        </template>
+
+        <p v-else class="semResultado">Não há cursos cadastrados para esta universidade.</p>
       </div>
     </div>
 
@@ -522,9 +534,13 @@ function onFecharCurso() {
 
 .conteudo {
   display: grid;
-  grid-template-columns: 2fr 1fr;
+  grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
   gap: 1.5rem;
   margin-top: 1rem;
+}
+
+.conteudo > * {
+  min-width: 0;
 }
 
 .secoesSuperiores {
@@ -560,7 +576,7 @@ function onFecharCurso() {
 
 @media (max-width: 800px) {
   .conteudo {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
   }
   .secoesSuperiores {
     grid-column: 1;
@@ -576,11 +592,129 @@ function onFecharCurso() {
   }
   .caixaInstitucional {
     grid-column: 1;
-    grid-row: auto;
+    grid-row: 4;
   }
   .caixaCadastro {
     grid-column: 1;
-    grid-row: 4;
+    grid-row: 5;
+  }
+}
+
+@media (max-width: 640px) {
+  .paginaUniversidade {
+    padding: 1.5rem 1rem 3rem;
+  }
+
+  .cabecalho {
+    padding: 1.5rem;
+    border-radius: 12px;
+  }
+
+  .logo {
+    width: 56px;
+    height: 56px;
+    min-width: 56px;
+    font-size: 0.9rem;
+  }
+
+  .cabecalho h1 {
+    font-size: 1.3rem;
+  }
+
+  .acoesCabecalho {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.8rem;
+    width: 100%;
+  }
+
+  .botaoFavoritar,
+  .botaoSite {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .estatisticas {
+    grid-template-columns: 1fr;
+  }
+
+  .caixaEstatistica:nth-child(odd) {
+    background-color: var(--creme-forte);
+    border: 1px solid var(--borda);
+    color: #1c1c22;
+  }
+  .caixaEstatistica:nth-child(odd) .rotuloEstatistica {
+    color: var(--texto-fraco);
+  }
+
+  .secao,
+  .secaoCursos,
+  .caixaInstitucional,
+  .caixaCadastro,
+  .detalheCurso {
+    padding: 1.2rem;
+    border-radius: 12px;
+  }
+
+  .secao h2 {
+    font-size: 1rem;
+  }
+
+  .gradeDiferenciais,
+  .gradeAvaliacoes,
+  .detalheCursoGrade {
+    grid-template-columns: 1fr;
+  }
+
+  .itemDiferencial:nth-child(odd) {
+    background-color: var(--creme-forte);
+    border: 1px solid var(--borda);
+  }
+  .itemDiferencial:nth-child(odd) p {
+    color: #1c1c22;
+  }
+
+  .avaliacaoItem:nth-child(even) {
+    background-color: var(--creme-forte);
+    border: 1px solid var(--borda);
+  }
+  .avaliacaoItem:nth-child(even) .notaRotulo {
+    color: var(--texto-fraco);
+  }
+  .avaliacaoItem:nth-child(even) .notaValor {
+    color: #1c1c22;
+  }
+
+  .chipsCursos {
+    max-height: 180px;
+  }
+
+  .buscaCursoInput {
+    max-width: 100%;
+  }
+
+  .linhaDado {
+    flex-direction: column;
+    gap: 0.1rem;
+  }
+
+  .caixaCadastro {
+    padding: 1.2rem;
+  }
+
+  .botaoPrimario,
+  .botaoSecundario {
+    width: 100%;
+  }
+
+  .detalheCursoCabecalho {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .fecharDetalheCurso {
+    margin-left: 0;
+    margin-top: 0.5rem;
   }
 }
 
@@ -850,6 +984,7 @@ function onFecharCurso() {
 .dadoValor {
   font-size: 0.88rem;
   color: #1c1c22;
+  overflow-wrap: anywhere;
 }
 .dadoValor.alerta {
   color: var(--vermelho-escuro);

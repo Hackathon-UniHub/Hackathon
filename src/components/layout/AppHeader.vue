@@ -1,8 +1,8 @@
 <script setup>
 import { HugeiconsIcon } from '@hugeicons/vue'
-import { /*Search01Icon,*/ HeartAddIcon, BriefcaseIcon } from '@hugeicons/core-free-icons'
+import { /*Search01Icon,*/ HeartAddIcon, BriefcaseIcon, Menu, XIcon } from '@hugeicons/core-free-icons'
 import { RouterLink } from 'vue-router'
-import { computed, onMounted, watch } from 'vue'
+import { computed, onMounted, watch, ref } from 'vue'
 import { useAuthStore } from '@/stores/auth'
 import { useFavoritosStore } from '@/stores/favoritos'
 
@@ -27,6 +27,16 @@ function carregarFavoritos() {
   if (!authStore.loading) favoritosStore.carregarFavoritos()
 }
 
+const menuAberto = ref(false)
+
+function alternarMenu() {
+  menuAberto.value = !menuAberto.value
+}
+
+function fecharMenu() {
+  menuAberto.value = false
+}
+
 onMounted(carregarFavoritos)
 watch(() => authStore.loading, carregarFavoritos)
 </script>
@@ -38,22 +48,47 @@ watch(() => authStore.loading, carregarFavoritos)
         <img src="../../assets/logo.svg" alt="UniHub" class="imagemLogo" />
       </RouterLink>
 
-      <nav aria-label="Navegação principal">
-        <ul class="menuNavegacao">
+      <button
+        class="botaoMenu"
+        type="button"
+        @click="alternarMenu"
+        :aria-expanded="menuAberto"
+        aria-label="Alternar menu de navegação"
+        aria-controls="menuNavegacao"
+      >
+        <HugeiconsIcon v-if="!menuAberto" :icon="Menu" :size="24" color="currentColor" :stroke-width="2" />
+        <HugeiconsIcon v-else :icon="XIcon" :size="24" color="currentColor" :stroke-width="2" />
+      </button>
+
+      <nav aria-label="Navegação principal" id="menuNavegacao" :class="['menuNavegacao', { aberto: menuAberto }]">
+        <ul>
           <li>
-            <RouterLink class="linkNavegacao" to="/" exact-active-class="ativo">
+            <RouterLink class="linkNavegacao" to="/" exact-active-class="ativo" @click="fecharMenu">
               Início
             </RouterLink>
           </li>
           <li>
-            <RouterLink to="/universidades" class="linkNavegacao" exact-active-class="ativo">
+            <RouterLink to="/universidades" class="linkNavegacao" exact-active-class="ativo" @click="fecharMenu">
               Universidades
             </RouterLink>
           </li>
           <li>
-            <RouterLink to="/mapa" class="linkNavegacao" exact-active-class="ativo">
+            <RouterLink to="/mapa" class="linkNavegacao" exact-active-class="ativo" @click="fecharMenu">
               Mapa
             </RouterLink>
+          </li>
+          <li v-if="!authStore.isLoggedIn" class="itemContaMobile">
+            <RouterLink class="linkNavegacao" to="/create-account" @click="fecharMenu">Criar conta</RouterLink>
+          </li>
+          <li v-if="authStore.isLoggedIn && isProfessor" class="itemContaMobile">
+            <RouterLink class="linkNavegacao" to="/professor/dashboard" @click="fecharMenu">
+              Painel do professor
+            </RouterLink>
+          </li>
+          <li v-if="authStore.isLoggedIn" class="itemContaMobile">
+            <button class="linkNavegacao acaoNavegacao" type="button" @click="sairDaConta(); fecharMenu()">
+              Sair
+            </button>
           </li>
         </ul>
       </nav>
@@ -61,10 +96,11 @@ watch(() => authStore.loading, carregarFavoritos)
       <div class="areaAcoes">
         <template v-if="authStore.isLoggedIn && isProfessor">
           <RouterLink
-            class="botaoPesquisa"
+            class="botaoPesquisa botaoPainelProfessor"
             to="/professor/dashboard"
             aria-label="Painel do Professor"
             title="Painel do Professor"
+            @click="fecharMenu"
           >
             <HugeiconsIcon :icon="BriefcaseIcon" :size="22" color="currentColor" :stroke-width="1.8" />
           </RouterLink>
@@ -76,6 +112,7 @@ watch(() => authStore.loading, carregarFavoritos)
           class="botaoPesquisa"
           :to="{ name: 'favoritos' }"
           aria-label="Favoritos"
+          @click="fecharMenu"
         >
           <HugeiconsIcon :icon="HeartAddIcon" :size="22" color="currentColor" :stroke-width="1.8" />
           <span v-if="quantidadeFavoritos" class="contadorFavoritos">
@@ -89,8 +126,8 @@ watch(() => authStore.loading, carregarFavoritos)
           <button class="botaoSair" type="button" @click="sairDaConta">Sair</button>
         </template>
         <template v-else>
-          <RouterLink class="botaoEntrar" to="/entrar">Entrar</RouterLink>
-          <RouterLink class="botaoCriarConta" to="/create-account">Criar conta</RouterLink>
+          <RouterLink class="botaoEntrar" to="/entrar" @click="fecharMenu">Entrar</RouterLink>
+          <RouterLink class="botaoCriarConta" to="/create-account" @click="fecharMenu">Criar conta</RouterLink>
         </template>
       </div>
     </div>
@@ -148,6 +185,16 @@ watch(() => authStore.loading, carregarFavoritos)
   padding: 0;
 }
 
+.menuNavegacao ul {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: clamp(14px, 2vw, 28px);
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
 .menuNavegacao li {
   list-style: none;
 }
@@ -190,6 +237,10 @@ watch(() => authStore.loading, carregarFavoritos)
   display: flex;
   align-items: center;
   gap: 12px;
+}
+
+.botaoMenu {
+  display: none;
 }
 
 .botaoPesquisa {
@@ -303,46 +354,110 @@ watch(() => authStore.loading, carregarFavoritos)
   box-shadow: 0 8px 18px rgba(122, 15, 26, 0.14);
 }
 
-/* === RESPONSIVO === */
+.itemContaMobile {
+  display: none;
+}
+
 @media (max-width: 768px) {
-  .cabecalhoConteudo {
-    display: grid;
-    grid-template-columns: 1fr auto;
-    padding: 10px 0;
-    gap: 8px 16px;
+  .botaoMenu {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex: 0 0 44px;
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: rgba(122, 15, 26, 0.05);
+    border: 1px solid rgba(122, 15, 26, 0.12);
+    color: var(--brand-700);
+    transition:
+      transform 0.2s ease,
+      background 0.2s ease;
+  }
+
+  .botaoMenu:hover {
+    transform: translateY(-1px);
+    background: rgba(122, 15, 26, 0.08);
   }
 
   .menuNavegacao {
-    grid-column: 1 / -1;
-    grid-row: 2;
-    width: 100%;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 10px 18px;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: rgba(255, 255, 255, 0.98);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--color-border);
+    padding: 16px 0;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-8px);
+    transition:
+      opacity 0.25s ease,
+      visibility 0.25s ease,
+      transform 0.25s ease;
+    box-shadow: 0 12px 24px rgba(28, 28, 34, 0.1);
   }
 
-  .areaAcoes {
-    grid-column: 2;
-    grid-row: 1;
-    justify-content: center;
+  .menuNavegacao.aberto {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+  }
+
+  .menuNavegacao ul {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 8px;
+    width: 100%;
+  }
+
+  .linkNavegacao {
+    width: 100%;
+    padding: 12px 24px;
+    font-size: 1rem;
+    border-radius: 8px;
+  }
+
+  .linkNavegacao:hover {
+    background: rgba(122, 15, 26, 0.08);
+  }
+
+  .linkNavegacao.ativo::after {
+    display: none;
+  }
+
+  .cabecalhoConteudo {
+    gap: 12px;
+  }
+
+  .itemContaMobile {
+    display: list-item;
+  }
+
+  .botaoCriarConta,
+  .botaoPainelProfessor,
+  .avatarUsuario,
+  .botaoSair {
+    display: none;
+  }
+
+  .acaoNavegacao {
+    border: 0;
+    background: transparent;
+    cursor: pointer;
+    font: inherit;
+    text-align: left;
   }
 }
 
 @media (max-width: 480px) {
   .cabecalhoConteudo {
-    display: flex;
-    flex-direction: column;
-    padding: 10px 0 12px;
-    gap: 10px;
-  }
-
-  .menuNavegacao,
-  .areaAcoes {
-    width: 100%;
+    gap: 8px;
   }
 
   .areaAcoes {
-    flex-wrap: wrap;
+    gap: 8px;
   }
 
   .botaoEntrar,
@@ -350,13 +465,12 @@ watch(() => authStore.loading, carregarFavoritos)
     min-height: 38px;
     padding: 0.65rem 0.85rem;
   }
-}
 
-/* === RESET === */
-/* http://meyerweb.com/eric/tools/css/reset/
-  v2.0 | 20110126
-  License: none (public domain)
-*/
+  .botaoSair {
+    min-height: 38px;
+    padding: 0.6rem 0.8rem;
+  }
+}
 
 html,
 body,

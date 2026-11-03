@@ -13,7 +13,7 @@ const vestibulares = [
 
 let nextId = 11
 
-function load() {
+function load(professorId = null) {
   try {
     const stored = localStorage.getItem('vestibulares_local')
     if (stored) {
@@ -21,7 +21,11 @@ function load() {
       if (Array.isArray(parsed) && parsed.length) {
         const maxId = Math.max(...parsed.map(v => v.id), ...vestibulares.map(v => v.id))
         nextId = maxId + 1
-        return [...vestibulares, ...parsed.filter(p => !vestibulares.some(v => v.id === p.id))]
+        const locais = parsed.filter(p => {
+          const isBase = vestibulares.some(v => v.id === p.id)
+          return !isBase && (!professorId || p.professor_id === professorId)
+        })
+        return [...vestibulares, ...locais]
       }
     }
   } catch {
@@ -34,9 +38,9 @@ function save(list) {
   localStorage.setItem('vestibulares_local', JSON.stringify(list))
 }
 
-export function getAll() { return load() }
-export function getByUni(id) { return load().filter(v => v.universidade_id === id) }
-export function getById(id) { return load().find(v => v.id === Number(id)) }
+export function getAll(professorId) { return load(professorId) }
+export function getByUni(id, professorId) { return load(professorId).filter(v => v.universidade_id === id) }
+export function getById(id, professorId) { return load(professorId).find(v => v.id === Number(id)) }
 export function add(v) { const list = load(); v.id = nextId++; v.criado_em = new Date().toISOString(); v.atualizado_em = new Date().toISOString(); list.push(v); save(list); return v }
 export function update(id, data) { const list = load(); const i = list.findIndex(v => v.id === id); if (i === -1) return null; list[i] = { ...list[i], ...data, atualizado_em: new Date().toISOString() }; save(list); return list[i] }
 export function remove(id) { const list = load().filter(v => v.id !== id); save(list); return true }

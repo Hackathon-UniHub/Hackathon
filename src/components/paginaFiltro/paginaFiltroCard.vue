@@ -1,7 +1,9 @@
 <script setup>
 import { computed } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
 import { HugeiconsIcon } from '@hugeicons/vue'
 import { HeartIcon } from '@hugeicons/core-free-icons'
+import { useAuthStore } from '@/stores/auth'
 import { useFavoritosStore } from '@/stores/favoritos'
 
 const props = defineProps([
@@ -19,10 +21,18 @@ const props = defineProps([
 ])
 
 const favoritosStore = useFavoritosStore()
+const authStore = useAuthStore()
+const route = useRoute()
+const router = useRouter()
 
 const favorito = computed(() => favoritosStore.isFavorito(Number(props.id)))
 
 function alternarFavorito() {
+  if (!authStore.isLoggedIn) {
+    router.push({ name: 'login', query: { redirect: route.fullPath } })
+    return
+  }
+
   if (favorito.value) {
     favoritosStore.removerFavorito(Number(props.id))
   } else {

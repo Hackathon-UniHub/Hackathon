@@ -154,7 +154,9 @@ const userInitial = computed(() => {
         <p>Entrar com o Google</p>
       </button>
 
-      <p v-if="errorMsg" class="error" role="alert">{{ errorMsg }}</p>
+      <!--
+        <p v-if="errorMsg" class="error" role="alert">{{ errorMsg }}</p>
+      -->
 
       <p class="footer-link">
         Não tem uma conta?
@@ -382,5 +384,22 @@ form {
 
 .footer-link a:hover {
   text-decoration: underline;
+}
+
+@media (max-width: 480px) {
+  .page {
+    align-items: flex-start;
+    padding: 1rem;
+  }
+
+  .auth-card {
+    width: 100%;
+    padding: 2rem 1.25rem;
+  }
+
+  .row {
+    flex-wrap: wrap;
+    gap: 8px;
+  }
 }
 </style>

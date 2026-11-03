@@ -347,5 +347,52 @@ h1 {
     width: 100%;
   }
 }
+
+@media (max-width: 480px) {
+  .favoritos-view {
+    padding: 2rem 1rem 3rem;
+  }
+
+  .favoritos-topo {
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .saudacao {
+    font-size: 0.85rem;
+  }
+
+  .barra-controles {
+    gap: 0.75rem;
+  }
+
+  .campo-busca {
+    min-height: 40px;
+    padding: 0 0.75rem;
+  }
+
+  .lista-favoritos {
+    grid-template-columns: 1fr;
+  }
+
+  .favorito-card {
+    min-height: auto;
+    padding: 1rem;
+  }
+
+  .favorito-card h2 {
+    font-size: 0.95rem;
+    margin-top: 0.8rem;
+  }
+
+  .card-rodape {
+    padding-top: 0.8rem;
+  }
+
+  .estado-vazio {
+    min-height: 200px;
+    padding: 1.5rem;
+  }
+}
 </style>
 *** End Patch

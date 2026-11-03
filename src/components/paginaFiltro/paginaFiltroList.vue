@@ -15,12 +15,15 @@ import {
   selecionarBuscaCurso,
   atualizarNotaEnem,
 } from '@/utils/filtroUtils.js'
+import { HugeiconsIcon } from '@hugeicons/vue'
+import { XIcon, FilterIcon } from '@hugeicons/core-free-icons'
 
 const estadoAtivo = ref('')
 const ratingAtivo = ref('Todas')
 const pesquisa = ref('')
 const buscaCurso = ref('')
 const notaEnem = ref('')
+const painelFiltrosAberto = ref(false)
 
 const estados = getEstados()
 const ratings = getRatings()
@@ -53,6 +56,14 @@ function onSelecionarBuscaCurso(curso) {
 
 function onAtualizarNotaEnem(evento) {
   atualizarNotaEnem(notaEnem, evento)
+}
+
+function alternarPainelFiltros() {
+  painelFiltrosAberto.value = !painelFiltrosAberto.value
+}
+
+function fecharPainelFiltros() {
+  painelFiltrosAberto.value = false
 }
 </script>
 
@@ -155,8 +166,26 @@ function onAtualizarNotaEnem(evento) {
       </div>
     </div>
 
+    <button
+      class="botaoToggleFiltros"
+      type="button"
+      @click="alternarPainelFiltros"
+      :aria-expanded="painelFiltrosAberto"
+      aria-label="Alternar filtros"
+      aria-controls="lateralEstados"
+    >
+      <HugeiconsIcon v-if="!painelFiltrosAberto" :icon="FilterIcon" :size="22" color="currentColor" :stroke-width="2" />
+      <HugeiconsIcon v-else :icon="XIcon" :size="22" color="currentColor" :stroke-width="2" />
+      <span class="textoBotaoFiltros">Filtros</span>
+    </button>
+
     <div class="divisao">
-      <div class="lateralEstados">
+      <aside
+        id="lateralEstados"
+        class="lateralEstados"
+        :class="{ aberta: painelFiltrosAberto }"
+        aria-label="Filtros laterais"
+      >
         <div class="pesquisa">
           <div class="filtroEstado">
             <span class="subtitulo">FILTRAR POR ESTADO</span>
@@ -195,7 +224,8 @@ function onAtualizarNotaEnem(evento) {
             </div>
           </div>
         </div>
-      </div>
+      </aside>
+
       <div class="cardsUniversidades">
         <div>
           <paginaFiltroCard
@@ -216,6 +246,13 @@ function onAtualizarNotaEnem(evento) {
         </div>
       </div>
     </div>
+
+    <div
+      v-if="painelFiltrosAberto"
+      class="overlayFiltros"
+      @click="fecharPainelFiltros"
+      aria-hidden="true"
+    ></div>
   </div>
 </template>
 
@@ -620,5 +657,188 @@ h2 {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
   gap: 1.25rem;
+}
+
+.botaoToggleFiltros {
+  display: none;
+}
+
+.overlayFiltros {
+  display: none;
+}
+
+/* === RESPONSIVO === */
+@media (max-width: 1024px) {
+  .containerQuatro {
+    flex-direction: column;
+  }
+
+  .containerEsquerdo {
+    flex-direction: row;
+    flex-wrap: wrap;
+  }
+
+  .containerDois,
+  .divUm,
+  .divDois {
+    flex: 1;
+    min-width: 280px;
+  }
+
+  .containerTres {
+    width: 100%;
+    max-width: 100%;
+  }
+}
+
+@media (max-width: 900px) {
+  .divisao {
+    flex-direction: column;
+  }
+
+  .lateralEstados {
+    width: 100%;
+    max-width: 100%;
+    position: relative;
+  }
+}
+
+@media (max-width: 768px) {
+  .paginaFiltro {
+    padding: 2rem 1rem;
+  }
+
+  .containerQuatro,
+  .pesquisa,
+  .divisao,
+  .filtroCurso {
+    width: 100%;
+    max-width: 100%;
+  }
+
+  .containerEsquerdo {
+    flex-direction: column;
+  }
+
+  .containerUm {
+    flex-direction: column;
+  }
+
+  .filtroCurso {
+    padding: 1.2rem;
+  }
+
+  .chips {
+    max-height: 180px;
+  }
+
+  .botaoToggleFiltros {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    width: 100%;
+    padding: 12px 16px;
+    margin-bottom: 1rem;
+    border: 1px solid var(--borda);
+    border-radius: 12px;
+    background: var(--creme-forte);
+    color: var(--vermelho);
+    font-weight: 700;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+
+  .botaoToggleFiltros:hover {
+    background: var(--vermelho);
+    color: #fff;
+    border-color: var(--vermelho);
+  }
+
+  .textoBotaoFiltros {
+    display: inline;
+  }
+
+  .lateralEstados {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 1000;
+    width: 100%;
+    max-width: 320px;
+    height: 100vh;
+    border-radius: 0;
+    border-right: 1px solid var(--borda);
+    box-shadow: 12px 0 28px rgba(28, 28, 34, 0.15);
+    transform: translateX(-100%);
+    transition: transform 0.3s ease;
+    overflow-y: auto;
+    padding: 1.5rem;
+    padding-top: 6rem;
+  }
+
+  .lateralEstados.aberta {
+    transform: translateX(0);
+  }
+
+  .overlayFiltros {
+    display: block;
+    position: fixed;
+    inset: 0;
+    z-index: 999;
+    background: rgba(0, 0, 0, 0.4);
+    backdrop-filter: blur(2px);
+  }
+
+  .lateralEstados .pesquisa {
+    background: 0 0;
+    padding: 0;
+    box-shadow: none;
+    margin: 0;
+    width: 100%;
+  }
+
+  .lateralEstados .subtitulo {
+    color: var(--texto-fraco);
+    margin-bottom: 0.8rem;
+  }
+
+  .botoesEstados {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 8px;
+  }
+
+  .botoesEstados .botao {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    min-height: 36px;
+    background: var(--creme-forte);
+    border: 1px solid var(--borda);
+    color: var(--texto);
+    padding: 0.4rem 0.85rem;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    cursor: pointer.
+  }
+}
+
+@media (max-width: 480px) {
+  .botoesEstados {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .h1 {
+    font-size: clamp(1.8rem, 4vw, 2.5rem);
+  }
+
+  .cardsUniversidades > div {
+    grid-template-columns: 1fr;
+  }
 }
 </style>

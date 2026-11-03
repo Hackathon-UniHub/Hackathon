@@ -3,7 +3,11 @@ import { computed, onMounted, ref } from 'vue'
 import { useAuthStore } from '@/stores/auth'
 import { useComentariosStore } from '@/stores/comentarios'
 
-const props = defineProps({ vestibularId: Number, universidadeId: Number })
+const props = defineProps({
+  vestibularId: Number,
+  universidadeId: Number,
+  titulo: { type: String, default: '' },
+})
 const store = useComentariosStore()
 const auth = useAuthStore()
 const aberto = ref(false)
@@ -11,9 +15,6 @@ const texto = ref('')
 const comentarios = computed(() => props.universidadeId
   ? store.getByUniversidade(props.universidadeId)
   : store.getByVest(props.vestibularId))
-const quantidade = computed(() => props.universidadeId
-  ? store.countUniversidade(props.universidadeId)
-  : store.count(props.vestibularId))
 
 onMounted(() => store.init())
 
@@ -36,9 +37,11 @@ async function excluir(id) {
 
 <template>
   <section class="comentarios">
-    <button class="abrir" type="button" @click="aberto = !aberto">
-      {{ aberto ? 'Ocultar' : 'Ver' }} comentários ({{ quantidade }})
+    <h2 v-if="titulo" class="titulo">{{ titulo }}</h2>
+    <button type="button" class="abrir" @click="aberto = !aberto">
+      {{ aberto ? 'Ocultar comentários' : 'Ver comentários' }}
     </button>
+
 
     <div v-if="aberto" class="conteudo">
       <p v-if="!comentarios.length" class="vazio">Ainda não há comentários.</p>
@@ -84,6 +87,12 @@ async function excluir(id) {
   color: #374151;
   cursor: pointer;
   font-weight: 600;
+}
+
+.titulo {
+  margin: 0 0 12px;
+  color: #1c1c22;
+  font-size: 1.1rem;
 }
 
 .conteudo {

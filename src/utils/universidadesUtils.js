@@ -55,13 +55,17 @@ export function getSiteOficial(universidade) {
 }
 
 export function temCursosDisponiveis(universidade) {
-  if (!universidade || !universidade.cursos_pda) return false
-  return universidade.cursos_pda.length > 0
+  return getCursosDaUniversidade(universidade).length > 0
 }
 
 export function getCursosDaUniversidade(universidade) {
-  if (!universidade || !universidade.cursos_pda) return []
-  return universidade.cursos_pda
+  if (!universidade) return []
+  if (universidade.cursos_pda?.length) return universidade.cursos_pda
+
+  return (universidade.principais_graduacoes || []).map((nome_curso) => ({
+    nome_curso,
+    ehDestaque: true,
+  }))
 }
 
 export function getRotuloCurso(curso) {

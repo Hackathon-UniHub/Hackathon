@@ -34,15 +34,23 @@ export const useFavoritosStore = defineStore('favoritos', () => {
   }
 
   function adicionarFavorito(idUni) {
+    const authStore = useAuthStore()
+    if (!authStore.isLoggedIn) return false
+
     if (!idsFavoritos.value.includes(idUni)) {
       idsFavoritos.value.push(idUni)
       salvarNoStorage()
     }
+    return true
   }
 
   function removerFavorito(idUni) {
+    const authStore = useAuthStore()
+    if (!authStore.isLoggedIn) return false
+
     idsFavoritos.value = idsFavoritos.value.filter((id) => id !== idUni)
     salvarNoStorage()
+    return true
   }
 
   function isFavorito(idUni) {
