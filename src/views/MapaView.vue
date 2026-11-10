@@ -4,11 +4,8 @@ import { RouterLink, useRouter } from 'vue-router'
 import ComponenteMapa from '@/components/ComponenteMapa.vue'
 import universidades from '@/data/universidades.js'
 import { coordenadasMapa } from '@/data/coordenadasMapa.js'
-import {
-  getCursos,
-  getCursosDaUniversidade,
-  getCursosFiltrados,
-} from '@/utils/filtroUtils.js'
+import { getCursos, getCursosFiltrados } from '@/utils/filtroUtils.js'
+import { getCursosDaUniversidade } from '@/utils/universidadesUtils.js'
 import {
   agruparUniversidadesPorEstado,
   alternarEstado,
@@ -34,7 +31,7 @@ const componenteMapaRef = ref(null)
 const estadosExpandidos = reactive({})
 const busca = ref('')
 const buscaCurso = ref('')
-const cursos = getCursos()
+const cursos = getCursos(universidades)
 const painelAberto = ref(false)
 
 const cursosFiltrados = computed(() => getCursosFiltrados(cursos, buscaCurso.value))
@@ -106,7 +103,13 @@ onUnmounted(() => {
       aria-label="Alternar painel de informações"
       aria-controls="mapaInformacoes"
     >
-      <HugeiconsIcon v-if="!painelAberto" :icon="FilterIcon" :size="24" color="currentColor" :stroke-width="2" />
+      <HugeiconsIcon
+        v-if="!painelAberto"
+        :icon="FilterIcon"
+        :size="24"
+        color="currentColor"
+        :stroke-width="2"
+      />
       <HugeiconsIcon v-else :icon="XIcon" :size="24" color="currentColor" :stroke-width="2" />
     </button>
 
@@ -163,9 +166,7 @@ onUnmounted(() => {
             >
               {{ curso }}
             </button>
-            <p v-if="!cursosFiltrados.length" class="semResultadoCurso">
-              Nenhum curso encontrado.
-            </p>
+            <p v-if="!cursosFiltrados.length" class="semResultadoCurso">Nenhum curso encontrado.</p>
           </div>
         </div>
       </div>
@@ -223,12 +224,7 @@ onUnmounted(() => {
       </div>
     </aside>
 
-    <div
-      v-if="painelAberto"
-      class="overlayPainel"
-      @click="fecharPainel"
-      aria-hidden="true"
-    ></div>
+    <div v-if="painelAberto" class="overlayPainel" @click="fecharPainel" aria-hidden="true"></div>
   </div>
 </template>
 
@@ -262,7 +258,9 @@ onUnmounted(() => {
   background: #ffffff;
   box-shadow: 0 12px 28px rgba(28, 28, 34, 0.12);
   transform: translateX(0);
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  transition:
+    transform 0.3s ease,
+    box-shadow 0.3s ease;
 }
 
 .mapaInformacoesCabecalho {

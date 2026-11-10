@@ -25,11 +25,13 @@ export function filtrarUniversidadesPorCurso(universidades, buscaCurso, getCurso
 
   if (!buscaNormalizada) return universidades
 
-  return universidades.filter((universidade) =>
-    getCursos(universidade.id).some((curso) =>
-      normalizar(curso.nome_curso).includes(buscaNormalizada),
-    ),
-  )
+  return universidades.filter((universidade) => {
+    const cursos = getCursos(universidade)
+    return cursos.some((curso) => {
+      const nomeCurso = typeof curso === 'string' ? curso : (curso?.nome_curso ?? '')
+      return normalizar(nomeCurso).includes(buscaNormalizada)
+    })
+  })
 }
 
 export function agruparUniversidadesPorEstado(universidades) {

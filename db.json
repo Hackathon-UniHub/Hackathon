@@ -88,6 +88,26 @@
       ],
       "descricao": "asdaaaaaaaaaaaaaaaaaaaaaa",
       "id": "aOAfgzUsbGs"
+    },
+    {
+      "nome": "asdad",
+      "sigla": "sdf",
+      "municipio": "asdsad",
+      "uf": "PE",
+      "categoria_administrativa": "Pública",
+      "situacao": "Ativa",
+      "site": "asdad",
+      "igc": "5",
+      "telefone": "(23) 42423-4234",
+      "email": "asdd@asd",
+      "endereco_sede": "asda",
+      "quantidade_alunos": "",
+      "quantidade_cursos": "",
+      "cursos": [
+        "medicina"
+      ],
+      "descricao": "sdfff",
+      "id": "vGgtNDDeO0A"
     }
   ],
   "$schema": "./node_modules/json-server/schema.json"
