@@ -5,6 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
+    "api": "json-server db.json",
     "build": "vite build",
     "preview": "vite preview",
     "lint": "run-s lint:*",
@@ -19,6 +20,7 @@
     "@hugeicons/core-free-icons": "^4.3.3",
     "@hugeicons/vue": "^1.0.8",
     "@supabase/supabase-js": "^2.112.3",
+    "api": "^7.0.4",
     "install": "^0.13.0",
     "json-server": "^1.0.0-beta.15",
     "leaflet": "^1.9.4",
