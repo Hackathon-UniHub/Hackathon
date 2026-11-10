@@ -33,7 +33,10 @@ function formatDate(date) {
       <h2>Vestibulares</h2>
     </div>
 
-    <div v-if="vestibulares.length" class="cards">
+    <p v-if="store.loading" class="vazia">Carregando vestibulares...</p>
+    <p v-else-if="store.error" class="vazia erro" role="alert">{{ store.error }}</p>
+
+    <div v-else-if="vestibulares.length" class="cards">
       <article v-for="vestibular in vestibulares" :key="vestibular.id" class="card">
         <div class="topo">
           <div>
@@ -268,6 +271,12 @@ function formatDate(date) {
   padding: 32px 20px;
   text-align: center;
   color: #6b7280;
+}
+
+.vazia.erro {
+  color: #b91c1c;
+  background: #fef2f2;
+  border-color: #fecaca;
 }
 
 @media (max-width: 640px) {

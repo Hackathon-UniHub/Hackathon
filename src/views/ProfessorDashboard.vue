@@ -100,6 +100,8 @@ function vestibularSalvo() {
         </div>
       </div>
 
+      <p v-if="vestibulares.error" class="erroApi" role="alert">{{ vestibulares.error }}</p>
+
       <section class="perfil">
         <div class="avatar">{{ nomeProfessor.charAt(0).toUpperCase() }}</div>
         <div>
@@ -214,6 +216,15 @@ function vestibularSalvo() {
   border: 1px solid #e4e4e4;
   border-radius: 12px;
   flex-wrap: wrap;
+}
+
+.erroApi {
+  margin: 0 0 18px;
+  padding: 12px 14px;
+  border: 1px solid #fecaca;
+  border-radius: 10px;
+  background: #fef2f2;
+  color: #b91c1c;
 }
 
 .avatar {
@@ -563,4 +574,3 @@ h1 {
   }
 }
 </style>
-

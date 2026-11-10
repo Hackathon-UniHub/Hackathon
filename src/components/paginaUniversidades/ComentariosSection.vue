@@ -4,7 +4,7 @@ import { useAuthStore } from '@/stores/auth'
 import { useComentariosStore } from '@/stores/comentarios'
 
 const props = defineProps({
-  vestibularId: Number,
+  vestibularId: [Number, String],
   universidadeId: Number,
   titulo: { type: String, default: '' },
 })
