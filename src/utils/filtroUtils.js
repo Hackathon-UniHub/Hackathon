@@ -1,4 +1,5 @@
 import notasUniversidades from '@/data/notasUniversidades.js'
+import dadosUniversidades from '@/data/universidades.js'
 
 const API_URL = 'http://localhost:3000'
 
@@ -35,19 +36,35 @@ export function getEstados(universidades) {
   return lista
 }
 
-export function getCursos(universidades) {
-  const lista = []
+export function getCursos(universidades = dadosUniversidades) {
+  const lista = new Set()
 
   for (const universidade of universidades) {
-    for (const curso of universidade.cursos) {
-      if (!lista.includes(curso)) {
-        lista.push(curso)
-      }
+    for (const curso of universidade.cursos || []) {
+      lista.add(typeof curso === 'string' ? curso : curso.nome_curso)
+    }
+
+    for (const curso of universidade.principais_graduacoes || []) {
+      lista.add(curso)
+    }
+
+    for (const curso of universidade.cursos_pda || []) {
+      if (curso.nome_curso) lista.add(curso.nome_curso)
     }
   }
 
-  lista.sort()
-  return lista
+  return [...lista].sort()
+}
+
+export function getCursosDaUniversidade(universidadeId) {
+  const universidade = dadosUniversidades.find((item) => item.id === Number(universidadeId))
+  if (!universidade) return []
+  if (universidade.cursos_pda?.length) return universidade.cursos_pda
+
+  return (universidade.principais_graduacoes || []).map((nome_curso) => ({
+    nome_curso,
+    ehDestaque: true,
+  }))
 }
 
 export function getCursosFiltrados(cursos, busca) {
