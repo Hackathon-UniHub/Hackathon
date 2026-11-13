@@ -36,7 +36,14 @@ export function buscarUsuario(id) {
 
 export async function buscarUsuarioPorAuthId(authUserId) {
   const users = await listarUsuarios(authUserId)
-  return users[0] || null
+
+  return users.reduce((latest, user) => {
+    if (!latest) return user
+
+    const latestDate = Date.parse(latest.updated_at || latest.created_at || '') || 0
+    const userDate = Date.parse(user.updated_at || user.created_at || '') || 0
+    return userDate >= latestDate ? user : latest
+  }, null)
 }
 
 export function criarUsuario(usuario) {

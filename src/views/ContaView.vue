@@ -2,11 +2,13 @@
 import { onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
+import universidades from '@/data/universidades.js'
 
 const auth = useAuthStore()
 const router = useRouter()
 const profile = ref(null)
 const fullName = ref('')
+const universidadeId = ref('')
 const loading = ref(true)
 const saving = ref(false)
 const deleting = ref(false)
@@ -20,7 +22,11 @@ async function carregarPerfil() {
 
   try {
     const profiles = await auth.listProfiles()
-    const ownProfile = profiles.find((item) => item.auth_user_id === auth.user?.id)
+    const ownProfile = profiles.find(
+      (item) =>
+        item.auth_user_id === auth.user?.id &&
+        item.id === auth.profile?.id,
+    )
     if (!ownProfile) {
       error.value = 'Seu perfil não foi encontrado na API.'
       return
@@ -28,6 +34,9 @@ async function carregarPerfil() {
 
     profile.value = await auth.getProfileById(ownProfile.id)
     fullName.value = profile.value.full_name
+    universidadeId.value = profile.value.universidade_id == null
+      ? ''
+      : String(profile.value.universidade_id)
   } catch (requestError) {
     error.value = requestError.message || 'Não foi possível carregar seu perfil.'
   } finally {
@@ -41,13 +50,25 @@ async function salvarPerfil() {
     return
   }
 
+  if (profile.value?.tipo_usuario === 'professor' && !universidadeId.value) {
+    error.value = 'Selecione sua universidade.'
+    return
+  }
+
   saving.value = true
   error.value = ''
   success.value = ''
 
   try {
-    profile.value = await auth.updateProfile({ full_name: fullName.value.trim() })
+    const updates = { full_name: fullName.value.trim() }
+    if (profile.value.tipo_usuario === 'professor') {
+      updates.universidade_id = Number(universidadeId.value)
+    }
+    profile.value = await auth.updateProfile(updates)
     fullName.value = profile.value.full_name
+    universidadeId.value = profile.value.universidade_id == null
+      ? ''
+      : String(profile.value.universidade_id)
     success.value = 'Perfil atualizado com sucesso.'
   } catch (requestError) {
     error.value = requestError.message || 'Não foi possível atualizar seu perfil.'
@@ -108,9 +129,23 @@ onMounted(carregarPerfil)
           <label for="profile-role">Tipo de usuário</label>
           <input id="profile-role" :value="profile.tipo_usuario" type="text" disabled />
 
-          <template v-if="profile.universidade_id">
-            <label for="profile-university">ID da universidade vinculada</label>
-            <input id="profile-university" :value="profile.universidade_id" type="text" disabled />
+          <template v-if="profile.tipo_usuario === 'professor'">
+            <label for="profile-university">Universidade vinculada</label>
+            <select
+              id="profile-university"
+              v-model="universidadeId"
+              required
+              :disabled="saving || deleting"
+            >
+              <option value="" disabled>Selecione sua universidade</option>
+              <option
+                v-for="universidade in universidades"
+                :key="universidade.id"
+                :value="String(universidade.id)"
+              >
+                {{ universidade.sigla }} - {{ universidade.nome }}
+              </option>
+            </select>
           </template>
 
           <button type="submit" :disabled="saving || deleting">
@@ -121,7 +156,12 @@ onMounted(carregarPerfil)
         <div class="acoes-exclusao">
           <h2>Excluir perfil</h2>
           <p>Isso remove os dados do perfil da API, mas não exclui sua conta de autenticação.</p>
-          <button class="botao-excluir" type="button" :disabled="deleting || saving" @click="excluirPerfil">
+          <button
+            class="botao-excluir"
+            type="button"
+            :disabled="deleting || saving"
+            @click="excluirPerfil"
+          >
             {{ deleting ? 'Excluindo...' : 'Excluir meu perfil' }}
           </button>
         </div>
@@ -176,7 +216,10 @@ label {
   font-weight: 600;
 }
 
-input {
+input,
+select {
+  box-sizing: border-box;
+  width: 100%;
   min-height: 42px;
   padding: 8px 12px;
   border: 1px solid #ccc;
@@ -184,8 +227,20 @@ input {
   font: inherit;
 }
 
-input:disabled {
+select {
+  height: 42px;
+  background-color: #fff;
+  color: #2c0102;
+  cursor: pointer;
+}
+
+input:disabled,
+select:disabled {
   background: #f0f0f0;
+}
+
+select:disabled {
+  cursor: wait;
 }
 
 button {

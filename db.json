@@ -41,14 +41,74 @@
       "id": "U7q-zleQcZ4"
     },
     {
+      "auth_user_id": "0852699b-1675-4a76-9389-b2568ec1569b",
+      "full_name": "batatagaymer02",
+      "avatar_url": null,
+      "tipo_usuario": "estudante",
+      "universidade_id": null,
+      "created_at": "2026-11-13T15:53:58.998Z",
+      "updated_at": "2026-11-13T15:53:58.998Z",
+      "id": "JB8blAHvv0Y"
+    },
+    {
       "auth_user_id": "2579a259-d984-47a9-ab8e-807f2328d2be",
-      "full_name": "Kaue Teixeira",
+      "full_name": "gfuit 7ouk",
       "avatar_url": "https://lh3.googleusercontent.com/a/ACg8ocLdgk1qHRNbedrLa9j6eq5urUm_ahaE_cUKA6su1Co1FI2Kg_4=s96-c",
       "tipo_usuario": "estudante",
       "universidade_id": null,
-      "created_at": "2026-11-13T12:12:52.238Z",
-      "updated_at": "2026-11-13T12:14:54.749Z",
-      "id": "s7YlJz5JR-0"
+      "created_at": "2026-11-13T16:04:01.741Z",
+      "updated_at": "2026-11-13T16:04:37.484Z",
+      "id": "oTMyoPgIIJg"
+    },
+    {
+      "auth_user_id": "b72310df-7d1c-44f7-a360-0f37e6e2e44b",
+      "full_name": "kauet57",
+      "avatar_url": null,
+      "tipo_usuario": "estudante",
+      "universidade_id": null,
+      "created_at": "2026-11-13T16:05:20.150Z",
+      "updated_at": "2026-11-13T16:05:20.150Z",
+      "id": "BbPzDRNTRbs"
+    },
+    {
+      "auth_user_id": "b72310df-7d1c-44f7-a360-0f37e6e2e44b",
+      "full_name": "Kaue Teixeira",
+      "avatar_url": null,
+      "tipo_usuario": "professor",
+      "universidade_id": 1,
+      "created_at": "2026-11-13T16:05:20.267Z",
+      "updated_at": "2026-11-13T16:05:20.267Z",
+      "id": "4n7MTQde2-0"
+    },
+    {
+      "auth_user_id": "75daddf4-fc6b-4c0c-9c7a-d3bb62d65882",
+      "full_name": "asdauogfb",
+      "avatar_url": null,
+      "tipo_usuario": "estudante",
+      "universidade_id": null,
+      "created_at": "2026-11-13T16:06:40.478Z",
+      "updated_at": "2026-11-13T16:06:40.478Z",
+      "id": "pVPXNEwmDyg"
+    },
+    {
+      "auth_user_id": "75daddf4-fc6b-4c0c-9c7a-d3bb62d65882",
+      "full_name": "asdasd",
+      "avatar_url": null,
+      "tipo_usuario": "professor",
+      "universidade_id": 1,
+      "created_at": "2026-11-13T16:06:40.583Z",
+      "updated_at": "2026-11-13T16:06:40.583Z",
+      "id": "jqS_5jldOqo"
+    },
+    {
+      "auth_user_id": "d8f44508-1a69-4fe6-a3c4-7c26f0379827",
+      "full_name": "zzzzzz",
+      "avatar_url": null,
+      "tipo_usuario": "professor",
+      "universidade_id": 1,
+      "created_at": "2026-11-13T16:52:55.250Z",
+      "updated_at": "2026-11-13T16:52:55.250Z",
+      "id": "5GF2CNVCLi8"
     }
   ],
   "$schema": "./node_modules/json-server/schema.json"

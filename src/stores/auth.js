@@ -24,6 +24,17 @@ function loadLocalProfile(userId) {
   return null
 }
 
+function saveLocalProfile(userId, profile) {
+  try {
+    const stored = localStorage.getItem(PROFILE_STORAGE_KEY)
+    const profiles = stored ? JSON.parse(stored) : {}
+    profiles[userId] = profile
+    localStorage.setItem(PROFILE_STORAGE_KEY, JSON.stringify(profiles))
+  } catch (error) {
+    console.warn('Erro ao salvar profile local:', error)
+  }
+}
+
 function clearLocalProfile(userId) {
   try {
     const stored = localStorage.getItem(PROFILE_STORAGE_KEY)
@@ -81,9 +92,15 @@ export const useAuthStore = defineStore('auth', {
     },
 
     async signUp({ email, password, tipo_usuario, universidade_id, full_name }) {
+      const profileData = {
+        full_name,
+        tipo_usuario: tipo_usuario || 'estudante',
+        universidade_id: tipo_usuario === 'professor' ? universidade_id : null,
+      }
       const { data, error } = await supabase.auth.signUp({
         email,
         password,
+        options: { data: profileData },
       })
       if (error) throw error
       this.session = data.session
@@ -92,14 +109,21 @@ export const useAuthStore = defineStore('auth', {
       if (this.user) {
         const profile = {
           auth_user_id: this.user.id,
+          ...profileData,
           full_name: full_name || this.user.email?.split('@')[0] || 'Usuário',
           avatar_url: this.user.user_metadata?.avatar_url || null,
-          tipo_usuario: tipo_usuario || 'estudante',
-          universidade_id: tipo_usuario === 'professor' ? universidade_id : null,
           created_at: new Date().toISOString(),
           updated_at: new Date().toISOString(),
         }
-        this.profile = await criarUsuario(profile)
+        saveLocalProfile(this.user.id, profile)
+        try {
+          this.profile = await criarUsuario(profile)
+          clearLocalProfile(this.user.id)
+        } catch (profileError) {
+          this.profile = profile
+          this.profileError = profileError.message
+          throw profileError
+        }
       }
       return data
     },
