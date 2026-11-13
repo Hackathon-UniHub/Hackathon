@@ -7,6 +7,7 @@ import { useAuthStore } from '@/stores/auth'
 import { useFavoritosStore } from '@/stores/favoritos'
 
 const props = defineProps(['universidade'])
+const emit = defineEmits(['excluir'])
 
 const favoritosStore = useFavoritosStore()
 const authStore = useAuthStore()
@@ -70,6 +71,7 @@ function alternarFavorito() {
       <RouterLink class="botao" :to="{ name: 'universidade', params: { id: universidade.id } }">
         Página da universidade
       </RouterLink>
+      <button class="excluir" type="button" @click="emit('excluir', universidade.id)">Excluir</button>
     </div>
   </div>
 </template>
@@ -84,10 +86,10 @@ function alternarFavorito() {
   background: #fff;
   border: 1px solid var(--borda);
   border-radius: 14px;
-  padding: 1.1rem 1.2rem;
+  padding: 0.9rem 1rem;
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
+  gap: 0.35rem;
   transition: 0.15s;
 }
 
@@ -168,7 +170,8 @@ function alternarFavorito() {
   display: flex;
   align-items: center;
   gap: 0.6rem;
-  margin-top: 0.3rem;
+  margin-top: auto;
+  padding-top: 0.3rem;
 }
 
 .favoritar {
@@ -192,10 +195,27 @@ function alternarFavorito() {
   color: var(--vermelho);
 }
 
+.excluir {
+  margin-left: auto;
+  background: #fff;
+  color: var(--vermelho);
+  border: 1px solid var(--vermelho);
+  padding: 0.45rem 0.9rem;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 0.82rem;
+  cursor: pointer;
+  transition: 0.15s;
+}
+.excluir:hover {
+  background: var(--vermelho);
+  color: #fff;
+}
+
 .botao {
   background: var(--vermelho);
   color: #fff;
-  padding: 0.5rem 1rem;
+  padding: 0.45rem 1rem;
   border-radius: 8px;
   font-weight: 600;
   font-size: 0.82rem;

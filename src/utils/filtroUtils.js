@@ -22,6 +22,17 @@ export async function cadastrarUniversidade(novaUniversidade) {
   })
 }
 
+export async function carregarUniversidade(id) {
+  const resposta = await fetch(`${API_URL}/universidades/${id}`)
+  return await resposta.json()
+}
+
+export async function deletarUniversidade(id) {
+  await fetch(`${API_URL}/universidades/${id}`, {
+    method: 'DELETE',
+  })
+}
+
 export function getEstados(universidades) {
   const lista = []
 
@@ -107,6 +118,6 @@ export function getRankingUniversidades(quantidade) {
     }
   }
 
-  comNota.sort((a, b) => b.Nota - a.Nota)
+  comNota.sort((anterior, proxima) => proxima.Nota - anterior.Nota)
   return comNota.slice(0, quantidade)
 }

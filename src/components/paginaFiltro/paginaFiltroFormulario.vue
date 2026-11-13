@@ -47,8 +47,8 @@ async function salvarUniversidade() {
       await cadastrarUniversidade(novaUniversidade.value)
       window.alert('Universidade cadastrada com sucesso!')
       router.push('/universidades')
-    } catch (e) {
-      console.log('Erro ao cadastrar universidade:', e)
+    } catch (error) {
+      console.log('Erro ao cadastrar universidade:', error)
       window.alert('Erro ao cadastrar a universidade. Verifique se a API está rodando.')
     }
   }
@@ -109,7 +109,11 @@ onMounted(carregarCursos)
         <label for="igc">Nota (IGC) *</label>
         <select id="igc" v-model="novaUniversidade.igc" required>
           <option value="" disabled>Selecione</option>
-          <option v-for="n in [1, 2, 3, 4, 5]" :key="n" :value="String(n)">{{ n }}</option>
+          <option value="1">1</option>
+          <option value="2">2</option>
+          <option value="3">3</option>
+          <option value="4">4</option>
+          <option value="5">5</option>
         </select>
       </div>
 
@@ -371,4 +375,4 @@ onMounted(carregarCursos)
     flex-direction: column;
   }
 }
-</style>  
+</style>

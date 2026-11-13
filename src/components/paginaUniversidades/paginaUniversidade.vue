@@ -1,1122 +1,254 @@
 <script setup>
-import { ref, computed } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
-import { useAuthStore } from '@/stores/auth'
-import { useFavoritosStore } from '@/stores/favoritos'
-import VestibularesList from './VestibularesList.vue'
-import VestibularForm from './VestibularForm.vue'
-import ComentariosSection from './ComentariosSection.vue'
-import {
-  UniversidadePorId,
-  getIniciais,
-  getAnoFundacao,
-  getSiteOficial,
-  temCursosDisponiveis,
-  getCursosDaUniversidade,
-  getRotuloCurso,
-  filtrarCursosDaUniversidade,
-  getCorteEnemDoCursoSelecionado,
-  selecionarCursoDaUniversidade,
-  fecharCursoSelecionado,
-} from '@/utils/universidadesUtils.js'
+import { onMounted, ref } from 'vue'
+import { RouterLink, useRoute } from 'vue-router'
+import { carregarUniversidade } from '@/utils/filtroUtils.js'
 
 const route = useRoute()
-const router = useRouter()
-const authStore = useAuthStore()
-const favoritosStore = useFavoritosStore()
+const universidade = ref({})
+const loading = ref(true)
+const erro = ref('')
 
-const universidade = computed(() => UniversidadePorId(route.params.id))
-
-const siteOficial = computed(() => getSiteOficial(universidade.value))
-const iniciais = computed(() => getIniciais(universidade.value))
-const anoFundacao = computed(() => getAnoFundacao(universidade.value))
-
-const favorito = computed(() =>
-  universidade.value ? favoritosStore.isFavorito(Number(universidade.value.id)) : false,
-)
-
-const modalVestibularAberto = ref(false)
-const vestibularEditando = ref(null)
-
-function abrirEdicaoVestibular(vestibular) {
-  vestibularEditando.value = vestibular
-  modalVestibularAberto.value = true
-}
-
-function fecharModalVestibular() {
-  modalVestibularAberto.value = false
-  vestibularEditando.value = null
-}
-
-function alternarFavorito() {
-  if (!authStore.isLoggedIn) {
-    router.push({ name: 'login', query: { redirect: route.fullPath } })
-    return
+async function carregarDados() {
+  try {
+    universidade.value = await carregarUniversidade(route.params.id)
+  } catch (error) {
+    console.log('Erro ao carregar universidade:', error)
+    erro.value = 'Não foi possível carregar a universidade. Verifique se a API está rodando.'
   }
 
-  const id = Number(universidade.value.id)
-  if (favorito.value) {
-    favoritosStore.removerFavorito(id)
-  } else {
-    favoritosStore.adicionarFavorito(id)
-  }
+  loading.value = false
 }
 
-const pesquisaCurso = ref('')
-const cursoSelecionado = ref(null)
-
-const cursosDaUniversidade = computed(() => getCursosDaUniversidade(universidade.value))
-const cursosFiltrados = computed(() =>
-  filtrarCursosDaUniversidade(cursosDaUniversidade.value, pesquisaCurso.value),
-)
-const corteEnemSelecionado = computed(() =>
-  getCorteEnemDoCursoSelecionado(universidade.value, cursoSelecionado.value),
-)
-
-function onSelecionarCurso(curso) {
-  selecionarCursoDaUniversidade(cursoSelecionado, curso)
-}
-
-function onFecharCurso() {
-  fecharCursoSelecionado(cursoSelecionado)
-}
+onMounted(carregarDados)
 </script>
 
 <template>
-  <div class="paginaFundo" v-if="universidade">
-    <div class="paginaUniversidade">
-      <RouterLink to="/universidades" class="voltar">Voltar ao catálogo</RouterLink>
+  <div class="paginaUniversidade">
+    <p v-if="loading" class="mensagem">Carregando universidade...</p>
+    <p v-else-if="erro" class="mensagem">{{ erro }}</p>
+    <p v-else-if="!universidade.nome" class="mensagem">Universidade não encontrada.</p>
 
-      <div class="cabecalho">
-        <div class="logo">{{ iniciais }}</div>
+    <div v-else class="caixa">
+      <RouterLink class="voltar" to="/universidades">Voltar para as universidades</RouterLink>
 
-        <div class="conteudoCabecalho">
-          <p class="selos">
-            {{ universidade.categoria_administrativa }}
-            <span v-if="universidade.situacao" class="situacao"> · {{ universidade.situacao }}</span>
-          </p>
-
-          <h1>{{ universidade.nome }}</h1>
-          <p class="localizacao">{{ universidade.municipio }}, {{ universidade.uf }}</p>
-        </div>
-
-        <div class="acoesCabecalho">
-          <div class="nota" v-if="universidade.igc && universidade.igc !== '-'">
-            <span class="notaValor">{{ universidade.igc }}</span>
-            <span class="notaLegenda">IGC/MEC</span>
-          </div>
-          <button class="botaoFavoritar" type="button" @click="alternarFavorito">
-            {{ favorito ? 'Remover favorito' : 'Favoritar' }}
-          </button>
-          <a class="botaoSite" :href="siteOficial" target="_blank" rel="noopener noreferrer">
-            Site oficial
-          </a>
-        </div>
+      <div class="topo">
+        <span
+          class="categoria"
+          :class="universidade.categoria_administrativa === 'Pública' ? 'publica' : 'privada'"
+        >
+          {{ universidade.categoria_administrativa }}
+        </span>
+        <span class="nota">Nota {{ universidade.igc }}</span>
       </div>
 
-      <div class="estatisticas">
-        <div class="caixaEstatistica" v-if="universidade.quantidade_alunos">
-          <p class="valorEstatistica">{{ universidade.quantidade_alunos }}</p>
-          <p class="rotuloEstatistica">Alunos</p>
+      <h1 class="nome">{{ universidade.nome }}</h1>
+      <p class="local">{{ universidade.sigla }} - {{ universidade.municipio }}/{{ universidade.uf }}</p>
+      <p class="descricao" v-if="universidade.descricao">{{ universidade.descricao }}</p>
+
+      <h2 class="titulo">Informações</h2>
+      <dl class="informacoes">
+        <div>
+          <dt>Situação</dt>
+          <dd>{{ universidade.situacao }}</dd>
         </div>
-        <div class="caixaEstatistica" v-if="universidade.quantidade_cursos">
-          <p class="valorEstatistica">{{ universidade.quantidade_cursos }}</p>
-          <p class="rotuloEstatistica">Cursos</p>
+        <div v-if="universidade.quantidade_alunos">
+          <dt>Alunos</dt>
+          <dd>{{ universidade.quantidade_alunos }}</dd>
         </div>
-      </div>
-
-      <div class="conteudo">
-        <div class="secoesSuperiores">
-          <div class="secao" v-if="universidade.descricao">
-            <h2>Sobre a instituição</h2>
-            <p class="descricao">{{ universidade.descricao }}</p>
-
-            <div class="etiquetas" v-if="universidade.principais_graduacoes?.length">
-              <span
-                class="etiqueta"
-                v-for="curso in universidade.principais_graduacoes"
-                :key="curso"
-              >
-                {{ curso }}
-              </span>
-            </div>
-          </div>
-
-          <div class="secao" v-if="universidade.diferenciais?.length">
-            <h2>Diferenciais</h2>
-            <div class="gradeDiferenciais">
-              <div class="itemDiferencial" v-for="dif in universidade.diferenciais" :key="dif">
-                <p>{{ dif }}</p>
-              </div>
-            </div>
-          </div>
-
-          <div class="secao">
-            <h2>Avaliações do MEC</h2>
-            <div class="gradeAvaliacoes">
-              <div class="avaliacaoItem" v-if="universidade.ci && universidade.ci !== '-'">
-                <p class="notaRotulo">Conceito Institucional (Presencial)</p>
-                <p class="notaValor">
-                  {{ universidade.ci }}
-                  <span v-if="universidade.ano_ci">({{ universidade.ano_ci }})</span>
-                </p>
-              </div>
-              <div class="avaliacaoItem" v-if="universidade.ci_ead && universidade.ci_ead !== '-'">
-                <p class="notaRotulo">Conceito Institucional (EAD)</p>
-                <p class="notaValor">
-                  {{ universidade.ci_ead }}
-                  <span v-if="universidade.ano_ci_ead">({{ universidade.ano_ci_ead }})</span>
-                </p>
-              </div>
-              <div class="avaliacaoItem" v-if="universidade.igc && universidade.igc !== '-'">
-                <p class="notaRotulo">Índice Geral de Cursos (IGC)</p>
-                <p class="notaValor">
-                  {{ universidade.igc }}
-                  <span v-if="universidade.ano_igc">({{ universidade.ano_igc }})</span>
-                </p>
-              </div>
-            </div>
-          </div>
+        <div v-if="universidade.quantidade_cursos">
+          <dt>Cursos</dt>
+          <dd>{{ universidade.quantidade_cursos }}</dd>
         </div>
-
-        <div class="caixaInstitucional">
-          <h3>Informações institucionais</h3>
-          <div class="linhaDado" v-if="universidade.razao_social">
-            <span class="dadoRotulo">Razão social</span>
-            <span class="dadoValor">{{ universidade.razao_social }}</span>
-          </div>
-          <div class="linhaDado" v-if="universidade.cnpj">
-            <span class="dadoRotulo">CNPJ</span>
-            <span class="dadoValor">{{ universidade.cnpj }}</span>
-          </div>
-          <div class="linhaDado" v-if="anoFundacao">
-            <span class="dadoRotulo">Fundação</span>
-            <span class="dadoValor">{{ anoFundacao }}</span>
-          </div>
-          <div class="linhaDado" v-if="universidade.natureza_juridica">
-            <span class="dadoRotulo">Natureza jurídica</span>
-            <span class="dadoValor">{{ universidade.natureza_juridica }}</span>
-          </div>
-          <div class="linhaDado" v-if="universidade.organizacao_academica">
-            <span class="dadoRotulo">Organização acadêmica</span>
-            <span class="dadoValor">{{ universidade.organizacao_academica }}</span>
-          </div>
-          <div class="linhaDado" v-if="universidade.tipo_credenciamento">
-            <span class="dadoRotulo">Credenciamento</span>
-            <span class="dadoValor">{{ universidade.tipo_credenciamento }}</span>
-          </div>
-          <div class="linhaDado" v-if="universidade.endereco_sede">
-            <span class="dadoRotulo">Endereço</span>
-            <span class="dadoValor">{{ universidade.endereco_sede }}</span>
-          </div>
-          <div class="linhaDado" v-if="universidade.site">
-            <span class="dadoRotulo">Site</span>
-            <span class="dadoValor">{{ universidade.site }}</span>
-          </div>
-          <div class="linhaDado" v-if="universidade.telefone">
-            <span class="dadoRotulo">Telefone</span>
-            <span class="dadoValor">{{ universidade.telefone }}</span>
-          </div>
-          <div class="linhaDado" v-if="universidade.email">
-            <span class="dadoRotulo">E-mail</span>
-            <span class="dadoValor">{{ universidade.email }}</span>
-          </div>
-          <div class="linhaDado" v-if="universidade.sinalizacoes_vigentes">
-            <span class="dadoRotulo">Sinalizações vigentes</span>
-            <span class="dadoValor alerta">{{ universidade.sinalizacoes_vigentes }}</span>
-          </div>
+        <div v-if="universidade.endereco_sede">
+          <dt>Endereço</dt>
+          <dd>{{ universidade.endereco_sede }}</dd>
         </div>
-
-        <div class="secao" v-if="universidade.fontes_pesquisa?.length">
-          <h2>Fontes de pesquisa</h2>
-          <ul class="listaFontes">
-            <li v-for="fonte in universidade.fontes_pesquisa" :key="fonte">{{ fonte }}</li>
-          </ul>
+        <div v-if="universidade.telefone">
+          <dt>Telefone</dt>
+          <dd>{{ universidade.telefone }}</dd>
         </div>
-
-        <div v-if="!authStore.loading && !authStore.isLoggedIn" class="caixaCadastro">
-          <h3>Interessado em {{ universidade.sigla || universidade.nome }}?</h3>
-          <p>Crie uma conta para salvar favoritos, ver mais instituições e localizalas no mapa.</p>
-          <RouterLink to="/criar-conta" class="botaoPrimario">Criar conta grátis</RouterLink>
-          <RouterLink to="/universidades" class="botaoSecundario">Outras universidades</RouterLink>
+        <div v-if="universidade.email">
+          <dt>E-mail</dt>
+          <dd>{{ universidade.email }}</dd>
         </div>
-      </div>
-
-      <VestibularesList
-        :universidade-id="universidade.id"
-        @editar="abrirEdicaoVestibular"
-      />
-
-      <ComentariosSection
-        :universidade-id="universidade.id"
-        :titulo="`Comentários sobre ${universidade.sigla || universidade.nome}`"
-      />
-
-      <div class="secaoCursos">
-        <h2>{{ universidade.cursos_pda?.length ? 'Cursos oferecidos' : 'Cursos em destaque' }}</h2>
-
-        <template v-if="temCursosDisponiveis(universidade)">
-          <p class="subtituloCursos">
-            {{ cursosDaUniversidade.length }}
-            {{ universidade.cursos_pda?.length ? 'cursos cadastrados' : 'opções de destaque' }}
-          </p>
-
-          <input v-model="pesquisaCurso" type="text" class="buscaCursoInput" placeholder="Filtrar cursos..." />
-
-          <div class="chipsCursos">
-            <button
-              class="chipCurso"
-              v-for="(curso, indice) in cursosFiltrados"
-              :key="`${curso.codigo_curso || curso.nome_curso}-${indice}`"
-              :class="{ ativo: cursoSelecionado === curso }"
-              @click="onSelecionarCurso(curso)"
+        <div v-if="universidade.site">
+          <dt>Site</dt>
+          <dd>
+            <a
+              :href="universidade.site.startsWith('http') ? universidade.site : 'https://' + universidade.site"
+              target="_blank"
             >
-              {{ getRotuloCurso(curso) }}
-            </button>
-            <p class="semResultado" v-if="!cursosFiltrados.length">Nenhum curso encontrado.</p>
-          </div>
-
-          <div class="detalheCurso" v-if="cursoSelecionado">
-            <div class="detalheCursoCabecalho">
-              <div>
-                <span class="subtitulo">DETALHES DO CURSO</span>
-
-                <h3>{{ cursoSelecionado.nome_curso }}</h3>
-                <p>{{ universidade.nome }}</p>
-              </div>
-              <button class="fecharDetalheCurso" type="button" @click="onFecharCurso">×</button>
-            </div>
-
-            <p v-if="cursoSelecionado.ehDestaque" class="semResultado">
-              Detalhes deste curso ainda não estão disponíveis.
-            </p>
-
-            <div v-else class="detalheCursoGrade">
-              <div class="detalheCursoItem">
-                <span class="detalheCursoRotulo">GRAU</span>
-                <span class="detalheCursoValor">{{ cursoSelecionado.grau || '-' }}</span>
-              </div>
-              <div class="detalheCursoItem">
-                <span class="detalheCursoRotulo">ÁREA</span>
-                <span class="detalheCursoValor">
-                  {{ cursoSelecionado.area_ocde_cine || cursoSelecionado.area_ocde || '-' }}
-                </span>
-              </div>
-              <div class="detalheCursoItem">
-                <span class="detalheCursoRotulo">MODALIDADE</span>
-                <span class="detalheCursoValor">{{ cursoSelecionado.modalidade || '-' }}</span>
-              </div>
-              <div class="detalheCursoItem">
-                <span class="detalheCursoRotulo">SITUAÇÃO</span>
-                <span class="detalheCursoValor">{{ cursoSelecionado.situacao_curso || '-' }}</span>
-              </div>
-              <div class="detalheCursoItem">
-                <span class="detalheCursoRotulo">VAGAS AUTORIZADAS</span>
-                <span class="detalheCursoValor">{{ cursoSelecionado.vagas_autorizadas ?? '-' }}</span>
-              </div>
-              <div class="detalheCursoItem">
-                <span class="detalheCursoRotulo">CARGA HORÁRIA</span>
-                <span class="detalheCursoValor">
-                  {{ cursoSelecionado.carga_horaria ? `${cursoSelecionado.carga_horaria}h` : '-' }}
-                </span>
-              </div>
-              <div class="detalheCursoItem">
-                <span class="detalheCursoRotulo">LOCAL</span>
-                <span class="detalheCursoValor">
-                  {{ cursoSelecionado.municipio }} - {{ cursoSelecionado.uf }}
-                </span>
-              </div>
-              <div class="detalheCursoItem" v-if="corteEnemSelecionado">
-                <span class="detalheCursoRotulo">CORTE ENEM</span>
-                <span class="detalheCursoValor destaqueCorte">{{ corteEnemSelecionado }}</span>
-              </div>
-            </div>
-          </div>
-        </template>
-
-        <p v-else class="semResultado">Não há cursos cadastrados para esta universidade.</p>
-      </div>
-    </div>
-
-    <VestibularForm
-      v-model="modalVestibularAberto"
-      :vestibular="vestibularEditando"
-      @salvo="fecharModalVestibular"
-    />
-  </div>
-
-  <div class="paginaFundo" v-else>
-    <div class="paginaErro">
-      <div class="conteudoErro">
-        <h1 class="codigoStatus">404</h1>
-        <h2 class="tituloPrincipal">Universidade não encontrada</h2>
-
-        <p class="textoDescritivo">
-          O site oficial dessa instituição não está disponível no momento ou não foi informado
-          corretamente. Volte para a listagem e explore outras opções no
-          <span class="textoDestacado">UniHub</span>.
-        </p>
-
-        <div class="grupoBotoes">
-          <RouterLink to="/" class="erroBotao erroBotaoPrimario">Voltar ao Início</RouterLink>
-          <RouterLink to="/universidades" class="erroBotao erroBotaoSecundario">
-            Explorar Universidades
-          </RouterLink>
+              {{ universidade.site }}
+            </a>
+          </dd>
         </div>
-      </div>
+      </dl>
+
+      <h2 class="titulo">Cursos oferecidos</h2>
+      <ul class="cursos">
+        <li v-for="curso in universidade.cursos" :key="curso">{{ curso }}</li>
+      </ul>
     </div>
   </div>
 </template>
 
 <style scoped>
-.paginaFundo {
+.paginaUniversidade {
   --vermelho: #7a0f1a;
   --vermelho-escuro: #9e1f2e;
-  --vermelho-claro: #f9e8e9;
-  --creme: #fffcf7;
   --creme-forte: #faf6ef;
   --borda: #eeeef0;
   --texto: #5d5d6b;
-  --texto-fraco: #91919f;
 
-  min-height: 100vh;
-  background-color: var(--creme);
+  min-height: 80vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 2rem 1rem;
+  background: #fff;
 }
 
-.paginaUniversidade {
-  max-width: 1100px;
-  margin: 0 auto;
-  padding: 2rem 1.5rem 4rem;
-  color: #1c1c22;
+.mensagem {
+  color: var(--texto);
+}
+
+.caixa {
+  width: 100%;
+  max-width: 640px;
+  border: 1px solid var(--borda);
+  border-radius: 16px;
+  padding: 1.8rem;
+  box-shadow: 0 6px 24px rgba(122, 15, 26, 0.08);
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
 }
 
 .voltar {
-  color: var(--texto);
-  text-decoration: none;
-  font-size: 0.9rem;
-  display: inline-block;
-  margin-bottom: 1.5rem;
-}
-.voltar:hover {
   color: var(--vermelho);
+  font-size: 0.85rem;
+  font-weight: 600;
+  text-decoration: none;
 }
 
-.cabecalho {
+.voltar:hover {
+  color: var(--vermelho-escuro);
+}
+
+.topo {
   display: flex;
-  align-items: center;
-  gap: 1.5rem;
-  background-color: var(--vermelho);
-  border-radius: 16px;
-  padding: 2rem;
-  color: #ffffff;
-  flex-wrap: wrap;
+  justify-content: space-between;
+  margin-top: 0.4rem;
 }
 
-.logo {
-  width: 64px;
-  height: 64px;
-  min-width: 64px;
-  border-radius: 50%;
-  border: 2px solid #ffffff;
-  color: #ffffff;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-weight: 800;
-  font-size: 1rem;
-  letter-spacing: 1px;
-}
-
-.conteudoCabecalho {
-  flex: 1;
-  min-width: 240px;
-}
-
-.selos {
+.categoria {
   font-size: 0.8rem;
-  font-weight: 700;
-  color: #ffffff;
-  margin: 0 0 0.5rem;
-}
-.selos .situacao {
-  color: rgba(255, 255, 255, 0.75);
-  font-weight: 500;
+  font-weight: 600;
 }
 
-.cabecalho h1 {
-  margin: 0 0 0.3rem;
-  font-size: 1.6rem;
+.categoria.publica {
+  color: #4c4c57;
 }
 
-.localizacao {
-  margin: 0;
-  color: rgba(255, 255, 255, 0.85);
-  font-size: 0.95rem;
-}
-
-.acoesCabecalho {
-  display: flex;
-  align-items: center;
-  gap: 1.2rem;
-  flex-wrap: wrap;
+.categoria.privada {
+  color: var(--vermelho);
 }
 
 .nota {
-  text-align: center;
-}
-.notaValor {
-  display: block;
-  font-size: 1.3rem;
-  font-weight: 800;
-  color: #ffffff;
-}
-.notaLegenda {
-  font-size: 0.62rem;
-  letter-spacing: 0.5px;
-  color: rgba(255, 255, 255, 0.75);
-}
-
-.botaoFavoritar,
-.botaoSite {
-  padding: 0.6rem 1.1rem;
-  border-radius: 999px;
-  font-weight: 600;
   font-size: 0.85rem;
-  cursor: pointer;
-  border: none;
-  text-decoration: none;
-  display: inline-flex;
-  align-items: center;
-}
-.botaoFavoritar {
-  background-color: transparent;
-  color: #ffffff;
-  border: 1px solid rgba(255, 255, 255, 0.5);
-}
-.botaoSite {
-  background-color: #ffffff;
+  font-weight: 700;
   color: var(--vermelho);
 }
 
-.estatisticas {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-  gap: 1rem;
-  margin: 1.5rem 0;
-}
-
-.caixaEstatistica {
-  background-color: var(--creme-forte);
-  border: 1px solid var(--borda);
-  border-radius: 14px;
-  padding: 1.2rem;
-}
-.caixaEstatistica:nth-child(odd) {
-  background-color: var(--vermelho);
-  border: none;
-  color: #ffffff;
-}
-.caixaEstatistica:nth-child(odd) .rotuloEstatistica {
-  color: #f0cdd0;
-}
-
-.valorEstatistica {
-  font-size: 1.1rem;
-  font-weight: 700;
-  margin: 0 0 0.2rem;
-  word-break: break-word;
-}
-.rotuloEstatistica {
+.nome {
+  font-size: 1.6rem;
+  font-weight: 800;
+  color: #1c1c22;
   margin: 0;
-  font-size: 0.8rem;
-  color: var(--texto-fraco);
+  line-height: 1.25;
 }
 
-.conteudo {
-  display: grid;
-  grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
-  gap: 1.5rem;
-  margin-top: 1rem;
-}
-
-.conteudo > * {
-  min-width: 0;
-}
-
-.secoesSuperiores {
-  grid-column: 1;
-  grid-row: 1;
-  display: flex;
-  flex-direction: column;
-  gap: 1.5rem;
-}
-.secoesSuperiores > *:last-child {
-  flex-grow: 1;
-}
-
-.caixaInstitucional {
-  margin-top: 0;
-}
-
-.colunaLateral {
-  grid-column: 2;
-  grid-row: 1 / span 2;
-  min-width: 0;
-}
-
-.conteudo > .secao {
-  grid-column: 1;
-  grid-row: 2;
-}
-
-.caixaCadastro {
-  grid-column: 2;
-  grid-row: 2;
-}
-
-@media (max-width: 800px) {
-  .conteudo {
-    grid-template-columns: minmax(0, 1fr);
-  }
-  .secoesSuperiores {
-    grid-column: 1;
-    grid-row: 1;
-  }
-  .conteudo > .secao {
-    grid-column: 1;
-    grid-row: 2;
-  }
-  .colunaLateral {
-    grid-column: 1;
-    grid-row: 3;
-  }
-  .caixaInstitucional {
-    grid-column: 1;
-    grid-row: 4;
-  }
-  .caixaCadastro {
-    grid-column: 1;
-    grid-row: 5;
-  }
-}
-
-@media (max-width: 640px) {
-  .paginaUniversidade {
-    padding: 1.5rem 1rem 3rem;
-  }
-
-  .cabecalho {
-    padding: 1.5rem;
-    border-radius: 12px;
-  }
-
-  .logo {
-    width: 56px;
-    height: 56px;
-    min-width: 56px;
-    font-size: 0.9rem;
-  }
-
-  .cabecalho h1 {
-    font-size: 1.3rem;
-  }
-
-  .acoesCabecalho {
-    flex-direction: column;
-    align-items: stretch;
-    gap: 0.8rem;
-    width: 100%;
-  }
-
-  .botaoFavoritar,
-  .botaoSite {
-    width: 100%;
-    justify-content: center;
-  }
-
-  .estatisticas {
-    grid-template-columns: 1fr;
-  }
-
-  .caixaEstatistica:nth-child(odd) {
-    background-color: var(--creme-forte);
-    border: 1px solid var(--borda);
-    color: #1c1c22;
-  }
-  .caixaEstatistica:nth-child(odd) .rotuloEstatistica {
-    color: var(--texto-fraco);
-  }
-
-  .secao,
-  .secaoCursos,
-  .caixaInstitucional,
-  .caixaCadastro,
-  .detalheCurso {
-    padding: 1.2rem;
-    border-radius: 12px;
-  }
-
-  .secao h2 {
-    font-size: 1rem;
-  }
-
-  .gradeDiferenciais,
-  .gradeAvaliacoes,
-  .detalheCursoGrade {
-    grid-template-columns: 1fr;
-  }
-
-  .itemDiferencial:nth-child(odd) {
-    background-color: var(--creme-forte);
-    border: 1px solid var(--borda);
-  }
-  .itemDiferencial:nth-child(odd) p {
-    color: #1c1c22;
-  }
-
-  .avaliacaoItem:nth-child(even) {
-    background-color: var(--creme-forte);
-    border: 1px solid var(--borda);
-  }
-  .avaliacaoItem:nth-child(even) .notaRotulo {
-    color: var(--texto-fraco);
-  }
-  .avaliacaoItem:nth-child(even) .notaValor {
-    color: #1c1c22;
-  }
-
-  .chipsCursos {
-    max-height: 180px;
-  }
-
-  .buscaCursoInput {
-    max-width: 100%;
-  }
-
-  .linhaDado {
-    flex-direction: column;
-    gap: 0.1rem;
-  }
-
-  .caixaCadastro {
-    padding: 1.2rem;
-  }
-
-  .botaoPrimario,
-  .botaoSecundario {
-    width: 100%;
-  }
-
-  .detalheCursoCabecalho {
-    flex-direction: column;
-    align-items: flex-start;
-  }
-
-  .fecharDetalheCurso {
-    margin-left: 0;
-    margin-top: 0.5rem;
-  }
-}
-
-.secao,
-.secaoCursos {
-  background-color: var(--creme-forte);
-  border: 1px solid var(--borda);
-  border-radius: 16px;
-  padding: 1.5rem;
-}
-
-.secao h2 {
-  font-size: 1.1rem;
-  margin: 0 0 1rem;
+.local {
+  color: var(--texto);
+  margin: 0;
 }
 
 .descricao {
-  color: #4c4c57;
-  line-height: 1.6;
-  margin: 0 0 1rem;
+  color: var(--texto);
+  line-height: 1.55;
+  font-size: 0.92rem;
+  margin: 0.4rem 0 0;
 }
 
-.etiquetas {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.5rem;
-}
-.etiqueta {
-  border: 1px solid var(--borda);
-  color: #4c4c57;
-  font-size: 0.8rem;
-  font-weight: 600;
-  padding: 0.3rem 0.75rem;
-  border-radius: 8px;
-}
-
-.gradeDiferenciais {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-  gap: 0.8rem;
-}
-
-.itemDiferencial {
-  border: 1px solid var(--borda);
-  border-radius: 10px;
-  padding: 0.8rem;
-}
-.itemDiferencial:nth-child(odd) {
-  background-color: var(--vermelho);
-  border: none;
-}
-.itemDiferencial:nth-child(odd) p {
-  color: #ffffff;
-}
-
-.itemDiferencial p {
-  margin: 0;
-  font-size: 0.9rem;
-  color: #41414a;
-}
-
-.gradeAvaliacoes {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-  gap: 0.8rem;
-}
-.avaliacaoItem {
-  border: 1px solid var(--borda);
-  border-radius: 10px;
-  padding: 0.9rem;
-}
-.avaliacaoItem:nth-child(even) {
-  background-color: #58141c;
-  border: none;
-}
-.avaliacaoItem:nth-child(even) .notaRotulo {
-  color: #f0cdd0;
-}
-.avaliacaoItem:nth-child(even) .notaValor {
-  color: #ffffff;
-}
-.notaRotulo {
-  margin: 0 0 0.3rem;
+.titulo {
   font-size: 0.78rem;
-  color: var(--texto-fraco);
-}
-.notaValor {
-  margin: 0;
   font-weight: 700;
-  font-size: 1.1rem;
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
+  color: var(--vermelho);
+  margin: 1rem 0 0.2rem;
 }
 
-.listaFontes {
+.informacoes {
   margin: 0;
-  padding-left: 1.2rem;
-  color: var(--texto);
-  font-size: 0.9rem;
-  line-height: 1.7;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
 }
 
-.secaoCursos {
-  margin-top: 1.5rem;
+.informacoes div {
+  display: flex;
+  gap: 1rem;
+  border-bottom: 1px solid var(--borda);
+  padding-bottom: 0.6rem;
 }
 
-.secaoCursos h2 {
-  margin: 0 0 0.2rem;
-  font-size: 1.1rem;
-}
-
-.subtituloCursos {
-  margin: 0 0 1rem;
+.informacoes dt {
+  width: 90px;
+  flex-shrink: 0;
+  font-weight: 700;
   font-size: 0.85rem;
-  color: var(--texto-fraco);
+  color: #1c1c22;
 }
 
-.buscaCursoInput {
-  width: 100%;
-  max-width: 420px;
-  padding: 0.7rem 1rem;
-  border-radius: 10px;
-  border: 1px solid var(--borda);
-  background: #fff;
-  font-size: 0.9rem;
-  outline: 0;
-  box-sizing: border-box;
-  margin-bottom: 1rem;
-  display: block;
+.informacoes dd {
+  margin: 0;
+  font-size: 0.88rem;
+  color: var(--texto);
+  word-break: break-word;
 }
 
-.buscaCursoInput:focus {
-  border-color: #1c1c22;
+.informacoes a {
+  color: var(--vermelho);
+  font-weight: 600;
 }
 
-.chipsCursos {
+.cursos {
+  list-style: none;
+  padding: 0;
+  margin: 0;
   display: flex;
   flex-wrap: wrap;
-  gap: 0.5rem;
-  max-height: 220px;
-  overflow-y: auto;
-  padding: 4px;
+  gap: 8px;
 }
 
-.chipCurso {
-  background: #fff;
-  border: 1px solid var(--borda);
-  color: var(--texto);
-  padding: 0.4rem 0.9rem;
-  border-radius: 999px;
-  font-size: 0.8rem;
-  cursor: pointer;
-}
-
-.chipCurso:hover {
-  border-color: #1c1c22;
-  color: #1c1c22;
-}
-
-.chipCurso.ativo {
-  background: var(--vermelho);
-  color: #fff;
-  border-color: var(--vermelho);
-}
-
-.semResultado {
-  font-size: 0.85rem;
-  color: var(--texto-fraco);
-  margin: 0;
-}
-
-.detalheCurso {
-  margin-top: 1.2rem;
-  background: #fff;
-  border: 1px solid var(--borda);
-  border-radius: 14px;
-  padding: 1.2rem;
-}
-
-.detalheCursoCabecalho {
-  display: flex;
-  align-items: flex-start;
-  gap: 0.8rem;
-  margin-bottom: 1rem;
-}
-
-.detalheCursoCabecalho h3 {
-  margin: 0.1rem 0;
-  font-size: 1.05rem;
-  color: #1c1c22;
-}
-
-.detalheCursoCabecalho p {
-  margin: 0;
-  font-size: 0.82rem;
-  color: var(--texto);
-}
-
-.fecharDetalheCurso {
-  margin-left: auto;
-  background: transparent;
-  border: none;
-  font-size: 1.3rem;
-  line-height: 1;
-  color: var(--texto-fraco);
-  cursor: pointer;
-}
-
-.detalheCursoGrade {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-  gap: 0.8rem;
-}
-
-.detalheCursoItem {
+.cursos li {
   background: var(--creme-forte);
   border: 1px solid var(--borda);
-  border-radius: 10px;
-  padding: 0.7rem 0.8rem;
-  display: flex;
-  flex-direction: column;
-  gap: 0.2rem;
+  color: var(--texto);
+  padding: 0.3rem 0.8rem;
+  border-radius: 20px;
+  font-size: 0.82rem;
 }
 
-.detalheCursoRotulo {
-  font-size: 0.7rem;
-  font-weight: 700;
-  letter-spacing: 0.5px;
-  color: var(--texto-fraco);
-}
+@media (max-width: 640px) {
+  .caixa {
+    padding: 1.2rem;
+  }
 
-.detalheCursoValor {
-  font-size: 0.9rem;
-  font-weight: 600;
-  color: #1c1c22;
-}
-
-.destaqueCorte {
-  color: var(--vermelho);
-}
-
-.caixaInstitucional,
-.caixaCadastro {
-  background-color: var(--creme-forte);
-  border: 1px solid var(--borda);
-  border-radius: 16px;
-  padding: 1.5rem;
-}
-
-.caixaInstitucional h3 {
-  margin: 0 0 1rem;
-  font-size: 1rem;
-}
-
-.linhaDado {
-  display: flex;
-  flex-direction: column;
-  gap: 0.15rem;
-  padding: 0.6rem 0;
-  border-bottom: 1px solid #f7f7f8;
-}
-.linhaDado:last-child {
-  border-bottom: none;
-}
-.dadoRotulo {
-  font-size: 0.75rem;
-  color: var(--texto-fraco);
-}
-.dadoValor {
-  font-size: 0.88rem;
-  color: #1c1c22;
-  overflow-wrap: anywhere;
-}
-.dadoValor.alerta {
-  color: var(--vermelho-escuro);
-  font-weight: 600;
-}
-
-.caixaCadastro {
-  background-color: #1c1c22;
-  color: #ffffff;
-}
-.caixaCadastro h3 {
-  margin: 0 0 0.6rem;
-}
-.caixaCadastro p {
-  font-size: 0.85rem;
-  color: #d9d9de;
-  margin: 0 0 1.2rem;
-}
-.botaoPrimario,
-.botaoSecundario {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 100%;
-  padding: 0.55rem;
-  border-radius: 999px;
-  font-weight: 500;
-  border: none;
-  cursor: pointer;
-  margin-bottom: 0.6rem;
-  box-sizing: border-box;
-  text-decoration: none;
-}
-.botaoPrimario {
-  background-color: #ffffff;
-  color: #1c1c22;
-}
-.botaoSecundario {
-  background-color: transparent;
-  color: #ffffff;
-  border: 1px solid #4c4c57;
-}
-
-.paginaErro {
-  min-height: 100vh;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  background: linear-gradient(135deg, #fffcf7 0%, #faf6ef 100%);
-  padding: 20px;
-  box-sizing: border-box;
-}
-
-.conteudoErro {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  text-align: center;
-  max-width: 500px;
-  width: 100%;
-}
-
-.codigoStatus {
-  font-size: 120px;
-  font-weight: 800;
-  color: #7a0f1a;
-  line-height: 1;
-  margin-bottom: 16px;
-  letter-spacing: -2px;
-}
-
-.tituloPrincipal {
-  font-size: 32px;
-  font-weight: 700;
-  color: #1c1c22;
-  margin-bottom: 20px;
-  line-height: 1.2;
-}
-
-.textoDescritivo {
-  font-size: 16px;
-  color: #5d5d6b;
-  line-height: 1.6;
-  margin-bottom: 32px;
-}
-
-.textoDestacado {
-  font-weight: 700;
-  color: #7a0f1a;
-}
-
-.grupoBotoes {
-  display: flex;
-  gap: 12px;
-  justify-content: center;
-  align-items: center;
-  width: 100%;
-  flex-wrap: wrap;
-}
-
-.erroBotao {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  padding: 14px 28px;
-  font-size: 15px;
-  font-weight: 700;
-  text-decoration: none;
-  border-radius: 999px;
-  cursor: pointer;
-  border: none;
-  min-width: 160px;
-}
-
-.erroBotaoPrimario {
-  background: linear-gradient(135deg, #7a0f1a 0%, #b83d4a 100%);
-  color: #ffffff;
-  box-shadow: 0 10px 24px rgba(122, 15, 26, 0.2);
-}
-
-.erroBotaoPrimario:hover {
-  transform: translateY(-2px);
-}
-
-.erroBotaoSecundario {
-  background: #ffffff;
-  color: #7a0f1a;
-  border: 2px solid #7a0f1a;
-}
-
-.erroBotaoSecundario:hover {
-  background: #faf6ef;
-  transform: translateY(-2px);
+  .informacoes div {
+    flex-direction: column;
+    gap: 0.2rem;
+  }
 }
 </style>

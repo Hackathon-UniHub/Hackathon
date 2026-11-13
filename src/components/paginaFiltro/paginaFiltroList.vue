@@ -6,6 +6,7 @@ import { HugeiconsIcon } from '@hugeicons/vue'
 import { XIcon, FilterIcon } from '@hugeicons/core-free-icons'
 import {
   carregarUniversidades,
+  deletarUniversidade,
   getEstados,
   getCursos,
   getCursosFiltrados,
@@ -32,12 +33,27 @@ async function carregarDados() {
 
   try {
     universidades.value = await carregarUniversidades()
-  } catch (e) {
-    console.log('Erro ao carregar universidades:', e)
+  } catch (error) {
+    console.log('Erro ao carregar universidades:', error)
     erro.value = 'Não foi possível carregar as universidades. Verifique se a API está rodando.'
   }
 
   loading.value = false
+}
+
+async function excluirUniversidade(id) {
+  const confirmarExclusao = window.confirm('Deseja realmente excluir a universidade?')
+
+  if (confirmarExclusao) {
+    try {
+      await deletarUniversidade(id)
+      window.alert('Universidade excluída com sucesso!')
+      await carregarDados()
+    } catch (error) {
+      console.log('Erro ao excluir universidade:', error)
+      window.alert('Erro ao excluir a universidade. Verifique se a API está rodando.')
+    }
+  }
 }
 
 const estados = computed(() => getEstados(universidades.value))
@@ -191,12 +207,12 @@ onMounted(carregarDados)
               </button>
               <button
                 class="botao"
-                v-for="r in ratings"
-                :key="r"
-                :class="{ ativo: ratingAtivo === r }"
-                @click="ratingAtivo = ratingAtivo === r ? 'Todas' : r"
+                v-for="rating in ratings"
+                :key="rating"
+                :class="{ ativo: ratingAtivo === rating }"
+                @click="ratingAtivo = ratingAtivo === rating ? 'Todas' : rating"
               >
-                {{ r }}
+                {{ rating }}
               </button>
             </div>
           </div>
@@ -219,6 +235,7 @@ onMounted(carregarDados)
             v-for="universidade in universidadesFiltradas"
             :key="universidade.id"
             :universidade="universidade"
+            @excluir="excluirUniversidade"
           />
 
           <RouterLink class="cardAdicionar" :to="{ name: 'formulario' }">
@@ -606,8 +623,15 @@ h2 {
 
 .cardsUniversidades > div {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  grid-template-columns: repeat(2, minmax(0, 420px));
+  align-items: stretch;
   gap: 1.25rem;
+}
+
+@media (max-width: 700px) {
+  .cardsUniversidades > div {
+    grid-template-columns: 1fr;
+  }
 }
 
 .botaoToggleFiltros {
@@ -825,17 +849,18 @@ h2 {
 
 .cardAdicionar {
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   align-items: center;
   justify-content: center;
   gap: 0.6rem;
   width: 80%;
   justify-self: center;
-  min-height: 230px;
-  padding: 1.5rem;
+  align-self: center;
+  min-height: 64px;
+  padding: 0.6rem 1rem;
   background: var(--creme-forte);
   border: 2px solid var(--vermelho);
-  border-radius: 14px;
+  border-radius: 12px;
   color: var(--vermelho);
   text-decoration: none;
   text-align: center;
@@ -855,13 +880,13 @@ h2 {
 }
 
 .cardAdicionarMais {
-  font-size: 4rem;
+  font-size: 1.8rem;
   line-height: 1;
   font-weight: 300;
 }
 
 .cardAdicionarTexto {
-  font-size: 1.2rem;
+  font-size: 1rem;
   font-weight: 700;
 }
 </style>

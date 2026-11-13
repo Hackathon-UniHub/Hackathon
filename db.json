@@ -68,26 +68,6 @@
         "Psicologia"
       ],
       "descricao": "A PUC-Rio é uma universidade privada brasileira com forte atuação em ensino, pesquisa e inovação, sendo referência em diversas áreas do conhecimento."
-    },
-    {
-      "nome": "asd",
-      "sigla": "asd",
-      "municipio": "asdada",
-      "uf": "PI",
-      "categoria_administrativa": "Pública",
-      "situacao": "Ativa",
-      "site": "asdadadadad",
-      "igc": "3",
-      "telefone": "(21) 31312-3213",
-      "email": "matheuslacerdamaximiano@gmail.com",
-      "endereco_sede": "asdadadadadsadsa",
-      "quantidade_alunos": "12333",
-      "quantidade_cursos": "23",
-      "cursos": [
-        "serer"
-      ],
-      "descricao": "asdaaaaaaaaaaaaaaaaaaaaaa",
-      "id": "aOAfgzUsbGs"
     }
   ],
   "$schema": "./node_modules/json-server/schema.json"
