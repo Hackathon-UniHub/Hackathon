@@ -1,10 +1,13 @@
 import { defineStore } from 'pinia'
 import { supabase } from '@/services/supabase'
-
-function limparFavoritosLocaisPorUsuario(userId) {
-  if (!userId) return
-  sessionStorage.removeItem(`favoritos_${userId}`)
-}
+import {
+  atualizarUsuario,
+  buscarUsuario,
+  buscarUsuarioPorAuthId,
+  criarUsuario,
+  excluirUsuario,
+  listarUsuarios,
+} from '@/services/usuariosApi'
 
 const PROFILE_STORAGE_KEY = 'unihub_profile_local'
 
@@ -19,17 +22,6 @@ function loadLocalProfile(userId) {
     console.warn('Erro ao carregar profile local:', e)
   }
   return null
-}
-
-function saveLocalProfile(userId, profile) {
-  try {
-    const stored = localStorage.getItem(PROFILE_STORAGE_KEY)
-    const profiles = stored ? JSON.parse(stored) : {}
-    profiles[userId] = { ...profile, updated_at: new Date().toISOString() }
-    localStorage.setItem(PROFILE_STORAGE_KEY, JSON.stringify(profiles))
-  } catch (e) {
-    console.warn('Erro ao salvar profile local:', e)
-  }
 }
 
 function clearLocalProfile(userId) {
@@ -50,6 +42,7 @@ export const useAuthStore = defineStore('auth', {
     user: null,
     session: null,
     profile: null,
+    profileError: null,
     loading: true,
   }),
 
@@ -76,7 +69,14 @@ export const useAuthStore = defineStore('auth', {
       if (error) throw error
       this.session = data.session
       this.user = data.user
-      if (this.user) await this.fetchProfile()
+      if (this.user) {
+        try {
+          await this.fetchProfile()
+        } catch (profileError) {
+          this.profileError = profileError.message
+          throw profileError
+        }
+      }
       return data
     },
 
@@ -91,15 +91,15 @@ export const useAuthStore = defineStore('auth', {
 
       if (this.user) {
         const profile = {
-          id: this.user.id,
+          auth_user_id: this.user.id,
           full_name: full_name || this.user.email?.split('@')[0] || 'Usuário',
           avatar_url: this.user.user_metadata?.avatar_url || null,
           tipo_usuario: tipo_usuario || 'estudante',
           universidade_id: tipo_usuario === 'professor' ? universidade_id : null,
           created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString(),
         }
-        saveLocalProfile(this.user.id, profile)
-        this.profile = profile
+        this.profile = await criarUsuario(profile)
       }
       return data
     },
@@ -128,93 +128,97 @@ export const useAuthStore = defineStore('auth', {
       await supabase.auth.signOut()
 
       if (this.user) {
-        limparFavoritosLocaisPorUsuario(this.user.id)
-        clearLocalProfile(this.user.id)
+        sessionStorage.removeItem(`favoritos_${this.user.id}`)
       }
 
       this.user = null
       this.session = null
       this.profile = null
+      this.profileError = null
     },
 
     async fetchProfile() {
       if (!this.user) return
 
+      const linkedProfile = await buscarUsuarioPorAuthId(this.user.id)
+      if (linkedProfile) {
+        this.profile = linkedProfile
+        this.profileError = null
+        return linkedProfile
+      }
+
       const localProfile = loadLocalProfile(this.user.id)
-      if (localProfile) {
-        this.profile = localProfile
-        return localProfile
-      }
-
-      const { data, error } = await supabase
-        .from('profiles')
-        .select('*')
-        .eq('id', this.user.id)
-        .maybeSingle()
-
-      if (!error && data) {
-        this.profile = data
-        saveLocalProfile(this.user.id, data)
-        return data
-      }
-
       const newProfile = {
-        id: this.user.id,
-        full_name:
+        auth_user_id: this.user.id,
+        full_name: localProfile?.full_name ||
           this.user.user_metadata?.full_name ||
           this.user.user_metadata?.name ||
           this.user.email?.split('@')[0] ||
           'Estudante',
-        avatar_url: this.user.user_metadata?.avatar_url || null,
-        tipo_usuario: 'estudante',
-        universidade_id: null,
-        created_at: new Date().toISOString(),
+        avatar_url: localProfile?.avatar_url || this.user.user_metadata?.avatar_url || null,
+        tipo_usuario: localProfile?.tipo_usuario ||
+          this.user.user_metadata?.tipo_usuario ||
+          'estudante',
+        universidade_id: localProfile?.universidade_id ||
+          this.user.user_metadata?.universidade_id ||
+          null,
+        created_at: localProfile?.created_at || new Date().toISOString(),
+        updated_at: new Date().toISOString(),
       }
-      saveLocalProfile(this.user.id, newProfile)
-      this.profile = newProfile
-      return newProfile
+      this.profile = await criarUsuario(newProfile)
+      this.profileError = null
+      clearLocalProfile(this.user.id)
+      return this.profile
     },
 
     async updateProfile(updates) {
       if (!this.user) throw new Error('USUARIO_NAO_LOGADO')
+      if (!this.profile?.id) throw new Error('PERFIL_NAO_ENCONTRADO')
 
-      const updated = { ...this.profile, ...updates, updated_at: new Date().toISOString() }
-      saveLocalProfile(this.user.id, updated)
+      const updated = await atualizarUsuario(this.profile.id, {
+        ...updates,
+        updated_at: new Date().toISOString(),
+      })
       this.profile = updated
-
-      const { error } = await supabase
-        .from('profiles')
-        .upsert(updated)
-        .select()
-        .single()
-
-      if (error) console.warn('Erro ao sincronizar profile com Supabase:', error)
-      return updated
+      this.profileError = null
+      return this.profile
     },
 
     async createProfile({ full_name, tipo_usuario, universidade_id }) {
       if (!this.user) throw new Error('USUARIO_NAO_LOGADO')
 
       const profile = {
-        id: this.user.id,
+        auth_user_id: this.user.id,
         full_name,
         avatar_url: this.user.user_metadata?.avatar_url || null,
         tipo_usuario: tipo_usuario || 'estudante',
         universidade_id: tipo_usuario === 'professor' ? universidade_id : null,
         created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
       }
 
-      saveLocalProfile(this.user.id, profile)
-      this.profile = profile
+      this.profile = await criarUsuario(profile)
+      this.profileError = null
+      return this.profile
+    },
 
-      const { error } = await supabase
-        .from('profiles')
-        .insert(profile)
-        .select()
-        .single()
+    async listProfiles() {
+      if (!this.user) throw new Error('USUARIO_NAO_LOGADO')
+      return listarUsuarios(this.user.id)
+    },
 
-      if (error) console.warn('Erro ao criar profile no Supabase:', error)
-      return profile
+    async getProfileById(id) {
+      if (!this.user || id !== this.profile?.id) throw new Error('SEM_PERMISSAO')
+      return buscarUsuario(id)
+    },
+
+    async deleteProfile() {
+      if (!this.user) throw new Error('USUARIO_NAO_LOGADO')
+      if (!this.profile?.id) throw new Error('PERFIL_NAO_ENCONTRADO')
+      await excluirUsuario(this.profile.id)
+      clearLocalProfile(this.user.id)
+      this.profile = null
+      this.profileError = null
     },
 
     async initAuthListener() {
@@ -223,16 +227,28 @@ export const useAuthStore = defineStore('auth', {
       } = await supabase.auth.getSession()
       this.session = session
       this.user = session?.user ?? null
-      if (this.user) await this.fetchProfile()
-      this.loading = false
+      try {
+        if (this.user) await this.fetchProfile()
+      } catch (error) {
+        this.profileError = error.message
+        console.error('Erro ao carregar perfil pela API:', error)
+      } finally {
+        this.loading = false
+      }
 
       supabase.auth.onAuthStateChange(async (_event, session) => {
         this.session = session
         this.user = session?.user ?? null
         if (this.user) {
-          await this.fetchProfile()
+          try {
+            await this.fetchProfile()
+          } catch (error) {
+            this.profileError = error.message
+            console.error('Erro ao carregar perfil pela API:', error)
+          }
         } else {
           this.profile = null
+          this.profileError = null
         }
       })
     },

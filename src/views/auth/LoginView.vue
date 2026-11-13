@@ -50,8 +50,10 @@ async function handleSubmit() {
     } else {
       router.push(redirect || '/')
     }
-  } catch {
-    errorMsg.value = 'Email ou senha incorretos.'
+  } catch (error) {
+    errorMsg.value = error.message?.includes('API')
+      ? 'Login realizado, mas não foi possível carregar o perfil. Verifique se a API está em execução.'
+      : 'Email ou senha incorretos.'
   } finally {
     loading.value = false
   }
@@ -154,9 +156,7 @@ const userInitial = computed(() => {
         <p>Entrar com o Google</p>
       </button>
 
-      <!--
-        <p v-if="errorMsg" class="error" role="alert">{{ errorMsg }}</p>
-      -->
+      <p v-if="errorMsg" class="error" role="alert">{{ errorMsg }}</p>
 
       <p class="footer-link">
         Não tem uma conta?

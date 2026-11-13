@@ -86,6 +86,9 @@ watch(() => authStore.loading, carregarFavoritos)
             </RouterLink>
           </li>
           <li v-if="authStore.isLoggedIn" class="itemContaMobile">
+            <RouterLink class="linkNavegacao" to="/conta" @click="fecharMenu">Meu perfil</RouterLink>
+          </li>
+          <li v-if="authStore.isLoggedIn" class="itemContaMobile">
             <button class="linkNavegacao acaoNavegacao" type="button" @click="sairDaConta(); fecharMenu()">
               Sair
             </button>
@@ -120,6 +123,7 @@ watch(() => authStore.loading, carregarFavoritos)
           </span>
         </RouterLink>
         <template v-if="authStore.isLoggedIn">
+          <RouterLink class="linkPerfil" to="/conta" @click="fecharMenu">Meu perfil</RouterLink>
           <div class="avatarUsuario" :aria-label="`Usuário: ${userInitial}`" role="img">
             {{ userInitial }}
           </div>
@@ -135,6 +139,12 @@ watch(() => authStore.loading, carregarFavoritos)
 </template>
 
 <style scoped>
+.linkPerfil {
+  color: inherit;
+  font-weight: 600;
+  text-decoration: none;
+}
+
 .cabecalho {
   position: fixed;
   top: 0;
