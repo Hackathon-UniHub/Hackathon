@@ -1,70 +1,78 @@
 <script setup>
-import { ref, computed } from 'vue'
+import { computed, onMounted, ref } from 'vue'
+import { RouterLink } from 'vue-router'
+import { useAuthStore } from '@/stores/auth'
 import paginaFiltroCard from './paginaFiltroCard.vue'
-import notasUniversidades from '@/data/notasUniversidades.js'
-import {
-  getEstados,
-  getRatings,
-  getCursos,
-  getCursosFiltrados,
-  getCursoDestaque,
-  getRankingUniversidades,
-  getUniversidadesFiltradas,
-  selecionarEstado,
-  selecionarRating,
-  selecionarBuscaCurso,
-  atualizarNotaEnem,
-} from '@/utils/filtroUtils.js'
 import { HugeiconsIcon } from '@hugeicons/vue'
 import { XIcon, FilterIcon } from '@hugeicons/core-free-icons'
+import {
+  carregarUniversidades,
+  deletarUniversidade,
+  getEstados,
+  getCursos,
+  getCursosFiltrados,
+  getUniversidadesFiltradas,
+  getRankingUniversidades,
+} from '@/utils/filtroUtils.js'
+
+const auth = useAuthStore()
+const universidades = ref([])
+const loading = ref(true)
+const erro = ref('')
 
 const estadoAtivo = ref('')
 const ratingAtivo = ref('Todas')
 const pesquisa = ref('')
 const buscaCurso = ref('')
-const notaEnem = ref('')
 const painelFiltrosAberto = ref(false)
 
-const estados = getEstados()
-const ratings = getRatings()
-const cursos = getCursos()
-const rankingUniversidades = getRankingUniversidades(notasUniversidades, 5)
+const ratings = [1, 2, 3, 4, 5]
+const rankingUniversidades = getRankingUniversidades(5)
 
-const cursosFiltrados = computed(() => getCursosFiltrados(cursos, buscaCurso.value))
+async function carregarDados() {
+  loading.value = true
+  erro.value = ''
 
-const universidades = computed(() =>
-  getUniversidadesFiltradas({
-    estadoAtivo: estadoAtivo.value,
+  try {
+    universidades.value = await carregarUniversidades()
+  } catch (error) {
+    console.log('Erro ao carregar universidades:', error)
+    erro.value = 'Não foi possível carregar as universidades. Verifique se a API está rodando.'
+  }
+
+  loading.value = false
+}
+
+async function excluirUniversidade(id) {
+  const confirmarExclusao = window.confirm('Deseja realmente excluir a universidade?')
+
+  if (confirmarExclusao) {
+    try {
+      await deletarUniversidade(id)
+      window.alert('Universidade excluída com sucesso!')
+      await carregarDados()
+    } catch (error) {
+      console.log('Erro ao excluir universidade:', error)
+      window.alert('Erro ao excluir a universidade. Verifique se a API está rodando.')
+    }
+  }
+}
+
+const estados = computed(() => getEstados(universidades.value))
+const cursos = computed(() => getCursos(universidades.value))
+
+const cursosFiltrados = computed(() => getCursosFiltrados(cursos.value, buscaCurso.value))
+
+const universidadesFiltradas = computed(() =>
+  getUniversidadesFiltradas(universidades.value, {
+    estado: estadoAtivo.value,
     pesquisa: pesquisa.value,
-    ratingAtivo: ratingAtivo.value,
-    buscaCurso: buscaCurso.value,
-    notaEnem: notaEnem.value,
+    rating: ratingAtivo.value,
+    curso: buscaCurso.value,
   }),
 )
 
-function onSelecionarEstado(uf) {
-  selecionarEstado(estadoAtivo, pesquisa, uf)
-}
-
-function onSelecionarRating(rating) {
-  selecionarRating(ratingAtivo, pesquisa, rating)
-}
-
-function onSelecionarBuscaCurso(curso) {
-  selecionarBuscaCurso(buscaCurso, pesquisa, curso)
-}
-
-function onAtualizarNotaEnem(evento) {
-  atualizarNotaEnem(notaEnem, evento)
-}
-
-function alternarPainelFiltros() {
-  painelFiltrosAberto.value = !painelFiltrosAberto.value
-}
-
-function fecharPainelFiltros() {
-  painelFiltrosAberto.value = false
-}
+onMounted(carregarDados)
 </script>
 
 <template>
@@ -143,33 +151,20 @@ function fecharPainelFiltros() {
           class="chip"
           v-for="curso in cursosFiltrados"
           :key="curso"
-          :class="{ ativo: buscaCurso.toLowerCase() === curso.toLowerCase() }"
-          @click="onSelecionarBuscaCurso(curso)"
+          :class="{ ativo: buscaCurso === curso }"
+          @click="buscaCurso = buscaCurso === curso ? '' : curso"
         >
           {{ curso }}
         </button>
         <p class="semResultado" v-if="!cursosFiltrados.length">Nenhum curso encontrado.</p>
       </div>
 
-      <div class="notaEnem">
-        <span class="rotulo">MÉDIA NO ENEM (0 a 1000)</span>
-        <input
-          type="number"
-          min="0"
-          max="1000"
-          class="notaInput"
-          :value="notaEnem"
-          @input="onAtualizarNotaEnem($event)"
-          placeholder="Ex: 650"
-        />
-        <p class="dica" v-if="notaEnem !== ''">Cursos com corte até {{ notaEnem }} pontos.</p>
-      </div>
     </div>
 
     <button
       class="botaoToggleFiltros"
       type="button"
-      @click="alternarPainelFiltros"
+      @click="painelFiltrosAberto = !painelFiltrosAberto"
       :aria-expanded="painelFiltrosAberto"
       aria-label="Alternar filtros"
       aria-controls="lateralEstados"
@@ -195,7 +190,7 @@ function fecharPainelFiltros() {
                 v-for="uf in estados"
                 :key="uf"
                 :class="{ ativo: estadoAtivo === uf }"
-                @click="onSelecionarEstado(uf)"
+                @click="estadoAtivo = estadoAtivo === uf ? '' : uf"
               >
                 {{ uf }}
               </button>
@@ -208,18 +203,18 @@ function fecharPainelFiltros() {
               <button
                 class="botao"
                 :class="{ ativo: ratingAtivo === 'Todas' }"
-                @click="onSelecionarRating('Todas')"
+                @click="ratingAtivo = 'Todas'"
               >
                 Todas
               </button>
               <button
                 class="botao"
-                v-for="r in ratings"
-                :key="r"
-                :class="{ ativo: ratingAtivo === r }"
-                @click="onSelecionarRating(r)"
+                v-for="rating in ratings"
+                :key="rating"
+                :class="{ ativo: ratingAtivo === rating }"
+                @click="ratingAtivo = ratingAtivo === rating ? 'Todas' : rating"
               >
-                {{ r }}
+                {{ rating }}
               </button>
             </div>
           </div>
@@ -227,22 +222,28 @@ function fecharPainelFiltros() {
       </aside>
 
       <div class="cardsUniversidades">
-        <div>
+
+        <p v-if="loading" class="mensagem">Carregando universidades...</p>
+
+        <div v-else-if="erro" class="mensagem">
+          <p class="alerta" role="alert">{{ erro }}</p>
+          <button class="botaoTentar" type="button" @click="carregarDados">
+            Tentar novamente
+          </button>
+        </div>
+
+        <div v-else>
           <paginaFiltroCard
-            v-for="universidade in universidades"
+            v-for="universidade in universidadesFiltradas"
             :key="universidade.id"
-            :id="universidade.id"
-            :nome="universidade.nome"
-            :sigla="universidade.sigla"
-            :municipio="universidade.municipio"
-            :uf="universidade.uf"
-            :categoria="universidade.categoria_administrativa"
-            :situacao="universidade.situacao"
-            :site="universidade.site"
-            :rating="universidade.igc"
-            :quantidade_alunos="universidade.quantidade_alunos"
-            :curso-destaque="getCursoDestaque(universidade.id, buscaCurso)"
+            :universidade="universidade"
+            @excluir="excluirUniversidade"
           />
+
+          <RouterLink v-if="auth.isProfessor" class="cardAdicionar" :to="{ name: 'formulario' }">
+            <span class="cardAdicionarMais" aria-hidden="true">+</span>
+            <span class="cardAdicionarTexto">Adicionar universidade</span>
+          </RouterLink>
         </div>
       </div>
     </div>
@@ -250,7 +251,7 @@ function fecharPainelFiltros() {
     <div
       v-if="painelFiltrosAberto"
       class="overlayFiltros"
-      @click="fecharPainelFiltros"
+      @click="painelFiltrosAberto = false"
       aria-hidden="true"
     ></div>
   </div>
@@ -547,37 +548,6 @@ h2 {
   margin: 0;
 }
 
-.notaEnem .rotulo {
-  font-size: 0.72rem;
-  font-weight: 700;
-  letter-spacing: 1.2px;
-  color: var(--vermelho-escuro);
-  display: block;
-  margin-bottom: 0.5rem;
-}
-
-.notaInput {
-  max-width: 320px;
-  width: 100%;
-  padding: 0.7rem 1rem;
-  border-radius: 10px;
-  border: 1px solid var(--borda);
-  background: var(--creme-forte);
-  font-size: 0.9rem;
-  outline: 0;
-}
-
-.notaInput:focus {
-  border-color: #d06f78;
-  background: #fff;
-}
-
-.notaEnem .dica {
-  font-size: 0.8rem;
-  color: var(--vermelho);
-  margin: 0.5rem 0 0;
-}
-
 .divisao {
   display: flex;
   gap: 2rem;
@@ -655,8 +625,15 @@ h2 {
 
 .cardsUniversidades > div {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  grid-template-columns: repeat(2, minmax(0, 420px));
+  align-items: stretch;
   gap: 1.25rem;
+}
+
+@media (max-width: 700px) {
+  .cardsUniversidades > div {
+    grid-template-columns: 1fr;
+  }
 }
 
 .botaoToggleFiltros {
@@ -667,7 +644,6 @@ h2 {
   display: none;
 }
 
-/* === RESPONSIVO === */
 @media (max-width: 1024px) {
   .containerQuatro {
     flex-direction: column;
@@ -824,7 +800,7 @@ h2 {
     padding: 0.4rem 0.85rem;
     border-radius: 20px;
     font-size: 0.85rem;
-    cursor: pointer.
+    cursor: pointer;
   }
 }
 
@@ -840,5 +816,79 @@ h2 {
   .cardsUniversidades > div {
     grid-template-columns: 1fr;
   }
+}
+
+.mensagem {
+  text-align: center;
+  color: var(--texto);
+  padding: 2rem 1rem;
+  margin: 0;
+}
+
+.alerta {
+  background: #fdecee;
+  border: 1px solid #f0cdd0;
+  color: var(--vermelho);
+  padding: 0.8rem 1rem;
+  border-radius: 10px;
+  font-size: 0.9rem;
+  margin: 0 0 1rem;
+}
+
+.botaoTentar {
+  background: var(--vermelho);
+  color: #fff;
+  border: none;
+  padding: 0.55rem 1.1rem;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.botaoTentar:hover {
+  background: var(--vermelho-escuro);
+}
+
+.cardAdicionar {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6rem;
+  width: 80%;
+  justify-self: center;
+  align-self: center;
+  min-height: 64px;
+  padding: 0.6rem 1rem;
+  background: var(--creme-forte);
+  border: 2px solid var(--vermelho);
+  border-radius: 12px;
+  color: var(--vermelho);
+  text-decoration: none;
+  text-align: center;
+  cursor: pointer;
+  transition:
+    background 0.15s ease,
+    color 0.15s ease,
+    box-shadow 0.15s ease;
+}
+
+.cardAdicionar:hover,
+.cardAdicionar:focus-visible {
+  background: var(--vermelho);
+  color: #fff;
+  box-shadow: 0 8px 22px rgba(122, 15, 26, 0.2);
+  outline: 0;
+}
+
+.cardAdicionarMais {
+  font-size: 1.8rem;
+  line-height: 1;
+  font-weight: 300;
+}
+
+.cardAdicionarTexto {
+  font-size: 1rem;
+  font-weight: 700;
 }
 </style>

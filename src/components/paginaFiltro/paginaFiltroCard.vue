@@ -6,26 +6,15 @@ import { HeartIcon } from '@hugeicons/core-free-icons'
 import { useAuthStore } from '@/stores/auth'
 import { useFavoritosStore } from '@/stores/favoritos'
 
-const props = defineProps([
-  'id',
-  'nome',
-  'sigla',
-  'municipio',
-  'uf',
-  'categoria',
-  'situacao',
-  'site',
-  'rating',
-  'quantidade_alunos',
-  'cursoDestaque',
-])
+const props = defineProps(['universidade'])
+const emit = defineEmits(['excluir'])
 
 const favoritosStore = useFavoritosStore()
 const authStore = useAuthStore()
 const route = useRoute()
 const router = useRouter()
 
-const favorito = computed(() => favoritosStore.isFavorito(Number(props.id)))
+const favorito = computed(() => favoritosStore.isFavorito(props.universidade.id))
 
 function alternarFavorito() {
   if (!authStore.isLoggedIn) {
@@ -34,9 +23,9 @@ function alternarFavorito() {
   }
 
   if (favorito.value) {
-    favoritosStore.removerFavorito(Number(props.id))
+    favoritosStore.removerFavorito(props.universidade.id)
   } else {
-    favoritosStore.adicionarFavorito(Number(props.id))
+    favoritosStore.adicionarFavorito(props.universidade.id)
   }
 }
 </script>
@@ -46,22 +35,22 @@ function alternarFavorito() {
     <div class="topo">
       <span
         class="categoria"
-        :class="categoria?.toLowerCase() === 'publica' ? 'publica' : 'privada'"
+        :class="universidade.categoria_administrativa === 'Pública' ? 'publica' : 'privada'"
       >
-        {{ categoria }}
+        {{ universidade.categoria_administrativa }}
       </span>
-      <span class="nota" v-if="rating">Nota {{ rating }}</span>
+      <span class="nota">Nota {{ universidade.igc }}</span>
     </div>
 
-    <h2 class="nome">{{ nome }}</h2>
-    <p class="local">{{ municipio }} - {{ uf }}</p>
+    <h2 class="nome">{{ universidade.nome }}</h2>
+    <p class="sigla">{{ universidade.sigla }}</p>
+    <p class="local">{{ universidade.municipio }} - {{ universidade.uf }}</p>
+    <p class="alunos">{{ universidade.quantidade_alunos }}</p>
+    <p class="alunos">{{ universidade.quantidade_cursos }}</p>
 
-    <p class="destaque" v-if="cursoDestaque">
-      <strong>{{ cursoDestaque.nome }}</strong>
-      <span v-if="cursoDestaque.nota"> · Corte ENEM: {{ cursoDestaque.nota }}</span>
-    </p>
-
-    <p class="alunos" v-if="quantidade_alunos">{{ quantidade_alunos }}</p>
+    <ul class="cursos">
+      <li v-for="curso in universidade.cursos" :key="curso">{{ curso }}</li>
+    </ul>
 
     <div class="rodape">
       <button
@@ -79,9 +68,10 @@ function alternarFavorito() {
           aria-hidden="true"
         />
       </button>
-      <RouterLink class="botao" :to="{ name: 'universidade', params: { id } }">
+      <RouterLink class="botao" :to="{ name: 'universidade', params: { id: universidade.id } }">
         Página da universidade
       </RouterLink>
+      <button class="excluir" type="button" @click="emit('excluir', universidade.id)">Excluir</button>
     </div>
   </div>
 </template>
@@ -96,10 +86,10 @@ function alternarFavorito() {
   background: #fff;
   border: 1px solid var(--borda);
   border-radius: 14px;
-  padding: 1.1rem 1.2rem;
+  padding: 0.9rem 1rem;
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
+  gap: 0.35rem;
   transition: 0.15s;
 }
 
@@ -139,20 +129,17 @@ function alternarFavorito() {
   line-height: 1.35;
 }
 
-.local {
-  font-size: 0.85rem;
+.sigla {
+  font-size: 0.8rem;
+  font-weight: 600;
   color: var(--texto);
   margin: 0;
 }
 
-.destaque {
-  margin: 0;
+.local {
   font-size: 0.85rem;
-  color: var(--vermelho);
-}
-.destaque span {
   color: var(--texto);
-  font-weight: 400;
+  margin: 0;
 }
 
 .alunos {
@@ -161,11 +148,30 @@ function alternarFavorito() {
   margin: 0;
 }
 
+.cursos {
+  list-style: none;
+  padding: 0;
+  margin: 0.2rem 0 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.cursos li {
+  background: #faf6ef;
+  border: 1px solid var(--borda);
+  color: var(--texto);
+  padding: 0.2rem 0.65rem;
+  border-radius: 20px;
+  font-size: 0.75rem;
+}
+
 .rodape {
   display: flex;
   align-items: center;
   gap: 0.6rem;
-  margin-top: 0.3rem;
+  margin-top: auto;
+  padding-top: 0.3rem;
 }
 
 .favoritar {
@@ -189,10 +195,27 @@ function alternarFavorito() {
   color: var(--vermelho);
 }
 
+.excluir {
+  margin-left: auto;
+  background: #fff;
+  color: var(--vermelho);
+  border: 1px solid var(--vermelho);
+  padding: 0.45rem 0.9rem;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 0.82rem;
+  cursor: pointer;
+  transition: 0.15s;
+}
+.excluir:hover {
+  background: var(--vermelho);
+  color: #fff;
+}
+
 .botao {
   background: var(--vermelho);
   color: #fff;
-  padding: 0.5rem 1rem;
+  padding: 0.45rem 1rem;
   border-radius: 8px;
   font-weight: 600;
   font-size: 0.82rem;
@@ -203,10 +226,3 @@ function alternarFavorito() {
   background: var(--vermelho-escuro);
 }
 </style>
-
-
-
-
-
-
-

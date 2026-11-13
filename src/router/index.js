@@ -24,14 +24,19 @@ const routes = [
     meta: { hideLayout: true },
   },
   {
+    path: '/mapa',
+    name: 'mapa',
+    component: () => import('@/views/MapaView.vue'),
+  },
+  {
     path: '/universidades',
     name: 'filtro',
     component: () => import('@/components/paginaFiltro/paginaFiltroList.vue'),
   },
   {
-    path: '/mapa',
-    name: 'mapa',
-    component: () => import('@/views/MapaView.vue'),
+    path: '/universidades/formulario',
+    name: 'formulario',
+    component: () => import('@/components/paginaFiltro/paginaFiltroFormulario.vue'),
   },
   {
     path: '/universidade/:id',
@@ -42,6 +47,12 @@ const routes = [
     path: '/favoritos',
     name: 'favoritos',
     component: () => import('@/views/FavoritosView.vue'),
+  },
+  {
+    path: '/conta',
+    name: 'conta',
+    component: () => import('@/views/ContaView.vue'),
+    meta: { requiresAuth: true },
   },
   {
     path: '/professor/dashboard',
