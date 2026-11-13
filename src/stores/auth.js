@@ -5,7 +5,7 @@ import {
   buscarUsuario,
   buscarUsuarioPorAuthId,
   criarUsuario,
-  excluirUsuario,
+  excluirUsuariosPorAuthId,
   listarUsuarios,
 } from '@/services/usuariosApi'
 
@@ -239,7 +239,7 @@ export const useAuthStore = defineStore('auth', {
     async deleteProfile() {
       if (!this.user) throw new Error('USUARIO_NAO_LOGADO')
       if (!this.profile?.id) throw new Error('PERFIL_NAO_ENCONTRADO')
-      await excluirUsuario(this.profile.id)
+      await excluirUsuariosPorAuthId(this.user.id, this.profile.id)
       clearLocalProfile(this.user.id)
       this.profile = null
       this.profileError = null

@@ -54,9 +54,9 @@ O `auth_user_id` relaciona o perfil à autenticação. O JSON Server gera o `id`
 | Consultar por ID | `GET /usuarios/{id}` | Carrega o perfil pelo ID da API para edição |
 | Cadastrar | `POST /usuarios` | Cria o perfil após cadastro/login sem perfil existente |
 | Atualizar | `PATCH /usuarios/{id}` | Atualiza os dados editáveis pelo ID da API |
-| Excluir | `DELETE /usuarios/{id}` | Remove o perfil pelo ID da API após confirmação; não exclui a conta Supabase |
+| Excluir | `DELETE /usuarios/{id}` | Remove todos os perfis vinculados ao usuário autenticado, um por vez, após confirmação; não exclui a conta Supabase |
 
-O cadastro e o login usam a entidade na criação/leitura do perfil. A rota autenticada **Meu perfil** permite consultar, atualizar o nome e excluir o perfil, com estados de carregamento, sucesso e erro e confirmação antes da exclusão.
+O cadastro e o login usam a entidade na criação/leitura do perfil. A rota autenticada **Meu perfil** permite consultar, atualizar o nome e excluir os perfis vinculados à conta autenticada, com estados de carregamento, sucesso e erro e confirmação antes da exclusão. Isso também remove registros duplicados com o mesmo `auth_user_id`; a conta do Supabase continua ativa.
 
 ### Respostas HTTP verificadas
 

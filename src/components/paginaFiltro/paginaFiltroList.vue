@@ -1,6 +1,7 @@
 <script setup>
 import { computed, onMounted, ref } from 'vue'
 import { RouterLink } from 'vue-router'
+import { useAuthStore } from '@/stores/auth'
 import paginaFiltroCard from './paginaFiltroCard.vue'
 import { HugeiconsIcon } from '@hugeicons/vue'
 import { XIcon, FilterIcon } from '@hugeicons/core-free-icons'
@@ -14,6 +15,7 @@ import {
   getRankingUniversidades,
 } from '@/utils/filtroUtils.js'
 
+const auth = useAuthStore()
 const universidades = ref([])
 const loading = ref(true)
 const erro = ref('')
@@ -238,7 +240,7 @@ onMounted(carregarDados)
             @excluir="excluirUniversidade"
           />
 
-          <RouterLink class="cardAdicionar" :to="{ name: 'formulario' }">
+          <RouterLink v-if="auth.isProfessor" class="cardAdicionar" :to="{ name: 'formulario' }">
             <span class="cardAdicionarMais" aria-hidden="true">+</span>
             <span class="cardAdicionarTexto">Adicionar universidade</span>
           </RouterLink>
