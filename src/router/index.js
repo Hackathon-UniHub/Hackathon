@@ -49,6 +49,12 @@ const routes = [
     component: () => import('@/views/FavoritosView.vue'),
   },
   {
+    path: '/conta',
+    name: 'conta',
+    component: () => import('@/views/ContaView.vue'),
+    meta: { requiresAuth: true },
+  },
+  {
     path: '/professor/dashboard',
     name: 'professor-dashboard',
     component: () => import('@/views/ProfessorDashboard.vue'),

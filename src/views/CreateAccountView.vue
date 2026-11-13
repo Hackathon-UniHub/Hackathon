@@ -120,6 +120,8 @@ async function handleSubmit() {
   } catch (error) {
     if (error.message?.includes('already registered')) {
       errorMsg.value = 'Esse email já está cadastrado.'
+    } else if (error.message?.includes('API')) {
+      errorMsg.value = 'Conta criada, mas a API de perfis não está disponível. Inicie a API e entre novamente.'
     } else {
       errorMsg.value = 'Erro ao criar conta. Tente novamente.'
     }
