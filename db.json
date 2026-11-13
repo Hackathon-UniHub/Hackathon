@@ -1,4 +1,73 @@
 {
+  "universidades": [
+    {
+      "id": "1",
+      "nome": "Afya Universidade Unigranrio (UNIGRANRIO)",
+      "sigla": "UNIGRANRIO",
+      "municipio": "Duque de Caxias",
+      "uf": "RJ",
+      "categoria_administrativa": "Privada",
+      "situacao": "Ativa",
+      "site": "www.unigranrio.br",
+      "igc": "3",
+      "telefone": "21 3219-4040 Ramal 2576",
+      "email": "procuradoriainstitucional.unigranrio@afya.com.br; luiz.pereira@afya.com.br",
+      "endereco_sede": "Avenida Perimetral Professor José de Souza Herdy - 120 - CEP: 25075-142 - Jardim Vinte e Cinco de Agosto",
+      "quantidade_alunos": "Mais de 7.500 alunos matriculados (Em um so campo)",
+      "quantidade_cursos": "30+ cursos de graduação (Em um so campo)",
+      "cursos": [
+        "Administração",
+        "Direito",
+        "Engenharia Civil",
+        "Psicologia"
+      ],
+      "descricao": "A Afya Universidade Unigranrio é uma universidade privada sediada em Duque de Caxias (RJ), fundada em 1970 (como Associação Fluminense de Educação) e credenciada como universidade em 1994. Desde 2021 integra o grupo Afya Educacional, a maior rede de ensino médico do Brasil, mantendo unidades em Duque de Caxias, Barra da Tijuca e Nova Iguaçu, além de polos EAD."
+    },
+    {
+      "id": "2",
+      "nome": "Universidade Federal do Rio de Janeiro",
+      "sigla": "UFRJ",
+      "municipio": "Rio de Janeiro",
+      "uf": "RJ",
+      "categoria_administrativa": "Pública",
+      "situacao": "Ativa",
+      "site": "www.ufrj.br",
+      "igc": "4",
+      "telefone": "21 3938-0000",
+      "email": "contato@ufrj.br",
+      "endereco_sede": "Avenida Athos da Silveira Ramos, 149 - Cidade Universitária, Rio de Janeiro - RJ",
+      "quantidade_alunos": "Mais de 50 mil alunos",
+      "quantidade_cursos": "Mais de 100 cursos de graduação e pós-graduação",
+      "cursos": [
+        "Administração",
+        "Direito",
+        "Engenharia Civil",
+        "Psicologia"
+      ],
+      "descricao": "A Universidade Federal do Rio de Janeiro é uma instituição pública brasileira de ensino superior, pesquisa e extensão, reconhecida nacional e internacionalmente pela qualidade acadêmica."
+    },
+    {
+      "id": "3",
+      "nome": "Pontifícia Universidade Católica do Rio de Janeiro",
+      "sigla": "PUC-Rio",
+      "municipio": "Rio de Janeiro",
+      "uf": "RJ",
+      "categoria_administrativa": "Privada",
+      "situacao": "Ativa",
+      "site": "www.puc-rio.br",
+      "igc": "4",
+      "telefone": "21 3527-1000",
+      "email": "contato@puc-rio.br",
+      "endereco_sede": "Rua Marquês de São Vicente, 225 - Gávea, Rio de Janeiro - RJ",
+      "quantidade_alunos": "Mais de 20 mil alunos",
+      "quantidade_cursos": "Mais de 70 cursos de graduação e pós-graduação",
+      "cursos": [
+        "Administração",
+        "Direito",
+        "Engenharia Civil",
+        "Psicologia"
+      ],
+      "descricao": "A PUC-Rio é uma universidade privada brasileira com forte atuação em ensino, pesquisa e inovação, sendo referência em diversas áreas do conhecimento."
   "usuarios": [
     {
       "id": "demo-estudante-1",
