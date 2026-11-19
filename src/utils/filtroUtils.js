@@ -1,6 +1,6 @@
 import notasUniversidades from '@/data/notasUniversidades.js'
 
-const API_URL = 'http://localhost:3000'
+const API_URL = 'http://localhost:3001'
 
 export const ufs = [
   'AC',
