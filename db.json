@@ -74,32 +74,30 @@
     {
       "id_usuario_autenticado": "b72310df-7d1c-44f7-a360-0f37e6e2e44b",
       "nome_completo": "Kaue Teixeira",
-      "url_avatar": null,
       "tipo_usuario": "professor",
       "universidade_id": 1,
-      "criado_em": "2026-11-13T16:05:20.267Z",
-      "atualizado_em": "2026-11-13T16:05:20.267Z",
       "id": "4n7MTQde2-0"
     },
     {
-      "id_usuario_autenticado": "0852699b-1675-4a76-9389-b2568ec1569b",
-      "nome_completo": "batatagaymer02",
-      "url_avatar": null,
+      "id_usuario_autenticado": "2ea30018-70c4-4e5c-b0ac-cd527e968372",
+      "nome_completo": "teste01",
       "tipo_usuario": "estudante",
       "universidade_id": null,
-      "criado_em": "2026-11-13T17:02:10.665Z",
-      "atualizado_em": "2026-11-13T17:35:59.945Z",
-      "id": "9rkjUmH6hAg"
+      "id": "TIyMD4JckbE"
     },
     {
-      "id_usuario_autenticado": "2579a259-d984-47a9-ab8e-807f2328d2be",
-      "nome_completo": "Kaue Teixeira",
-      "url_avatar": "https://lh3.googleusercontent.com/a/ACg8ocLdgk1qHRNbedrLa9j6eq5urUm_ahaE_cUKA6su1Co1FI2Kg_4=s96-c",
+      "id_usuario_autenticado": "5c44bf74-5b51-466a-9479-6ba0c2dc96cf",
+      "nome_completo": "teste01",
       "tipo_usuario": "estudante",
       "universidade_id": null,
-      "criado_em": "2026-11-13T17:53:08.630Z",
-      "atualizado_em": "2026-11-13T17:53:08.630Z",
-      "id": "OT-v1L7Pro8"
+      "id": "oCA85jMHd2U"
+    },
+    {
+      "id_usuario_autenticado": "5c44bf74-5b51-466a-9479-6ba0c2dc96cf",
+      "nome_completo": "teste",
+      "tipo_usuario": "estudante",
+      "universidade_id": null,
+      "id": "KD8fDEGCZyY"
     }
   ],
   "$schema": "./node_modules/json-server/schema.json"

@@ -71,7 +71,7 @@ function alternarFavorito() {
       <RouterLink class="botao" :to="{ name: 'universidade', params: { id: universidade.id } }">
         Página da universidade
       </RouterLink>
-      <button class="excluir" type="button" @click="emit('excluir', universidade.id)">Excluir</button>
+      <button v-if="authStore.isLoggedIn" class="excluir" type="button" @click="emit('excluir', universidade.id)">Excluir</button>
     </div>
   </div>
 </template>

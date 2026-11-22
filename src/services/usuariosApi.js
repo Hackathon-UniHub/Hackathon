@@ -3,9 +3,6 @@ const pendingCreations = new Map()
 const CAMPOS_API = {
   auth_user_id: 'id_usuario_autenticado',
   full_name: 'nome_completo',
-  avatar_url: 'url_avatar',
-  created_at: 'criado_em',
-  updated_at: 'atualizado_em',
 }
 const CAMPOS_APP = Object.fromEntries(
   Object.entries(CAMPOS_API).map(([campoApp, campoApi]) => [campoApi, campoApp]),
@@ -56,14 +53,7 @@ export async function buscarUsuario(id) {
 
 export async function buscarUsuarioPorAuthId(authUserId) {
   const users = await listarUsuarios(authUserId)
-
-  return users.reduce((latest, user) => {
-    if (!latest) return user
-
-    const latestDate = Date.parse(latest.updated_at || latest.created_at || '') || 0
-    const userDate = Date.parse(user.updated_at || user.created_at || '') || 0
-    return userDate >= latestDate ? user : latest
-  }, null)
+  return users[users.length - 1] || null
 }
 
 export function criarUsuario(usuario) {

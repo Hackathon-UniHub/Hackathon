@@ -1,5 +1,5 @@
 <script setup>
-import { onMounted, ref } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import universidades from '@/data/universidades.js'
@@ -15,6 +15,16 @@ const deleting = ref(false)
 const error = ref('')
 const success = ref('')
 const profileRemoved = ref(false)
+const hasProfileChanges = computed(() => {
+  if (!profile.value) return false
+
+  const nameChanged = fullName.value.trim() !== (profile.value.full_name || '')
+  const universityChanged =
+    profile.value.tipo_usuario === 'professor' &&
+    universidadeId.value !== String(profile.value.universidade_id ?? '')
+
+  return nameChanged || universityChanged
+})
 
 async function carregarPerfil() {
   loading.value = true
@@ -45,6 +55,10 @@ async function carregarPerfil() {
 }
 
 async function salvarPerfil() {
+  error.value = ''
+  success.value = ''
+  if (!hasProfileChanges.value) return
+
   if (!fullName.value.trim()) {
     error.value = 'Informe seu nome.'
     return
@@ -56,9 +70,6 @@ async function salvarPerfil() {
   }
 
   saving.value = true
-  error.value = ''
-  success.value = ''
-
   try {
     const updates = { full_name: fullName.value.trim() }
     if (profile.value.tipo_usuario === 'professor') {
@@ -148,7 +159,7 @@ onMounted(carregarPerfil)
             </select>
           </template>
 
-          <button type="submit" :disabled="saving || deleting">
+          <button type="submit" :disabled="saving || deleting || !hasProfileChanges">
             {{ saving ? 'Salvando...' : 'Salvar alterações' }}
           </button>
         </form>

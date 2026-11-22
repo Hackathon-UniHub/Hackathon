@@ -1,9 +1,11 @@
 <script setup>
 import { onMounted, ref } from 'vue'
 import { RouterLink, useRouter } from 'vue-router'
+import { useAuthStore } from '@/stores/auth'
 import { ufs, carregarUniversidades, cadastrarUniversidade, getCursos } from '@/utils/filtroUtils.js'
 
 const router = useRouter()
+const auth = useAuthStore()
 
 const novaUniversidade = ref({
   nome: '',
@@ -40,6 +42,12 @@ function adicionarNovoCurso() {
 }
 
 async function salvarUniversidade() {
+  if (!auth.isAdmin) {
+    window.alert('Apenas administradores podem cadastrar universidades.')
+    router.push('/')
+    return
+  }
+
   if (novaUniversidade.value.cursos.length === 0) {
     window.alert('Selecione ao menos um curso.')
   } else {

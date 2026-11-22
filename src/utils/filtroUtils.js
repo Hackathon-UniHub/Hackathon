@@ -1,6 +1,6 @@
 import notasUniversidades from '@/data/notasUniversidades.js'
 
-const API_URL = 'http://localhost:3000'
+const API_URL = (import.meta.env.VITE_API_URL || 'http://localhost:3001').replace(/\/+$/, '')
 
 export const ufs = [
   'AC',
@@ -38,13 +38,17 @@ export async function carregarUniversidades() {
 }
 
 export async function cadastrarUniversidade(novaUniversidade) {
-  await fetch(`${API_URL}/universidades`, {
+  const resposta = await fetch(`${API_URL}/universidades`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
     },
     body: JSON.stringify(novaUniversidade),
   })
+
+  if (!resposta.ok) {
+    throw new Error(`Não foi possível cadastrar a universidade (HTTP ${resposta.status}).`)
+  }
 }
 
 export async function carregarUniversidade(id) {

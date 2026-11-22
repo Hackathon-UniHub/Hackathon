@@ -38,7 +38,7 @@ const nomeProfessor = computed(() =>
 )
 
 onMounted(() => {
-  if (!auth.isLoggedIn || !(auth.isProfessor || auth.profile?.tipo_usuario === 'professor')) {
+  if (!auth.isLoggedIn) {
     router.push('/')
     return
   }
