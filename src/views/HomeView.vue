@@ -124,7 +124,7 @@ onUnmounted(() => {
         <div class="cabecalhoSecao">
           <div class="eyebrowLinha">
             <span class="linhaEyebrow"></span>
-            <span class="destaque">Destaques · Ranking RUF</span>
+            <span class="destaque">Destaques | Ranking RUF</span>
           </div>
 
           <div class="tituloELink">
@@ -157,12 +157,6 @@ onUnmounted(() => {
               <span>Nº{{ universidade.rankingRuf }} no RUF</span>
             </div>
 
-            <RouterLink
-              class="linkCartao"
-              :to="{ name: 'universidade', params: { id: universidade.id } }"
-            >
-              Ver detalhes <span class="setaLink">→</span>
-            </RouterLink>
           </article>
         </div>
       </div>
@@ -503,8 +497,7 @@ onUnmounted(() => {
   transition: transform 0.15s ease;
 }
 
-.verTodasLink:hover .setaLink,
-.linkCartao:hover .setaLink {
+.verTodasLink:hover .setaLink {
   transform: translateX(2px);
 }
 
@@ -523,10 +516,6 @@ onUnmounted(() => {
   padding: 28px 24px;
   box-shadow: 0 8px 20px rgba(28, 28, 34, 0.04);
   transition: background 0.15s ease;
-}
-
-.cartaoUniversidade:hover {
-  background: var(--white);
 }
 
 .topoCartao {
@@ -591,19 +580,6 @@ onUnmounted(() => {
 
 .separadorMeta {
   color: rgba(28, 28, 34, 0.25);
-}
-
-.linkCartao {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  color: var(--brand-700);
-  font-size: 0.8rem;
-  font-weight: 700;
-}
-
-.linkCartao:hover {
-  color: var(--brand-900);
 }
 
 .comoFunciona {

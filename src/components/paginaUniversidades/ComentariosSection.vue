@@ -57,7 +57,7 @@ async function excluir(id) {
         <p>{{ comentario.conteudo }}</p>
       </article>
 
-      <form v-if="auth.isEstudante || auth.isProfessor" class="formulario" @submit.prevent="publicar">
+      <form v-if="auth.isLoggedIn" class="formulario" @submit.prevent="publicar">
         <textarea v-model="texto" rows="3" placeholder="Escreva um comentário..."></textarea>
         <button type="submit" :disabled="!texto.trim()">Comentar</button>
       </form>

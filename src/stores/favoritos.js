@@ -17,7 +17,7 @@ export const useFavoritosStore = defineStore('favoritos', () => {
 
   function carregarFavoritos() {
     const salvos = sessionStorage.getItem(chaveAtual())
-    idsFavoritos.value = salvos ? JSON.parse(salvos) : []
+    idsFavoritos.value = salvos ? JSON.parse(salvos).map(String) : []
   }
 
   function salvarNoStorage() {
@@ -37,8 +37,9 @@ export const useFavoritosStore = defineStore('favoritos', () => {
     const authStore = useAuthStore()
     if (!authStore.isLoggedIn) return false
 
-    if (!idsFavoritos.value.includes(idUni)) {
-      idsFavoritos.value.push(idUni)
+    const id = String(idUni)
+    if (!idsFavoritos.value.includes(id)) {
+      idsFavoritos.value.push(id)
       salvarNoStorage()
     }
     return true
@@ -48,17 +49,20 @@ export const useFavoritosStore = defineStore('favoritos', () => {
     const authStore = useAuthStore()
     if (!authStore.isLoggedIn) return false
 
-    idsFavoritos.value = idsFavoritos.value.filter((id) => id !== idUni)
+    const id = String(idUni)
+    idsFavoritos.value = idsFavoritos.value.filter((favoritoId) => favoritoId !== id)
     salvarNoStorage()
     return true
   }
 
   function isFavorito(idUni) {
-    return idsFavoritos.value.includes(idUni)
+    return idsFavoritos.value.includes(String(idUni))
   }
 
   const favoritos = computed(() =>
-    idsFavoritos.value.map((id) => universidades.find((u) => u.id === id)).filter(Boolean),
+    idsFavoritos.value
+      .map((id) => universidades.find((universidade) => String(universidade.id) === id))
+      .filter(Boolean),
   )
 
   return {
