@@ -1,9 +1,18 @@
 <script setup>
 import { onMounted, ref } from 'vue'
-import { RouterLink, useRouter } from 'vue-router'
-import { ufs, carregarUniversidades, cadastrarUniversidade, getCursos } from '@/utils/filtroUtils.js'
+import { RouterLink, useRoute, useRouter } from 'vue-router'
+import {
+  ufs,
+  carregarUniversidades,
+  carregarUniversidade,
+  cadastrarUniversidade,
+  atualizarUniversidade,
+  getCursos,
+} from '@/utils/filtroUtils.js'
 
+const route = useRoute()
 const router = useRouter()
+const idEdicao = route.query.id
 
 const novaUniversidade = ref({
   nome: '',
@@ -26,9 +35,20 @@ const novaUniversidade = ref({
 const cursosDisponiveis = ref([])
 const novoCurso = ref('')
 
-async function carregarCursos() {
+async function carregarDados() {
   const universidades = await carregarUniversidades()
   cursosDisponiveis.value = getCursos(universidades)
+
+  if (idEdicao) {
+    const universidade = await carregarUniversidade(idEdicao)
+
+    if (universidade.nome) {
+      novaUniversidade.value = universidade
+    } else {
+      window.alert('Universidade não encontrada.')
+      router.push('/universidades')
+    }
+  }
 }
 
 function adicionarNovoCurso() {
@@ -44,24 +64,30 @@ async function salvarUniversidade() {
     window.alert('Selecione ao menos um curso.')
   } else {
     try {
-      await cadastrarUniversidade(novaUniversidade.value)
-      window.alert('Universidade cadastrada com sucesso!')
+      if (idEdicao) {
+        await atualizarUniversidade(idEdicao, novaUniversidade.value)
+        window.alert('Universidade atualizada com sucesso!')
+      } else {
+        await cadastrarUniversidade(novaUniversidade.value)
+        window.alert('Universidade cadastrada com sucesso!')
+      }
       router.push('/universidades')
     } catch (error) {
-      console.log('Erro ao cadastrar universidade:', error)
-      window.alert('Erro ao cadastrar a universidade. Verifique se a API está rodando.')
+      console.log('Erro ao salvar universidade:', error)
+      window.alert('Erro ao salvar a universidade. Verifique se a API está rodando.')
     }
   }
 }
 
-onMounted(carregarCursos)
+onMounted(carregarDados)
 </script>
 
 <template>
   <div class="pagina-filtro-formulario">
     <header class="cabecalho">
-      <h1>Adicionar universidade</h1>
-      <p>Preencha os dados abaixo para criar um novo card na listagem.</p>
+      <h1>{{ idEdicao ? 'Editar universidade' : 'Adicionar universidade' }}</h1>
+      <p v-if="idEdicao">Altere os dados abaixo e salve para atualizar o card na listagem.</p>
+      <p v-else>Preencha os dados abaixo para criar um novo card na listagem.</p>
     </header>
 
     <form class="formulario" @submit.prevent="salvarUniversidade">
@@ -191,7 +217,9 @@ onMounted(carregarCursos)
 
       <div class="acoes largo">
         <RouterLink class="botaoSecundario" to="/universidades">Cancelar</RouterLink>
-        <button class="botaoPrincipal" type="submit">Cadastrar universidade</button>
+        <button class="botaoPrincipal" type="submit">
+          {{ idEdicao ? 'Salvar alterações' : 'Cadastrar universidade' }}
+        </button>
       </div>
     </form>
   </div>

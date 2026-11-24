@@ -3,33 +3,8 @@ import notasUniversidades from '@/data/notasUniversidades.js'
 const API_URL = 'http://localhost:3000'
 
 export const ufs = [
-  'AC',
-  'AL',
-  'AP',
-  'AM',
-  'BA',
-  'CE',
-  'DF',
-  'ES',
-  'GO',
-  'MA',
-  'MT',
-  'MS',
-  'MG',
-  'PA',
-  'PB',
-  'PR',
-  'PE',
-  'PI',
-  'RJ',
-  'RN',
-  'RS',
-  'RO',
-  'RR',
-  'SC',
-  'SP',
-  'SE',
-  'TO',
+  'AC', 'AL', 'AP', 'AM', 'BA', 'CE', 'DF', 'ES', 'GO', 'MA', 'MT', 'MS', 'MG', 'PA',
+  'PB', 'PR', 'PE', 'PI', 'RJ', 'RN', 'RS', 'RO', 'RR', 'SC', 'SP', 'SE', 'TO',
 ]
 
 export async function carregarUniversidades() {
@@ -44,6 +19,16 @@ export async function cadastrarUniversidade(novaUniversidade) {
       'Content-Type': 'application/json',
     },
     body: JSON.stringify(novaUniversidade),
+  })
+}
+
+export async function atualizarUniversidade(id, universidade) {
+  await fetch(`${API_URL}/universidades/${id}`, {
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(universidade),
   })
 }
 
@@ -73,21 +58,12 @@ export function getEstados(universidades) {
 
 export function getCursos(universidades) {
   const lista = []
-  const universidadesLista = Array.isArray(universidades) ? universidades : [universidades]
 
-  for (const universidade of universidadesLista) {
-    const cursosDaUniversidade = Array.isArray(universidade?.cursos)
-      ? universidade.cursos
-      : Array.isArray(universidade?.principais_graduacoes)
-        ? universidade.principais_graduacoes
-        : Array.isArray(universidade?.cursos_pda)
-          ? universidade.cursos_pda.map((curso) => curso?.nome_curso ?? curso)
-          : []
-
-    for (const curso of cursosDaUniversidade) {
-      const nomeCurso = typeof curso === 'string' ? curso : (curso?.nome_curso ?? curso?.nome ?? '')
-      if (!nomeCurso || lista.includes(nomeCurso)) continue
-      lista.push(nomeCurso)
+  for (const universidade of universidades) {
+    for (const curso of universidade.cursos) {
+      if (!lista.includes(curso)) {
+        lista.push(curso)
+      }
     }
   }
 
@@ -117,10 +93,7 @@ export function getUniversidadesFiltradas(universidades, filtros) {
       passa = false
     }
 
-    if (
-      filtros.pesquisa &&
-      !universidade.nome.toLowerCase().includes(filtros.pesquisa.toLowerCase())
-    ) {
+    if (filtros.pesquisa && !universidade.nome.toLowerCase().includes(filtros.pesquisa.toLowerCase())) {
       passa = false
     }
 
