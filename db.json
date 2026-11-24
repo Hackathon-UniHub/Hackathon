@@ -1,4 +1,16 @@
 {
+  "favoritos": [
+    {
+      "id": "1",
+      "usuario_id": "user_exemplo",
+      "universidade_id": 1
+    },
+    {
+      "usuario_id": "1f09f9b3-4566-4ea3-aef5-8ce15897dafd",
+      "universidade_id": 1,
+      "id": "iKYa_TsENO4"
+    }
+  ],
   "universidades": [
     {
       "id": "1",
@@ -98,6 +110,20 @@
       "tipo_usuario": "estudante",
       "universidade_id": null,
       "id": "KD8fDEGCZyY"
+    },
+    {
+      "id_usuario_autenticado": "1f09f9b3-4566-4ea3-aef5-8ce15897dafd",
+      "nome_completo": "fffff fffff",
+      "tipo_usuario": "estudante",
+      "universidade_id": null,
+      "id": "eaO1pTMmWSA"
+    },
+    {
+      "id_usuario_autenticado": "1f09f9b3-4566-4ea3-aef5-8ce15897dafd",
+      "nome_completo": "fffff fffff",
+      "tipo_usuario": "estudante",
+      "universidade_id": null,
+      "id": "7MS3-kzd7sE"
     }
   ],
   "$schema": "./node_modules/json-server/schema.json"
