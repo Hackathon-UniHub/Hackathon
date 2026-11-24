@@ -77,7 +77,14 @@ async function alternarFavorito() {
       <RouterLink class="botao" :to="{ name: 'universidade', params: { id: universidade.id } }">
         Página da universidade
       </RouterLink>
-      <button v-if="authStore.isLoggedIn" class="excluir" type="button" @click="emit('excluir', universidade.id)">Excluir</button>
+      <button
+        class="editar"
+        type="button"
+        @click="router.push({ name: 'formulario', query: { id: universidade.id } })"
+      >
+        Editar
+      </button>
+      <button class="excluir" type="button" @click="emit('excluir', universidade.id)">Excluir</button>
     </div>
   </div>
 </template>
@@ -174,8 +181,9 @@ async function alternarFavorito() {
 
 .rodape {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
-  gap: 0.6rem;
+  gap: 0.45rem;
   margin-top: auto;
   padding-top: 0.3rem;
 }
@@ -201,30 +209,37 @@ async function alternarFavorito() {
   color: var(--vermelho);
 }
 
+.editar,
 .excluir {
-  margin-left: auto;
   background: #fff;
   color: var(--vermelho);
   border: 1px solid var(--vermelho);
-  padding: 0.45rem 0.9rem;
+  padding: 0.45rem 0.7rem;
+  min-width: 4.5rem;
+  text-align: center;
   border-radius: 8px;
   font-weight: 600;
-  font-size: 0.82rem;
+  font-size: 0.8rem;
   cursor: pointer;
   transition: 0.15s;
 }
+.editar:hover,
 .excluir:hover {
   background: var(--vermelho);
   color: #fff;
 }
 
+.editar {
+  margin-left: auto;
+}
+
 .botao {
   background: var(--vermelho);
   color: #fff;
-  padding: 0.45rem 1rem;
+  padding: 0.45rem 0.8rem;
   border-radius: 8px;
   font-weight: 600;
-  font-size: 0.82rem;
+  font-size: 0.8rem;
   text-decoration: none;
   transition: 0.15s;
 }
