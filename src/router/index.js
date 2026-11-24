@@ -37,6 +37,7 @@ const routes = [
     path: '/universidades/formulario',
     name: 'formulario',
     component: () => import('@/components/paginaFiltro/paginaFiltroFormulario.vue'),
+    meta: { requiresAuth: true, requiresAdmin: true },
   },
   {
     path: '/universidade/:id',
@@ -58,7 +59,7 @@ const routes = [
     path: '/professor/dashboard',
     name: 'professor-dashboard',
     component: () => import('@/views/ProfessorDashboard.vue'),
-    meta: { requiresAuth: true, requiresProfessor: true },
+    meta: { requiresAuth: true },
   },
   {
     path: '/:pathMatch(.*)*',
@@ -93,6 +94,10 @@ router.beforeEach(async (to) => {
 
   if (to.meta.requiresAuth && !authStore.isLoggedIn) {
     return { name: 'login', query: { redirect: to.fullPath } }
+  }
+
+  if (to.meta.requiresAdmin && !authStore.isAdmin) {
+    return { name: 'home' }
   }
 
   const isProfessorUser =

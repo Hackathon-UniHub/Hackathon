@@ -28,66 +28,73 @@ onMounted(carregarDados)
     <p v-else-if="erro" class="mensagem">{{ erro }}</p>
     <p v-else-if="!universidade.nome" class="mensagem">Universidade não encontrada.</p>
 
-    <div v-else class="caixa">
-      <RouterLink class="voltar" to="/universidades">Voltar para as universidades</RouterLink>
+    <div v-else class="conteudoUniversidade">
+      <RouterLink class="voltar" to="/universidades">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M19 12H5m7 7-7-7 7-7" />
+        </svg>
+        Voltar para as universidades
+      </RouterLink>
 
-      <div class="topo">
-        <span
-          class="categoria"
-          :class="universidade.categoria_administrativa === 'Pública' ? 'publica' : 'privada'"
-        >
-          {{ universidade.categoria_administrativa }}
-        </span>
-        <span class="nota">Nota {{ universidade.igc }}</span>
+      <div class="caixa">
+        <div class="topo">
+          <span
+            class="categoria"
+            :class="universidade.categoria_administrativa === 'Pública' ? 'publica' : 'privada'"
+          >
+            {{ universidade.categoria_administrativa }}
+          </span>
+          <span class="nota">Nota {{ universidade.igc }}</span>
+        </div>
+
+        <h1 class="nome">{{ universidade.nome }}</h1>
+        <p class="local">{{ universidade.sigla }} - {{ universidade.municipio }}/{{ universidade.uf }}</p>
+        <p class="descricao" v-if="universidade.descricao">{{ universidade.descricao }}</p>
+
+        <h2 class="titulo">Informações</h2>
+        <dl class="informacoes">
+          <div>
+            <dt>Situação</dt>
+            <dd>{{ universidade.situacao }}</dd>
+          </div>
+          <div v-if="universidade.quantidade_alunos">
+            <dt>Alunos</dt>
+            <dd>{{ universidade.quantidade_alunos }}</dd>
+          </div>
+          <div v-if="universidade.quantidade_cursos">
+            <dt>Cursos</dt>
+            <dd>{{ universidade.quantidade_cursos }}</dd>
+          </div>
+          <div v-if="universidade.endereco_sede">
+            <dt>Endereço</dt>
+            <dd>{{ universidade.endereco_sede }}</dd>
+          </div>
+          <div v-if="universidade.telefone">
+            <dt>Telefone</dt>
+            <dd>{{ universidade.telefone }}</dd>
+          </div>
+          <div v-if="universidade.email">
+            <dt>E-mail</dt>
+            <dd>{{ universidade.email }}</dd>
+          </div>
+          <div v-if="universidade.site">
+            <dt>Site</dt>
+            <dd>
+              <a
+                :href="universidade.site.startsWith('http') ? universidade.site : 'https://' + universidade.site"
+                target="_blank"
+              >
+                {{ universidade.site }}
+              </a>
+            </dd>
+          </div>
+        </dl>
+
+        <h2 class="titulo">Cursos oferecidos</h2>
+        <ul class="cursos">
+          <li v-for="curso in universidade.cursos" :key="curso">{{ curso }}</li>
+        </ul>
       </div>
-
-      <h1 class="nome">{{ universidade.nome }}</h1>
-      <p class="local">{{ universidade.sigla }} - {{ universidade.municipio }}/{{ universidade.uf }}</p>
-      <p class="descricao" v-if="universidade.descricao">{{ universidade.descricao }}</p>
-
-      <h2 class="titulo">Informações</h2>
-      <dl class="informacoes">
-        <div>
-          <dt>Situação</dt>
-          <dd>{{ universidade.situacao }}</dd>
-        </div>
-        <div v-if="universidade.quantidade_alunos">
-          <dt>Alunos</dt>
-          <dd>{{ universidade.quantidade_alunos }}</dd>
-        </div>
-        <div v-if="universidade.quantidade_cursos">
-          <dt>Cursos</dt>
-          <dd>{{ universidade.quantidade_cursos }}</dd>
-        </div>
-        <div v-if="universidade.endereco_sede">
-          <dt>Endereço</dt>
-          <dd>{{ universidade.endereco_sede }}</dd>
-        </div>
-        <div v-if="universidade.telefone">
-          <dt>Telefone</dt>
-          <dd>{{ universidade.telefone }}</dd>
-        </div>
-        <div v-if="universidade.email">
-          <dt>E-mail</dt>
-          <dd>{{ universidade.email }}</dd>
-        </div>
-        <div v-if="universidade.site">
-          <dt>Site</dt>
-          <dd>
-            <a
-              :href="universidade.site.startsWith('http') ? universidade.site : 'https://' + universidade.site"
-              target="_blank"
-            >
-              {{ universidade.site }}
-            </a>
-          </dd>
-        </div>
-      </dl>
-
-      <h2 class="titulo">Cursos oferecidos</h2>
-      <ul class="cursos">
-        <li v-for="curso in universidade.cursos" :key="curso">{{ curso }}</li>
-      </ul>
     </div>
   </div>
 </template>
@@ -112,9 +119,13 @@ onMounted(carregarDados)
   color: var(--texto);
 }
 
-.caixa {
+.conteudoUniversidade {
   width: 100%;
   max-width: 640px;
+}
+
+.caixa {
+  width: 100%;
   border: 1px solid var(--borda);
   border-radius: 16px;
   padding: 1.8rem;
@@ -125,10 +136,25 @@ onMounted(carregarDados)
 }
 
 .voltar {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  margin-left: -1.5rem;
   color: var(--vermelho);
   font-size: 0.85rem;
   font-weight: 600;
   text-decoration: none;
+  margin-bottom: 0.75rem;
+}
+
+.voltar svg {
+  width: 1rem;
+  height: 1rem;
+  fill: none;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 2;
 }
 
 .voltar:hover {

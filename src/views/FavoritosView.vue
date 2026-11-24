@@ -9,7 +9,18 @@ import { filtrarFavoritosPorTexto } from '@/utils/favoritosUtils'
 
 const favoritosStore = useFavoritosStore()
 const authStore = useAuthStore()
+
 const busca = ref('')
+const feedback = ref({ tipo: '', texto: '' })
+
+function mostrarFeedback(tipo, texto) {
+  feedback.value = { tipo, texto }
+  setTimeout(() => {
+    if (feedback.value.texto === texto) {
+      feedback.value = { tipo: '', texto: '' }
+    }
+  }, 4000)
+}
 
 function carregarFavoritos() {
   if (!authStore.loading) favoritosStore.carregarFavoritos()
@@ -27,8 +38,19 @@ const nomeUsuario = computed(
     authStore.user?.user_metadata?.full_name || authStore.user?.email?.split('@')[0] || 'Estudante',
 )
 
-function remover(idUni) {
-  favoritosStore.removerFavorito(idUni)
+// DELETE (DELETE /favoritos/:id com confirmação)
+async function remover(uni) {
+  const confirmou = window.confirm(
+    `Tem certeza que deseja remover "${uni.nome}" da sua lista de favoritos?`,
+  )
+  if (!confirmou) return
+
+  try {
+    await favoritosStore.removerFavorito(uni.favoritoId)
+    mostrarFeedback('sucesso', 'Universidade removida dos favoritos.')
+  } catch (err) {
+    mostrarFeedback('erro', err.message || 'Erro ao excluir favorito.')
+  }
 }
 </script>
 
@@ -62,15 +84,21 @@ function remover(idUni) {
         >
       </div>
 
-      <div v-if="favoritosFiltrados.length" class="lista-favoritos">
-        <article v-for="uni in favoritosFiltrados" :key="uni.id" class="favorito-card">
+      <div v-if="favoritosStore.loading" class="estado-vazio">
+        <p>Carregando seus favoritos da API...</p>
+      </div>
+
+      <div v-else-if="favoritosFiltrados.length" class="lista-favoritos">
+        <article v-for="uni in favoritosFiltrados" :key="uni.favoritoId" class="favorito-card">
           <div class="card-topo">
-            <span class="sigla">{{ uni.sigla || uni.nome.slice(0, 3) }}</span>
+            <div class="badges-topo">
+              <span class="sigla">{{ uni.sigla || uni.nome.slice(0, 3) }}</span>
+            </div>
             <button
               class="remover"
               type="button"
               :aria-label="`Remover ${uni.nome} dos favoritos`"
-              @click="remover(uni.id)"
+              @click="remover(uni)"
             >
               <HugeiconsIcon
                 :icon="Cancel01Icon"
@@ -81,14 +109,9 @@ function remover(idUni) {
               />
             </button>
           </div>
+
           <h2>{{ uni.nome }}</h2>
           <p class="localizacao">{{ uni.municipio }}, {{ uni.uf }}</p>
-          <div class="card-rodape">
-            <span v-if="uni.categoria" class="tag">{{ uni.categoria }}</span>
-            <RouterLink :to="{ name: 'universidade', params: { id: uni.id } }" class="detalhes"
-              >Ver detalhes <span aria-hidden="true"></span
-            ></RouterLink>
-          </div>
         </article>
       </div>
 
@@ -108,6 +131,14 @@ function remover(idUni) {
         <RouterLink v-else to="/universidades" class="botao-primario"
           >Explorar universidades</RouterLink
         >
+      </div>
+
+      <div
+        v-if="feedback.texto || favoritosStore.error"
+        :class="['alerta-feedback', feedback.tipo === 'sucesso' ? 'sucesso' : 'erro']"
+        role="alert"
+      >
+        {{ feedback.texto || favoritosStore.error }}
       </div>
     </div>
   </main>
@@ -395,4 +426,3 @@ h1 {
   }
 }
 </style>
-*** End Patch

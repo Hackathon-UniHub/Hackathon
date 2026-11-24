@@ -44,6 +44,11 @@ async function carregarDados() {
 }
 
 async function excluirUniversidade(id) {
+  if (!auth.isLoggedIn) {
+    window.alert('Faça login antes de excluir uma universidade.')
+    return
+  }
+
   const confirmarExclusao = window.confirm('Deseja realmente excluir a universidade?')
 
   if (confirmarExclusao) {
@@ -240,7 +245,7 @@ onMounted(carregarDados)
             @excluir="excluirUniversidade"
           />
 
-          <RouterLink v-if="auth.isProfessor" class="cardAdicionar" :to="{ name: 'formulario' }">
+          <RouterLink v-if="auth.isAdmin" class="cardAdicionar" :to="{ name: 'formulario' }">
             <span class="cardAdicionarMais" aria-hidden="true">+</span>
             <span class="cardAdicionarTexto">Adicionar universidade</span>
           </RouterLink>

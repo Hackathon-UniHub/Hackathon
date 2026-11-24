@@ -16,16 +16,22 @@ const router = useRouter()
 
 const favorito = computed(() => favoritosStore.isFavorito(props.universidade.id))
 
-function alternarFavorito() {
+async function alternarFavorito() {
   if (!authStore.isLoggedIn) {
     router.push({ name: 'login', query: { redirect: route.fullPath } })
     return
   }
 
-  if (favorito.value) {
-    favoritosStore.removerFavorito(props.universidade.id)
-  } else {
-    favoritosStore.adicionarFavorito(props.universidade.id)
+  try {
+    if (favorito.value) {
+      const confirmar = window.confirm(`Remover ${props.universidade.nome} dos favoritos?`)
+      if (!confirmar) return
+      await favoritosStore.removerFavorito(props.universidade.id)
+    } else {
+      await favoritosStore.adicionarFavorito(props.universidade.id)
+    }
+  } catch (error) {
+    window.alert(error.message || 'Erro ao atualizar favoritos na API.')
   }
 }
 </script>
@@ -71,7 +77,7 @@ function alternarFavorito() {
       <RouterLink class="botao" :to="{ name: 'universidade', params: { id: universidade.id } }">
         Página da universidade
       </RouterLink>
-      <button class="excluir" type="button" @click="emit('excluir', universidade.id)">Excluir</button>
+      <button v-if="authStore.isLoggedIn" class="excluir" type="button" @click="emit('excluir', universidade.id)">Excluir</button>
     </div>
   </div>
 </template>
