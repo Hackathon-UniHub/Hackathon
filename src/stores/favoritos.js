@@ -2,76 +2,167 @@ import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
 import universidades from '@/data/universidades.js'
 import { useAuthStore } from '@/stores/auth'
+import {
+  listarFavoritosPorUsuario,
+  buscarFavoritoPorId,
+  criarFavorito,
+  atualizarFavorito,
+  excluirFavorito,
+} from '@/services/favoritosApi'
 
 export const useFavoritosStore = defineStore('favoritos', () => {
-  const idsFavoritos = ref([])
+  const registrosFavoritos = ref([])
+  const loading = ref(false)
+  const error = ref('')
 
-  function chaveStorage(userId) {
-    return `favoritos_${userId}`
-  }
+  const idsFavoritos = computed(() =>
+    registrosFavoritos.value.map((item) => String(item.universidade_id)),
+  )
 
-  function chaveAtual() {
+  const favoritos = computed(() =>
+    registrosFavoritos.value
+      .map((registro) => {
+        const uni = universidades.find(
+          (u) => String(u.id) === String(registro.universidade_id),
+        )
+        if (!uni) return null
+
+        return {
+          ...uni,
+          favoritoId: registro.id,
+          anotacao: registro.anotacao || '',
+          prioridade: registro.prioridade || 'Média',
+        }
+      })
+      .filter(Boolean),
+  )
+
+  async function carregarFavoritos() {
     const authStore = useAuthStore()
-    return authStore.isLoggedIn ? chaveStorage(authStore.user.id) : 'favoritos_guest'
+
+    if (!authStore.isLoggedIn || !authStore.user?.id) {
+      registrosFavoritos.value = []
+      return
+    }
+
+    loading.value = true
+    error.value = ''
+
+    try {
+      registrosFavoritos.value = await listarFavoritosPorUsuario(authStore.user.id)
+    } catch (err) {
+      error.value = err.message || 'Erro ao carregar favoritos.'
+    } finally {
+      loading.value = false
+    }
   }
 
-  function carregarFavoritos() {
-    const salvos = sessionStorage.getItem(chaveAtual())
-    idsFavoritos.value = salvos ? JSON.parse(salvos).map(String) : []
+  async function consultarFavorito(idFavorito) {
+    loading.value = true
+    error.value = ''
+
+    try {
+      return await buscarFavoritoPorId(idFavorito)
+    } catch (err) {
+      error.value = err.message || 'Erro ao consultar favorito.'
+      throw err
+    } finally {
+      loading.value = false
+    }
   }
 
-  function salvarNoStorage() {
-    sessionStorage.setItem(chaveAtual(), JSON.stringify(idsFavoritos.value))
+  async function adicionarFavorito(idUni, dadosExtras = {}) {
+    const authStore = useAuthStore()
+
+    if (!authStore.isLoggedIn || !authStore.user?.id) return false
+
+    const jaExiste = registrosFavoritos.value.find(
+      (item) => String(item.universidade_id) === String(idUni),
+    )
+    if (jaExiste) return true
+
+    error.value = ''
+
+    try {
+      const criado = await criarFavorito({
+        usuario_id: authStore.user.id,
+        universidade_id: Number(idUni) || idUni,
+        anotacao: dadosExtras.anotacao || '',
+        prioridade: dadosExtras.prioridade || 'Média',
+      })
+      registrosFavoritos.value.push(criado)
+      return true
+    } catch (err) {
+      error.value = err.message || 'Erro ao favoritar universidade.'
+      throw err
+    }
+  }
+
+  async function editarFavorito(idFavorito, { anotacao, prioridade }) {
+    error.value = ''
+
+    try {
+      const atualizado = await atualizarFavorito(idFavorito, { anotacao, prioridade })
+      const index = registrosFavoritos.value.findIndex((item) => item.id === idFavorito)
+
+      if (index !== -1) {
+        registrosFavoritos.value[index] = atualizado
+      }
+
+      return atualizado
+    } catch (err) {
+      error.value = err.message || 'Erro ao atualizar favorito.'
+      throw err
+    }
+  }
+
+  async function removerFavorito(idUniOuFavorito) {
+    const authStore = useAuthStore()
+
+    if (!authStore.isLoggedIn) return false
+
+    const registro = registrosFavoritos.value.find(
+      (item) =>
+        String(item.id) === String(idUniOuFavorito) ||
+        String(item.universidade_id) === String(idUniOuFavorito),
+    )
+    if (!registro) return false
+
+    error.value = ''
+
+    try {
+      await excluirFavorito(registro.id)
+      registrosFavoritos.value = registrosFavoritos.value.filter(
+        (item) => item.id !== registro.id,
+      )
+      return true
+    } catch (err) {
+      error.value = err.message || 'Erro ao remover favorito.'
+      throw err
+    }
   }
 
   function limparFavoritos() {
-    const authStore = useAuthStore()
-    if (authStore.user) {
-      sessionStorage.removeItem(chaveStorage(authStore.user.id))
-    }
-    sessionStorage.removeItem('favoritos_guest')
-    idsFavoritos.value = []
-  }
-
-  function adicionarFavorito(idUni) {
-    const authStore = useAuthStore()
-    if (!authStore.isLoggedIn) return false
-
-    const id = String(idUni)
-    if (!idsFavoritos.value.includes(id)) {
-      idsFavoritos.value.push(id)
-      salvarNoStorage()
-    }
-    return true
-  }
-
-  function removerFavorito(idUni) {
-    const authStore = useAuthStore()
-    if (!authStore.isLoggedIn) return false
-
-    const id = String(idUni)
-    idsFavoritos.value = idsFavoritos.value.filter((favoritoId) => favoritoId !== id)
-    salvarNoStorage()
-    return true
+    registrosFavoritos.value = []
+    error.value = ''
   }
 
   function isFavorito(idUni) {
     return idsFavoritos.value.includes(String(idUni))
   }
 
-  const favoritos = computed(() =>
-    idsFavoritos.value
-      .map((id) => universidades.find((universidade) => String(universidade.id) === id))
-      .filter(Boolean),
-  )
-
   return {
+    registrosFavoritos,
     idsFavoritos,
     favoritos,
+    loading,
+    error,
     carregarFavoritos,
-    limparFavoritos,
+    consultarFavorito,
     adicionarFavorito,
+    editarFavorito,
     removerFavorito,
+    limparFavoritos,
     isFavorito,
   }
 })
