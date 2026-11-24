@@ -3,15 +3,11 @@
     {
       "id": "1",
       "usuario_id": "user_exemplo",
-      "universidade_id": 1,
-      "anotacao": "Primeira opção de curso, conferir data de isenção.",
-      "prioridade": "Alta"
+      "universidade_id": 1
     },
     {
       "usuario_id": "1f09f9b3-4566-4ea3-aef5-8ce15897dafd",
       "universidade_id": 1,
-      "anotacao": "",
-      "prioridade": "Média",
       "id": "iKYa_TsENO4"
     }
   ],

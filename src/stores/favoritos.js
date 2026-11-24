@@ -4,9 +4,7 @@ import universidades from '@/data/universidades.js'
 import { useAuthStore } from '@/stores/auth'
 import {
   listarFavoritosPorUsuario,
-  buscarFavoritoPorId,
   criarFavorito,
-  atualizarFavorito,
   excluirFavorito,
 } from '@/services/favoritosApi'
 
@@ -30,8 +28,6 @@ export const useFavoritosStore = defineStore('favoritos', () => {
         return {
           ...uni,
           favoritoId: registro.id,
-          anotacao: registro.anotacao || '',
-          prioridade: registro.prioridade || 'Média',
         }
       })
       .filter(Boolean),
@@ -57,21 +53,7 @@ export const useFavoritosStore = defineStore('favoritos', () => {
     }
   }
 
-  async function consultarFavorito(idFavorito) {
-    loading.value = true
-    error.value = ''
-
-    try {
-      return await buscarFavoritoPorId(idFavorito)
-    } catch (err) {
-      error.value = err.message || 'Erro ao consultar favorito.'
-      throw err
-    } finally {
-      loading.value = false
-    }
-  }
-
-  async function adicionarFavorito(idUni, dadosExtras = {}) {
+  async function adicionarFavorito(idUni) {
     const authStore = useAuthStore()
 
     if (!authStore.isLoggedIn || !authStore.user?.id) return false
@@ -87,31 +69,11 @@ export const useFavoritosStore = defineStore('favoritos', () => {
       const criado = await criarFavorito({
         usuario_id: authStore.user.id,
         universidade_id: Number(idUni) || idUni,
-        anotacao: dadosExtras.anotacao || '',
-        prioridade: dadosExtras.prioridade || 'Média',
       })
       registrosFavoritos.value.push(criado)
       return true
     } catch (err) {
       error.value = err.message || 'Erro ao favoritar universidade.'
-      throw err
-    }
-  }
-
-  async function editarFavorito(idFavorito, { anotacao, prioridade }) {
-    error.value = ''
-
-    try {
-      const atualizado = await atualizarFavorito(idFavorito, { anotacao, prioridade })
-      const index = registrosFavoritos.value.findIndex((item) => item.id === idFavorito)
-
-      if (index !== -1) {
-        registrosFavoritos.value[index] = atualizado
-      }
-
-      return atualizado
-    } catch (err) {
-      error.value = err.message || 'Erro ao atualizar favorito.'
       throw err
     }
   }
@@ -158,9 +120,7 @@ export const useFavoritosStore = defineStore('favoritos', () => {
     loading,
     error,
     carregarFavoritos,
-    consultarFavorito,
     adicionarFavorito,
-    editarFavorito,
     removerFavorito,
     limparFavoritos,
     isFavorito,

@@ -93,9 +93,6 @@ async function remover(uni) {
           <div class="card-topo">
             <div class="badges-topo">
               <span class="sigla">{{ uni.sigla || uni.nome.slice(0, 3) }}</span>
-              <span class="badge-prioridade" :data-prioridade="uni.prioridade">
-                {{ uni.prioridade }}
-              </span>
             </div>
             <button
               class="remover"
