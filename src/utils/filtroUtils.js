@@ -1,6 +1,6 @@
 import notasUniversidades from '@/data/notasUniversidades.js'
 
-const API_URL = (import.meta.env.VITE_API_URL || 'http://localhost:3001').replace(/\/+$/, '')
+const API_URL = (import.meta.env.VITE_API_URL || 'http://localhost:3000').replace(/\/+$/, '')
 
 export const ufs = [
   'AC',

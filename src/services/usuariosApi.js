@@ -1,4 +1,4 @@
-const API_URL = (import.meta.env.VITE_API_URL || 'http://localhost:3001').replace(/\/+$/, '')
+const API_URL = (import.meta.env.VITE_API_URL || 'http://localhost:3000').replace(/\/+$/, '')
 const pendingCreations = new Map()
 const CAMPOS_API = {
   auth_user_id: 'id_usuario_autenticado',

@@ -19,14 +19,14 @@ Requisitos: Node.js `^20.19.0` ou `>=22.12.0`.
    npm run api
    ```
 
-   O JSON Server fica disponível em `http://localhost:3001`.
+   O JSON Server fica disponível em `http://localhost:3000`.
 4. Em outro terminal, inicie a aplicação:
 
    ```sh
    npm run dev
    ```
 
-   A aplicação usa `http://localhost:3001` por padrão. Para outra URL, defina `VITE_API_URL`.
+   A aplicação usa `http://localhost:3000` por padrão. Para outra URL, defina `VITE_API_URL`.
 
 ## Entidade de usuário e relacionamento
 
@@ -61,7 +61,7 @@ O cadastro e o login usam a entidade na criação/leitura do perfil. A rota aute
 
 ### Respostas HTTP verificadas
 
-Testes locais do JSON Server em `http://localhost:3001`:
+Testes locais do JSON Server em `http://localhost:3000`:
 
 | Operação | Resposta observada |
 |---|---:|
