@@ -1,5 +1,18 @@
-const API_URL = (import.meta.env.VITE_API_URL || 'http://localhost:3001').replace(/\/+$/, '')
+const API_URL = (import.meta.env.VITE_API_URL || 'http://localhost:3000').replace(/\/+$/, '')
 const pendingCreations = new Map()
+const CAMPOS_API = {
+  auth_user_id: 'id_usuario_autenticado',
+  full_name: 'nome_completo',
+}
+const CAMPOS_APP = Object.fromEntries(
+  Object.entries(CAMPOS_API).map(([campoApp, campoApi]) => [campoApi, campoApp]),
+)
+
+function converterCampos(usuario, campos) {
+  return Object.fromEntries(
+    Object.entries(usuario).map(([campo, valor]) => [campos[campo] || campo, valor]),
+  )
+}
 
 async function request(path, options = {}, notFoundIsNull = false) {
   let response
@@ -25,25 +38,22 @@ async function request(path, options = {}, notFoundIsNull = false) {
   return response.json()
 }
 
-export function listarUsuarios(authUserId) {
-  const query = authUserId ? `?auth_user_id=${encodeURIComponent(authUserId)}` : ''
-  return request(`/usuarios${query}`)
+export async function listarUsuarios(authUserId) {
+  const query = authUserId
+    ? `?id_usuario_autenticado=${encodeURIComponent(authUserId)}`
+    : ''
+  const usuarios = await request(`/usuarios${query}`)
+  return usuarios.map((usuario) => converterCampos(usuario, CAMPOS_APP))
 }
 
-export function buscarUsuario(id) {
-  return request(`/usuarios/${encodeURIComponent(id)}`, {}, true)
+export async function buscarUsuario(id) {
+  const usuario = await request(`/usuarios/${encodeURIComponent(id)}`, {}, true)
+  return usuario && converterCampos(usuario, CAMPOS_APP)
 }
 
 export async function buscarUsuarioPorAuthId(authUserId) {
   const users = await listarUsuarios(authUserId)
-
-  return users.reduce((latest, user) => {
-    if (!latest) return user
-
-    const latestDate = Date.parse(latest.updated_at || latest.created_at || '') || 0
-    const userDate = Date.parse(user.updated_at || user.created_at || '') || 0
-    return userDate >= latestDate ? user : latest
-  }, null)
+  return users[users.length - 1] || null
 }
 
 export function criarUsuario(usuario) {
@@ -52,8 +62,8 @@ export function criarUsuario(usuario) {
 
   const requestPromise = request('/usuarios', {
     method: 'POST',
-    body: JSON.stringify(usuario),
-  })
+    body: JSON.stringify(converterCampos(usuario, CAMPOS_API)),
+  }).then((registro) => converterCampos(registro, CAMPOS_APP))
   pendingCreations.set(usuario.auth_user_id, requestPromise)
   requestPromise.then(
     () => pendingCreations.delete(usuario.auth_user_id),
@@ -65,10 +75,24 @@ export function criarUsuario(usuario) {
 export function atualizarUsuario(id, atualizacoes) {
   return request(`/usuarios/${encodeURIComponent(id)}`, {
     method: 'PATCH',
-    body: JSON.stringify(atualizacoes),
-  })
+    body: JSON.stringify(converterCampos(atualizacoes, CAMPOS_API)),
+  }).then((registro) => converterCampos(registro, CAMPOS_APP))
 }
 
 export function excluirUsuario(id) {
   return request(`/usuarios/${encodeURIComponent(id)}`, { method: 'DELETE' })
+}
+
+export async function excluirUsuariosPorAuthId(authUserId, profileId) {
+  const usuarios = await listarUsuarios(authUserId)
+  const ids = new Set(
+    usuarios
+      .filter((usuario) => usuario.auth_user_id === authUserId)
+      .map((usuario) => usuario.id),
+  )
+  ids.add(profileId)
+
+  for (const id of ids) {
+    await excluirUsuario(id)
+  }
 }

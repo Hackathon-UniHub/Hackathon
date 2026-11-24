@@ -5,7 +5,7 @@ import {
   buscarUsuario,
   buscarUsuarioPorAuthId,
   criarUsuario,
-  excluirUsuario,
+  excluirUsuariosPorAuthId,
   listarUsuarios,
 } from '@/services/usuariosApi'
 
@@ -68,6 +68,7 @@ export const useAuthStore = defineStore('auth', {
       state.profile?.tipo_usuario === 'estudante' ||
       state.user?.user_metadata?.tipo_usuario === 'estudante' ||
       state.session?.user?.user_metadata?.tipo_usuario === 'estudante',
+    isAdmin: (state) => state.profile?.tipo_usuario === 'admin',
     professorUniversidadeId: (state) => state.profile?.universidade_id || null,
   },
 
@@ -92,10 +93,11 @@ export const useAuthStore = defineStore('auth', {
     },
 
     async signUp({ email, password, tipo_usuario, universidade_id, full_name }) {
+      const tipoUsuario = tipo_usuario === 'professor' ? 'professor' : 'estudante'
       const profileData = {
         full_name,
-        tipo_usuario: tipo_usuario || 'estudante',
-        universidade_id: tipo_usuario === 'professor' ? universidade_id : null,
+        tipo_usuario: tipoUsuario,
+        universidade_id: tipoUsuario === 'professor' ? universidade_id : null,
       }
       const { data, error } = await supabase.auth.signUp({
         email,
@@ -111,9 +113,6 @@ export const useAuthStore = defineStore('auth', {
           auth_user_id: this.user.id,
           ...profileData,
           full_name: full_name || this.user.email?.split('@')[0] || 'Usuário',
-          avatar_url: this.user.user_metadata?.avatar_url || null,
-          created_at: new Date().toISOString(),
-          updated_at: new Date().toISOString(),
         }
         saveLocalProfile(this.user.id, profile)
         try {
@@ -172,6 +171,7 @@ export const useAuthStore = defineStore('auth', {
       }
 
       const localProfile = loadLocalProfile(this.user.id)
+      const savedRole = localProfile?.tipo_usuario || this.user.user_metadata?.tipo_usuario
       const newProfile = {
         auth_user_id: this.user.id,
         full_name: localProfile?.full_name ||
@@ -179,15 +179,10 @@ export const useAuthStore = defineStore('auth', {
           this.user.user_metadata?.name ||
           this.user.email?.split('@')[0] ||
           'Estudante',
-        avatar_url: localProfile?.avatar_url || this.user.user_metadata?.avatar_url || null,
-        tipo_usuario: localProfile?.tipo_usuario ||
-          this.user.user_metadata?.tipo_usuario ||
-          'estudante',
+        tipo_usuario: savedRole === 'professor' ? 'professor' : 'estudante',
         universidade_id: localProfile?.universidade_id ||
           this.user.user_metadata?.universidade_id ||
           null,
-        created_at: localProfile?.created_at || new Date().toISOString(),
-        updated_at: new Date().toISOString(),
       }
       this.profile = await criarUsuario(newProfile)
       this.profileError = null
@@ -199,10 +194,7 @@ export const useAuthStore = defineStore('auth', {
       if (!this.user) throw new Error('USUARIO_NAO_LOGADO')
       if (!this.profile?.id) throw new Error('PERFIL_NAO_ENCONTRADO')
 
-      const updated = await atualizarUsuario(this.profile.id, {
-        ...updates,
-        updated_at: new Date().toISOString(),
-      })
+      const updated = await atualizarUsuario(this.profile.id, updates)
       this.profile = updated
       this.profileError = null
       return this.profile
@@ -211,14 +203,12 @@ export const useAuthStore = defineStore('auth', {
     async createProfile({ full_name, tipo_usuario, universidade_id }) {
       if (!this.user) throw new Error('USUARIO_NAO_LOGADO')
 
+      const tipoUsuario = tipo_usuario === 'professor' ? 'professor' : 'estudante'
       const profile = {
         auth_user_id: this.user.id,
         full_name,
-        avatar_url: this.user.user_metadata?.avatar_url || null,
-        tipo_usuario: tipo_usuario || 'estudante',
-        universidade_id: tipo_usuario === 'professor' ? universidade_id : null,
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString(),
+        tipo_usuario: tipoUsuario,
+        universidade_id: tipoUsuario === 'professor' ? universidade_id : null,
       }
 
       this.profile = await criarUsuario(profile)
@@ -239,7 +229,7 @@ export const useAuthStore = defineStore('auth', {
     async deleteProfile() {
       if (!this.user) throw new Error('USUARIO_NAO_LOGADO')
       if (!this.profile?.id) throw new Error('PERFIL_NAO_ENCONTRADO')
-      await excluirUsuario(this.profile.id)
+      await excluirUsuariosPorAuthId(this.user.id, this.profile.id)
       clearLocalProfile(this.user.id)
       this.profile = null
       this.profileError = null

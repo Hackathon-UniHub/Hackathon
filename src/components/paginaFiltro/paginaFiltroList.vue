@@ -1,6 +1,7 @@
 <script setup>
 import { computed, onMounted, ref } from 'vue'
 import { RouterLink } from 'vue-router'
+import { useAuthStore } from '@/stores/auth'
 import paginaFiltroCard from './paginaFiltroCard.vue'
 import { HugeiconsIcon } from '@hugeicons/vue'
 import { XIcon, FilterIcon } from '@hugeicons/core-free-icons'
@@ -14,6 +15,7 @@ import {
   getRankingUniversidades,
 } from '@/utils/filtroUtils.js'
 
+const auth = useAuthStore()
 const universidades = ref([])
 const loading = ref(true)
 const erro = ref('')
@@ -42,6 +44,11 @@ async function carregarDados() {
 }
 
 async function excluirUniversidade(id) {
+  if (!auth.isLoggedIn) {
+    window.alert('Faça login antes de excluir uma universidade.')
+    return
+  }
+
   const confirmarExclusao = window.confirm('Deseja realmente excluir a universidade?')
 
   if (confirmarExclusao) {
@@ -238,7 +245,7 @@ onMounted(carregarDados)
             @excluir="excluirUniversidade"
           />
 
-          <RouterLink class="cardAdicionar" :to="{ name: 'formulario' }">
+          <RouterLink v-if="auth.isAdmin" class="cardAdicionar" :to="{ name: 'formulario' }">
             <span class="cardAdicionarMais" aria-hidden="true">+</span>
             <span class="cardAdicionarTexto">Adicionar universidade</span>
           </RouterLink>

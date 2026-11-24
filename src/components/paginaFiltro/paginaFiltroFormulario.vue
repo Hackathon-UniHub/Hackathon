@@ -60,6 +60,12 @@ function adicionarNovoCurso() {
 }
 
 async function salvarUniversidade() {
+  if (!auth.isAdmin) {
+    window.alert('Apenas administradores podem cadastrar universidades.')
+    router.push('/')
+    return
+  }
+
   if (novaUniversidade.value.cursos.length === 0) {
     window.alert('Selecione ao menos um curso.')
   } else {
